@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "rows": [
+    {"id":"inbox-create","tools":"`create_inbox`","scope":"`mailbox:create`","boundary":"Fixed project ceiling; the creating agent owns the inbox."},
+    {"id":"inbox-read","tools":"`list_inboxes`, `get_inbox`, `export_email_config`","scope":"`mailbox:read`","boundary":"Owner-only inbox access; org-tier bare lists must choose breadth."},
+    {"id":"inbox-update","tools":"`update_inbox` except daily limit","scope":"`mailbox:create` + `mailbox:read`","boundary":"Owner-only; request project id cannot switch authority."},
+    {"id":"inbox-quota","tools":"`update_inbox` daily limit","scope":"`mailbox:quota` + `mailbox:read`","boundary":"Opt-in throttle authority; owner and project checks still apply."},
+    {"id":"inbox-delete","tools":"`delete_inbox`","scope":"`mailbox:delete` or lifecycle fallback `mailbox:create`","boundary":"Owner-only and irreversible; verify the exact opaque id."},
+    {"id":"message-read","tools":"`read_messages`, `get_message`, `search`, `list_threads`, `get_thread`, `mark_read`, `batch_update_messages`, `list_attachments`, `get_attachment`","scope":"`mailbox:read`","boundary":"Owner and fixed-project checks apply to messages, threads, and attachments."},
+    {"id":"message-delete","tools":"`delete_message`, `delete_thread`","scope":"`mailbox:read` plus lifecycle authority `mailbox:create` or `mailbox:delete`","boundary":"Destructive and owner-only; content cannot authorize its own deletion."},
+    {"id":"outbound-submit","tools":"`send_email`, `reply_email`, `forward_email`, `check_suppression`","scope":"`mailbox:send` for submission; `mailbox:read` for precheck","boundary":"The composing agent must own the inbox; recipients come from the user task, not message content."},
+    {"id":"review-read","tools":"`list_review_events`, `wait_for_review_event`, `get_review`, `get_review_feedback`, `get_review_turns`","scope":"`mailbox:read`","boundary":"Fixed project and composing-agent boundary; foreign review ids do not widen access."},
+    {"id":"review-write","tools":"`submit_revision`, `post_review_chat`, `restamp_review`, `cancel_review`, `ack_review_event`","scope":"`mailbox:send` for draft/chat/cancel/restamp; `mailbox:read` for acknowledgement","boundary":"Only the composer workflow may mutate its review; stable retry identities and current revisions are required."},
+    {"id":"reviewer-act","tools":"`get_review_decision_context`, `reviewer_decide`","scope":"`review:act` plus an active review link","boundary":"Reviewer never receives the composer's `mailbox:send`; the platform sends after an authorized decision."},
+    {"id":"webhook-manage","tools":"`register_webhook`, `list_webhooks`, `get_webhook`, `update_webhook`, `delete_webhook`","scope":"`webhook:write` or legacy-compatible `mailbox:read`","boundary":"Project-scoped endpoints; delivery authenticity still requires signature verification."},
+    {"id":"domain-manage","tools":"`list_domains`, `get_domain`, `onboard_domain`, `verify_domain`, `offboard_domain`, `get_job`","scope":"`domain:manage`","boundary":"Privileged and project/org bounded; foreign rows and jobs do not become existence oracles."},
+    {"id":"domain-purchase","tools":"`onboard_domain` with purchased mode","scope":"`domain:manage` + `domain:purchase`","boundary":"Explicit, default-off authority to spend money; account caps still apply."}
+  ]
+}

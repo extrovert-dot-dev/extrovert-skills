@@ -1,0 +1,46 @@
+{
+  "$schema": "https://skills.sh/schemas/skills.sh.schema.json",
+  "name": "extrovert",
+  "skills": [
+    "agent-email-architecture",
+    "extrovert-sdk",
+    "extrovert-connect",
+    "extrovert-manage-inboxes",
+    "extrovert-read-inbox",
+    "extrovert-send-email",
+    "extrovert-writing-rules",
+    "wait-for-otp",
+    "configure-himalaya"
+  ],
+  "groupings": [
+    {
+      "title": "Design and integrate",
+      "skills": [
+        "agent-email-architecture",
+        "extrovert-sdk"
+      ]
+    },
+    {
+      "title": "Connect and manage",
+      "skills": [
+        "extrovert-connect",
+        "extrovert-manage-inboxes",
+        "configure-himalaya"
+      ]
+    },
+    {
+      "title": "Read and verify",
+      "skills": [
+        "extrovert-read-inbox",
+        "wait-for-otp"
+      ]
+    },
+    {
+      "title": "Reviewed outbound mail",
+      "skills": [
+        "extrovert-send-email",
+        "extrovert-writing-rules"
+      ]
+    }
+  ]
+}

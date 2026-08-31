@@ -1,0 +1,24 @@
+name: Validate skills
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - name: Discover exactly nine skills
+        run: |
+          output="$(npx --yes skills@1.5.23 add . --list)"
+          printf '%s\n' "$output"
+          test "$(find . -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l)" -eq 9
+
