@@ -5,17 +5,17 @@
 Install the explicit prerelease tag:
 
 ```bash
-npm install @extrovert/sdk@next
+npm install @extrovert.dev/sdk@next
 ```
 
-Pin `@extrovert/sdk@0.1.0-pre.3` when a test needs a reproducible contract. The public REST fallback
+Pin `@extrovert.dev/sdk@0.1.0-pre.3` when a test needs a reproducible contract. The public REST fallback
 is `https://api.extrovert.dev/v1`; obtain the current schema from the service's OpenAPI endpoint
 rather than copying a stale schema.
 
 ## Client and authority
 
 ```ts
-import { Extrovert } from "@extrovert/sdk";
+import { Extrovert } from "@extrovert.dev/sdk";
 
 const client = new Extrovert({
   apiKey: process.env.EXTROVERT_API_KEY!,

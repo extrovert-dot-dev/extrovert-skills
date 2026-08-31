@@ -35,7 +35,7 @@ npx skills add extrovert-dot-dev/extrovert-skills --skill extrovert-send-email
 The repository is directly installable through the open `skills` CLI. Search indexing on skills.sh
 is asynchronous and is not a release or integrity signal; the GitHub source is canonical.
 
-The `@extrovert/sdk` and `@extrovert/mcp` npm prereleases are published under the explicit `next`
+The `@extrovert.dev/sdk` and `@extrovert.dev/mcp` npm prereleases are published under the explicit `next`
 dist-tag. Extrovert's hosted `/mcp` route remains unavailable; use the packaged stdio MCP server or
 an HTTP deployment you operate.
 

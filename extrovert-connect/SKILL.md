@@ -14,7 +14,7 @@ description: Connect an agent runtime to Extrovert and diagnose authentication, 
 Set the API base URL to `https://api.extrovert.dev` and provide the scoped agent key as `EXTROVERT_API_KEY`. Do not place an org administrator credential in an agent host.
 
 The MCP prerelease is published under the explicit `next` dist-tag. Configure local hosts to run
-`npx -y @extrovert/mcp@next` over stdio, or pin `@extrovert/mcp@0.1.0-pre.3`. Extrovert does not
+`npx -y @extrovert.dev/mcp@next` over stdio, or pin `@extrovert.dev/mcp@0.1.0-pre.3`. Extrovert does not
 expose a production hosted `/mcp` route. A self-hosted HTTP transport is a deployment the user
 operates, not an Extrovert-hosted service.
 
