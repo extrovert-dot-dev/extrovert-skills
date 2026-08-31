@@ -6,9 +6,9 @@ description: Build or troubleshoot a TypeScript integration against the Extrover
 # Extrovert TypeScript SDK
 
 The prerelease package is published under the explicit `next` dist-tag. Use
-`npm install @extrovert.dev/sdk@next`, or pin `@extrovert.dev/sdk@0.1.0-pre.3` for reproducible dogfood
+`npm install @extrovert.dev/sdk@next`, or pin `@extrovert.dev/sdk@0.1.0-pre.4` for reproducible dogfood
 tests. The public REST API and served OpenAPI remain the underlying contract. Do not imply that a
-hosted MCP route substitutes for the SDK; Extrovert does not currently operate one.
+hosted MCP route substitutes for the SDK; use the SDK for direct TypeScript application integration.
 
 ## Choose the smallest mode
 

@@ -21,4 +21,3 @@ jobs:
           output="$(npx --yes skills@1.5.23 add . --list)"
           printf '%s\n' "$output"
           test "$(find . -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l)" -eq 9
-

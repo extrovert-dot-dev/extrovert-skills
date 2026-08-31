@@ -8,7 +8,7 @@ Install the explicit prerelease tag:
 npm install @extrovert.dev/sdk@next
 ```
 
-Pin `@extrovert.dev/sdk@0.1.0-pre.3` when a test needs a reproducible contract. The public REST fallback
+Pin `@extrovert.dev/sdk@0.1.0-pre.4` when a test needs a reproducible contract. The public REST fallback
 is `https://api.extrovert.dev/v1`; obtain the current schema from the service's OpenAPI endpoint
 rather than copying a stale schema.
 

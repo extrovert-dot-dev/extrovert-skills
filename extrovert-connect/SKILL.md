@@ -7,16 +7,21 @@ description: Connect an agent runtime to Extrovert and diagnose authentication, 
 
 ## Choose credentials
 
+- Hosted OAuth (recommended): connect the MCP client to `https://mcp.extrovert.dev/mcp`, follow its
+  browser sign-in and consent flow, then let the client store and refresh the OAuth grant. No API key
+  is pasted into client configuration. The initial grant maps to the user's default project and
+  allows ordinary create/read/send/webhook work; destructive deletes, quota changes, domain
+  management, purchasing, and reviewer authority stay excluded.
 - No token: call `sign_up`, receive the verification email, then call `verify_signup`.
 - Enrollment token: call `redeem_enrollment` once and store the returned agent key.
 - Existing agent key: configure it directly.
 
 Set the API base URL to `https://api.extrovert.dev` and provide the scoped agent key as `EXTROVERT_API_KEY`. Do not place an org administrator credential in an agent host.
 
-The MCP prerelease is published under the explicit `next` dist-tag. Configure local hosts to run
-`npx -y @extrovert.dev/mcp@next` over stdio, or pin `@extrovert.dev/mcp@0.1.0-pre.3`. Extrovert does not
-expose a production hosted `/mcp` route. A self-hosted HTTP transport is a deployment the user
-operates, not an Extrovert-hosted service.
+The MCP prerelease is published under the explicit `next` dist-tag. Prefer the hosted stateless
+Streamable HTTP endpoint and OAuth when the client supports remote MCP. For a local stdio host, run
+`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.4` and supply only a scoped
+agent key.
 
 ## Verify immediately
 

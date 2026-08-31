@@ -36,8 +36,9 @@ The repository is directly installable through the open `skills` CLI. Search ind
 is asynchronous and is not a release or integrity signal; the GitHub source is canonical.
 
 The `@extrovert.dev/sdk` and `@extrovert.dev/mcp` npm prereleases are published under the explicit `next`
-dist-tag. Extrovert's hosted `/mcp` route remains unavailable; use the packaged stdio MCP server or
-an HTTP deployment you operate.
+dist-tag. The hosted stateless MCP endpoint is `https://mcp.extrovert.dev/mcp`; compatible clients
+discover Clerk OAuth and open a browser sign-in, while scoped agent-key bearer authentication remains
+available for clients configured explicitly.
 
 ## Security boundary
 
