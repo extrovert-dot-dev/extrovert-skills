@@ -1,0 +1,30 @@
+{
+  "name": "extrovert",
+  "version": "0.1.0-pre.5",
+  "description": "A persistent, scoped inbox for coding agents, with reviewed outbound mail and native MCP tools.",
+  "author": {
+    "name": "Extrovert",
+    "url": "https://extrovert.dev"
+  },
+  "homepage": "https://docs.extrovert.dev",
+  "repository": "https://github.com/extrovert-dot-dev/extrovert-skills",
+  "license": "MIT",
+  "keywords": ["email", "inbox", "mcp", "agent", "review-loop"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Extrovert",
+    "shortDescription": "A real inbox for your coding agent",
+    "longDescription": "Create and operate persistent agent inboxes, read and search mail, wait for OTPs and replies, and send through Extrovert's human Review Loop using native MCP tools.",
+    "developerName": "Extrovert",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://extrovert.dev",
+    "defaultPrompt": [
+      "Create an Extrovert account and connect this session.",
+      "Check my Extrovert inbox and summarize unread mail.",
+      "Draft an email and submit it for human review."
+    ],
+    "brandColor": "#D89A43"
+  }
+}

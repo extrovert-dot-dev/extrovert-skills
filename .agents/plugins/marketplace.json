@@ -1,0 +1,20 @@
+{
+  "name": "extrovert",
+  "interface": {
+    "displayName": "Extrovert Plugins"
+  },
+  "plugins": [
+    {
+      "name": "extrovert",
+      "source": {
+        "source": "local",
+        "path": "./plugins/extrovert"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

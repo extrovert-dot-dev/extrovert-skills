@@ -1,6 +1,27 @@
-# Extrovert skills
+# Extrovert plugin and skills
 
 Nine standalone, task-first skills for Extrovert and provider-neutral agent-email design.
+
+## Install the complete Codex plugin
+
+The plugin installs these skills together with Extrovert's published MCP server. The local stdio
+server can start with no key, perform `sign_up` → `verify_signup`, store the resulting full key in a
+permission-restricted credential file, and reuse it after a new session. No custom MCP client or
+JSON-RPC helper is required.
+
+```bash
+codex plugin marketplace add extrovert-dot-dev/extrovert-skills
+codex plugin add extrovert@extrovert
+```
+
+Start a new Codex session after installation. Call `sign_up` if this agent does not have an account,
+or `whoami` when a credential already exists. The equivalent non-plugin setup is:
+
+```bash
+npx -y @extrovert.dev/mcp@next setup --host codex
+```
+
+Start a new session after either installation path.
 
 | Skill | Purpose |
 |---|---|
@@ -14,7 +35,9 @@ Nine standalone, task-first skills for Extrovert and provider-neutral agent-emai
 | `wait-for-otp` | Wait for a verification message and extract its code or preferred link. |
 | `configure-himalaya` | Export standard mail-client credentials with explicit bypass warnings. |
 
-Each skill directory contains only instructions and progressive references. There is no skill-local package manager, executable, or dependency on a monorepo checkout.
+Each skill directory contains only instructions and progressive references. The plugin launches the
+separately published `@extrovert.dev/mcp` package; there is no skill-local executable or dependency
+on a monorepo checkout.
 
 ## Distribution status
 
