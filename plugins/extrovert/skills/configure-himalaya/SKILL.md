@@ -5,7 +5,13 @@ description: Configure Himalaya or another standard mail client for an Extrovert
 
 # Configure Himalaya
 
-Call `export_email_config` for the inbox. Never guess a host, username, port, encryption mode, or password. Treat the response as a secret.
+Call `export_email_config` for the inbox only with an explicitly granted `mailbox:credentials` key on a paid account. Free accounts cannot export these credentials. Never guess a host, username, port, encryption mode, or password. Treat the response as a secret.
+
+<!-- authorization:start -->
+| Row | Tools | Required scope | Boundary |
+|---|---|---|---|
+| inbox-credentials | `export_email_config` | `mailbox:credentials` plus a paid plan | Owner-only portable secret export; free accounts cannot export IMAP/SMTP credentials even if a key carries the scope. |
+<!-- authorization:end -->
 
 For Himalaya, request `format: "himalaya"`. Back up an existing `~/.config/himalaya/config.toml`, then merge the returned account block instead of overwriting the file. Restrict file permissions to the current user. Test IMAP by listing a folder before attempting SMTP.
 

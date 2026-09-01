@@ -9,7 +9,7 @@ Extrovert stores and orders rules; the connected agent applies judgment. The ser
 
 ## Before composing
 
-Call `get_rules`, optionally with the matched category. Preserve the returned order and provenance. Apply the most specific relevant rule while honoring higher-priority house style. If rules conflict semantically, do not silently choose a permanent winner; ask for clarification through the review loop.
+Call `get_rules`, optionally with the matched category and without a scope filter when composing. Preserve the returned order, provenance, and short-lived `composition_token`; pass that token with the resulting send or revision. If the token expires or a rule save invalidates it, fetch and apply the stack again. Apply the most specific relevant rule while honoring higher-priority house style. If rules conflict semantically, do not silently choose a permanent winner; ask for clarification through the review loop.
 
 Use `list_categories` and `get_category` before proposing a new category. `propose_category` creates a proposal; `update_category` changes governed category metadata.
 
@@ -19,14 +19,14 @@ After a human edit or rejection:
 
 1. Read `get_review_feedback`, the actual diff, and reviewer comments.
 2. Decide whether the feedback is reusable beyond this message.
-3. If it is reusable, call `save_rule` at the narrowest correct scope with accurate provenance.
+3. If it is reusable, call `save_rule` at the narrowest correct scope with accurate provenance and a stable `client_id`.
 4. If it applies only to this recipient, moment, or draft, revise the message but do not create a durable rule.
 
 Do not infer a global preference from silence, an approval, or a one-off factual correction.
 
 ## Governance
 
-- `save_rule` creates or supersedes a rule without rewriting history.
+- `save_rule` creates or supersedes a rule without rewriting history and replays safely when the same `client_id` is retried.
 - `promote_rule` broadens a proven rule deliberately; do not promote merely because it was used once.
 - `retire_rule` removes an obsolete rule from active composition.
 - `get_rule_audit` explains lineage and changes.

@@ -2,7 +2,8 @@
   "schemaVersion": 1,
   "rows": [
     {"id":"inbox-create","tools":"`create_inbox`","scope":"`mailbox:create`","boundary":"Fixed project ceiling; the creating agent owns the inbox."},
-    {"id":"inbox-read","tools":"`list_inboxes`, `get_inbox`, `export_email_config`","scope":"`mailbox:read`","boundary":"Owner-only inbox access; org-tier bare lists must choose breadth."},
+    {"id":"inbox-read","tools":"`list_inboxes`, `get_inbox`","scope":"`mailbox:read`","boundary":"Owner-only inbox access; org-tier bare lists must choose breadth."},
+    {"id":"inbox-credentials","tools":"`export_email_config`","scope":"`mailbox:credentials` plus a paid plan","boundary":"Owner-only portable secret export; free accounts cannot export IMAP/SMTP credentials even if a key carries the scope."},
     {"id":"inbox-update","tools":"`update_inbox` except daily limit","scope":"`mailbox:create` + `mailbox:read`","boundary":"Owner-only; request project id cannot switch authority."},
     {"id":"inbox-quota","tools":"`update_inbox` daily limit","scope":"`mailbox:quota` + `mailbox:read`","boundary":"Opt-in throttle authority; owner and project checks still apply."},
     {"id":"inbox-delete","tools":"`delete_inbox`","scope":"`mailbox:delete` or lifecycle fallback `mailbox:create`","boundary":"Owner-only and irreversible; verify the exact opaque id."},

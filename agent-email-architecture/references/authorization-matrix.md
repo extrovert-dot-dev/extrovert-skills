@@ -5,7 +5,8 @@ This is the canonical human-readable matrix for the agent-facing surface. The ad
 | Row | Tools | Required scope | Boundary |
 |---|---|---|---|
 | inbox-create | `create_inbox` | `mailbox:create` | Fixed project ceiling; the creating agent owns the inbox. |
-| inbox-read | `list_inboxes`, `get_inbox`, `export_email_config` | `mailbox:read` | Owner-only inbox access; org-tier bare lists must choose breadth. |
+| inbox-read | `list_inboxes`, `get_inbox` | `mailbox:read` | Owner-only inbox access; org-tier bare lists must choose breadth. |
+| inbox-credentials | `export_email_config` | `mailbox:credentials` plus a paid plan | Owner-only portable secret export; free accounts cannot export IMAP/SMTP credentials even if a key carries the scope. |
 | inbox-update | `update_inbox` except daily limit | `mailbox:create` + `mailbox:read` | Owner-only; request project id cannot switch authority. |
 | inbox-quota | `update_inbox` daily limit | `mailbox:quota` + `mailbox:read` | Opt-in throttle authority; owner and project checks still apply. |
 | inbox-delete | `delete_inbox` | `mailbox:delete` or lifecycle fallback `mailbox:create` | Owner-only and irreversible; verify the exact opaque id. |

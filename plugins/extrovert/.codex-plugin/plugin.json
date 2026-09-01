@@ -1,6 +1,6 @@
 {
   "name": "extrovert",
-  "version": "0.1.0-pre.5",
+  "version": "0.1.0-pre.6",
   "description": "A persistent, scoped inbox for coding agents, with reviewed outbound mail and native MCP tools.",
   "author": {
     "name": "Extrovert",

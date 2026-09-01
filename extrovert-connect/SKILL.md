@@ -40,7 +40,8 @@ do not invent another transport.
   allows ordinary create/read/send/webhook work; destructive deletes, quota changes, domain
   management, purchasing, and reviewer authority stay excluded.
 - No token: call `sign_up`, receive the verification email, then call `verify_signup`. The
-  limited bootstrap key expires with the code; successful verification revokes it and returns
+  limited bootstrap key has only `signup:verify` and expires with the code; it cannot read or send
+  mail. Successful verification revokes it and returns
   the durable full-scope key. The packaged local stdio server stores only that replacement key in
   its permission-restricted credential file and reloads it in future sessions.
 - Enrollment token: call `redeem_enrollment` once. The packaged local stdio server stores the
@@ -52,7 +53,7 @@ credential when an explicit key is needed. Do not place an org administrator cre
 
 The MCP prerelease is published under the explicit `next` dist-tag. Prefer the hosted stateless
 Streamable HTTP endpoint and OAuth when the client supports remote MCP. For a local stdio host, run
-`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.5` and supply only a scoped
+`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.6` and supply only a scoped
 agent key.
 
 ## Verify immediately
@@ -80,6 +81,7 @@ Common scope failures are explicit:
 
 - create inbox: `mailbox:create`
 - read inbox: `mailbox:read`
+- export raw IMAP/SMTP credentials: `mailbox:credentials` plus a paid plan (free accounts cannot export them)
 - outbound and review work: `mailbox:send`
 - change daily limit: `mailbox:quota`
 - webhook management: `webhook:write` (legacy keys may use `mailbox:read`)

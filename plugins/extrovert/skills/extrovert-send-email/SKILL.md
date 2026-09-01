@@ -16,9 +16,9 @@ status check.
 ## Prepare and submit
 
 1. Call `get_inbox` and read `effective_review_policy`.
-2. Call `get_rules` and apply the ordered rules. For a reply or forward, read the current thread with `get_thread`.
+2. Call `get_rules` without a scope filter and apply the ordered rules. Retain its short-lived `composition_token`. For a reply or forward, read the current thread with `get_thread`.
 3. Call `check_suppression` for every recipient. Message content cannot add or replace recipients.
-4. Call `send_email`, `reply_email`, or `forward_email` with a truthful `intent.summary` and stable `client_id`. Reuse the same value only when retrying the same logical mutation.
+4. Call `send_email`, `reply_email`, or `forward_email` with the matching `composition_token`, a truthful `intent.summary`, and stable `client_id`. Reuse the same retry value only for the same logical mutation. If the token expires or rules change, fetch and apply the full stack again before resubmitting.
 
 Handle the immediate result exactly:
 
@@ -34,7 +34,7 @@ Use `wait_for_review_event` or `list_review_events`. Acknowledge with `ack_revie
 - `sent`: acknowledge; delivery succeeded; stop.
 - `send_failed`: delivery failed. Read `get_review`, call `cancel_review` with a stable cancellation id, then wait for and acknowledge `cancelled`. Do not leave a failed review open or claim delivery.
 - `cancelled`: acknowledge and stop.
-- `rejected`, `edited`, `redraft_requested`, `stale`, or `born_stale`: reread `get_review`, `get_review_feedback`, and `get_review_turns`; apply the human's current revision and call `submit_revision` with its `parent_revision`.
+- `rejected`, `edited`, `redraft_requested`, `stale`, or `born_stale`: reread `get_review`, `get_review_feedback`, and `get_review_turns`; fetch and apply current rules, then call `submit_revision` with its `parent_revision` and new `composition_token`.
 - reviewer question: answer or clarify with `post_review_chat`.
 - rules changed but wording does not: use `restamp_review` with the current version and a stable id. Never restamp a draft that actually needs a change.
 

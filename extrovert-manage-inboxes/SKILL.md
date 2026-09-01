@@ -13,7 +13,7 @@ Authenticate first and call `whoami`. Scope is fixed by the key; request project
 2. Call `get_inbox` and retain the opaque inbox id, address, `effective_review_policy`, metadata, and effective daily limit.
 3. Use one unique retry identity per inbox in a fleet. Do not treat an address as a global identifier.
 
-Use `list_inboxes` within the key's tier. An org-tier key must explicitly choose a project or the supported org wildcard. Use `export_email_config` only when standard-client credentials are genuinely required; its response is secret.
+Use `list_inboxes` within the key's tier. An org-tier key must explicitly choose a project or the supported org wildcard. Use `export_email_config` only when standard-client credentials are genuinely required; it needs the dedicated `mailbox:credentials` scope and a paid plan, and its response is secret.
 
 ## Update, contact controls, and domains
 
@@ -30,7 +30,8 @@ Confirm the exact opaque id and impact before `delete_inbox`. Verify the result 
 | Row | Tools | Required scope | Boundary |
 |---|---|---|---|
 | inbox-create | `create_inbox` | `mailbox:create` | Fixed project ceiling; the creating agent owns the inbox. |
-| inbox-read | `list_inboxes`, `get_inbox`, `export_email_config` | `mailbox:read` | Owner-only inbox access; org-tier bare lists must choose breadth. |
+| inbox-read | `list_inboxes`, `get_inbox` | `mailbox:read` | Owner-only inbox access; org-tier bare lists must choose breadth. |
+| inbox-credentials | `export_email_config` | `mailbox:credentials` plus a paid plan | Owner-only portable secret export; free accounts cannot export IMAP/SMTP credentials even if a key carries the scope. |
 | inbox-update | `update_inbox` except daily limit | `mailbox:create` + `mailbox:read` | Owner-only; request project id cannot switch authority. |
 | inbox-quota | `update_inbox` daily limit | `mailbox:quota` + `mailbox:read` | Opt-in throttle authority; owner and project checks still apply. |
 | inbox-delete | `delete_inbox` | `mailbox:delete` or lifecycle fallback `mailbox:create` | Owner-only and irreversible; verify the exact opaque id. |
