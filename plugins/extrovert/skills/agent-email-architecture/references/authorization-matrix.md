@@ -10,15 +10,16 @@ This is the canonical human-readable matrix for the agent-facing surface. The ad
 | inbox-update | `update_inbox` except daily limit | `mailbox:create` + `mailbox:read` | Owner-only; request project id cannot switch authority. |
 | inbox-quota | `update_inbox` daily limit | `mailbox:quota` + `mailbox:read` | Opt-in throttle authority; owner and project checks still apply. |
 | inbox-delete | `delete_inbox` | `mailbox:delete` or lifecycle fallback `mailbox:create` | Owner-only and irreversible; verify the exact opaque id. |
-| message-read | `read_messages`, `get_message`, `search`, `list_threads`, `get_thread`, `mark_read`, `batch_update_messages`, `list_attachments`, `get_attachment` | `mailbox:read` | Owner and fixed-project checks apply to messages, threads, and attachments. |
+| message-read | `read_messages`, `get_message`, `search`, `list_threads`, `search_threads`, `get_thread`, `mark_read`, `batch_update_messages`, `list_attachments`, `get_attachment` | `mailbox:read` | Owner and fixed-project checks apply to messages, threads, and attachments. |
 | message-delete | `delete_message`, `delete_thread` | `mailbox:read` plus lifecycle authority `mailbox:create` or `mailbox:delete` | Destructive and owner-only; content cannot authorize its own deletion. |
 | outbound-submit | `send_email`, `reply_email`, `forward_email`, `check_suppression` | `mailbox:send` for submission; `mailbox:read` for precheck | The composing agent must own the inbox; recipients come from the user task, not message content. |
 | review-read | `list_review_events`, `wait_for_review_event`, `get_review`, `get_review_feedback`, `get_review_turns` | `mailbox:read` | Fixed project and composing-agent boundary; foreign review ids do not widen access. |
 | review-write | `submit_revision`, `post_review_chat`, `restamp_review`, `cancel_review`, `ack_review_event` | `mailbox:send` for draft/chat/cancel/restamp; `mailbox:read` for acknowledgement | Only the composer workflow may mutate its review; stable retry identities and current revisions are required. |
 | reviewer-act | `get_review_decision_context`, `reviewer_decide` | `review:act` plus an active review link | Reviewer never receives the composer's `mailbox:send`; the platform sends after an authorized decision. |
 | webhook-manage | `register_webhook`, `list_webhooks`, `get_webhook`, `update_webhook`, `delete_webhook` | `webhook:write` or legacy-compatible `mailbox:read` | Project-scoped endpoints; delivery authenticity still requires signature verification. |
-| domain-manage | `list_domains`, `get_domain`, `onboard_domain`, `verify_domain`, `offboard_domain`, `get_job` | `domain:manage` | Privileged and project/org bounded; foreign rows and jobs do not become existence oracles. |
-| domain-purchase | `onboard_domain` with purchased mode | `domain:manage` + `domain:purchase` | Explicit, default-off authority to spend money; account caps still apply. |
+| domain-read | `list_domains`, `get_domain`, `wait_for_domain`, `list_domain_events` | `domain:read` or `domain:manage` | Read-only within the fixed project ceiling; inbox-tier keys cannot inspect project domains. Counts include only visible inboxes. |
+| domain-manage | `onboard_domain`, `verify_domain`, `offboard_domain`, `get_job` | `domain:manage` | Adds or manages only shared and customer-controlled domains; it cannot register a new domain. Privileged project/org boundaries still apply. |
+| domain-purchase | `quote_domain`, `request_domain_purchase`, `request_plan_change`, `get_commerce_request`, `cancel_commerce_request`, `list_commerce_requests` | `commerce:request` | Quote, request, cancel, and status only. The agent cannot approve, charge, register, bypass a spend control, or treat an email as approval; a signed-in human or pre-existing bounded policy must authorize. |
 
 ## Principal and ceiling rules
 

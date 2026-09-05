@@ -7,9 +7,11 @@ description: Connect an agent runtime to Extrovert and diagnose authentication, 
 
 ## Ensure the native tools exist
 
-Before authentication work, inspect the host's tool catalog for `sign_up`, `verify_signup`, and
-`whoami`. A skill explains how to use tools; installing a skill alone does not install an MCP
+Before authentication work, inspect the host's tool catalog for `whoami`. A skill explains how to use tools; installing a skill alone does not install an MCP
 transport.
+
+Self-signup is currently disabled. Use an existing agent key or an enrollment
+token. Do not start signup or create a second account for an existing customer.
 
 If the Extrovert tools are absent, do not write a JSON-RPC client, a custom stdio helper, a temporary
 HTTP script, or a `curl | jq` workflow. Install one supported connection and start a new session:
@@ -27,6 +29,12 @@ codex mcp add extrovert --url https://mcp.extrovert.dev/mcp
 codex mcp login extrovert
 ```
 
+For Hermes, select its intended profile first (the corresponding `HERMES_HOME`), then use
+`npx -y @extrovert.dev/mcp@next setup --host hermes --transport hosted` followed by
+`hermes mcp login extrovert`. For local enrollment use `--transport stdio` instead. The setup command
+preserves other servers and refuses to overwrite an existing Extrovert entry. A saved configuration
+does not mean authentication or tool enablement succeeded: start a new Hermes session and call `whoami`.
+
 For Claude Code, use `npx -y @extrovert.dev/mcp@next setup --host claude`; Cursor and generic-host
 configuration are at `https://docs.extrovert.dev/mcp/client-configuration/`. If host configuration is
 not writable, report that exact blocker and use the packaged `extrovert` CLI as the explicit fallback;
@@ -34,39 +42,70 @@ do not invent another transport.
 
 ## Choose credentials
 
+- Connect to the human's existing account. If no account or credential is available, ask the human
+  to obtain access through the console; self-signup is disabled.
 - Hosted OAuth (recommended for an existing human console account): connect the MCP client to `https://mcp.extrovert.dev/mcp`, follow its
   browser sign-in and consent flow, then let the client store and refresh the OAuth grant. No API key
   is pasted into client configuration. The initial grant maps to the user's default project and
-  allows ordinary create/read/send/webhook work; destructive deletes, quota changes, domain
-  management, purchasing, and reviewer authority stay excluded.
-- No token: call `sign_up`, receive the verification email, then call `verify_signup`. The
-  limited bootstrap key has only `signup:verify` and expires with the code; it cannot read or send
-  mail. Successful verification revokes it and returns
-  the durable full-scope key. The packaged local stdio server stores only that replacement key in
-  its permission-restricted credential file and reloads it in future sessions.
-- Enrollment token: call `redeem_enrollment` once. The packaged local stdio server stores the
-  returned full key automatically.
-- Existing agent key: configure it directly.
+  allows ordinary create/read/send/webhook work plus non-spending commerce requests; destructive
+  deletes, quota changes, connecting/removing domains, human approvals, and reviewer authority stay excluded.
+  Domain status reads are available without granting domain management.
+- Enrollment token: prefer `npx -y @extrovert.dev/mcp@next enroll --agent-handle <stable-name>`.
+  It accepts hidden stdin or `EXTROVERT_ENROLLMENT_KEY`, saves the scoped agent key privately, and checks
+  identity. Keep the same handle and `--client-id` on a retry. With tools already connected,
+  `redeem_enrollment` also stores the returned key in the packaged local stdio server.
+- Existing agent key: use `npx -y @extrovert.dev/mcp@next auth login --with-token` and hidden stdin.
+  Never put a key in a command argument or repeat it in a response.
+
+Set `EXTROVERT_PROFILE` before enrollment and setup to separate agent identities. Hermes uses its
+selected `HERMES_HOME` automatically. `EXTROVERT_CONFIG_DIR` explicitly overrides both. Do not copy a
+global credential into a different profile or replace an existing identity to make a login succeed.
 
 Set the API base URL to `https://api.extrovert.dev`. `EXTROVERT_API_KEY` overrides the local stored
 credential when an explicit key is needed. Do not place an org administrator credential in an agent host.
 
 The MCP prerelease is published under the explicit `next` dist-tag. Prefer the hosted stateless
 Streamable HTTP endpoint and OAuth when the client supports remote MCP. For a local stdio host, run
-`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.6` and supply only a scoped
+`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.7` and supply only a scoped
 agent key.
 
 ## Verify immediately
 
-Call `whoami` before real work. Record the fixed `org_id`, `project_id`, key tier, and scopes. Project identifiers on requests are assertions, not selectors: a mismatch fails rather than switching projects.
+Call `whoami` in the actual MCP session before real work. Lead with its summary, account/project names
+and available capabilities, not opaque IDs or raw scope names. Keep the fixed `org_id`, `project_id`,
+key tier and scopes for authorization checks. Project identifiers are assertions, not selectors:
+a mismatch fails rather than switching projects.
 
-## Use the signup inbox immediately
+`doctor` checks a local credential against the API; it does not prove the host's OAuth session works.
+If browser approval succeeds but MCP returns 401, stop repeated approvals, preserve only the error
+and non-secret request ID, and report the failed step. A login process exiting zero or a callback
+returning 200 does not prove tool access. Do not suggest SSH tunnels or broader keys as a speculative
+repair. Offer the supported enrollment path only with the human's chosen permissions.
 
-`verify_signup` is the handoff into ordinary mailbox work. It switches the current MCP session to the
-durable key, repeats the ready inbox address, and returns copy-ready calls under
-`mailbox_quickstart`:
+## Explain domain readiness
 
-1. Call `read_messages` with the returned inbox. It already returns readable previews and structured
+Use `get_domain` or `extrovert domain status <domain>`. Present `readiness.label` and `summary` first.
+Never infer readiness from `verified`, DKIM, delegation mode, or zero deliverability findings.
+When `ready_for_inboxes` is true, say the domain is ready to use. Explain the visible inbox count:
+offer inbox creation when zero, or use of existing ready inboxes. Counts are scoped; never claim that
+zero visible inboxes means the entire account has none. Creation still needs permission and capacity;
+sending follows the inbox's review policy.
+
+If the customer must act, show the DNS entries and offer `verify_domain` / `domain recheck` after they
+add them. If Extrovert must act, say the customer's entries are confirmed only when the summary says
+so; do not ask for more DNS changes. Use `wait_for_domain` / `domain wait` for a bounded check. A
+`timed_out` result is not a setup failure: resume after `resume_after_seconds`.
+
+Save `list_domain_events.next_cursor` and pass it as `after` for the same domain, including after a
+restart. Drain `has_more`, otherwise wait `poll_after_seconds`. Summarize new ready, action-needed or
+recovered events for the human. Extrovert emails verified account administrators, but polling cannot
+wake a disconnected agent. Do not promise a future agent update without an active host task.
+
+## Use the intended inbox
+
+After `whoami`, use `list_inboxes` and select the intended inbox, or create one if the user requested it:
+
+1. Call `read_messages` with that inbox. It already returns readable previews and structured
    message fields.
 2. Pass a returned `msg_…` id to `get_message`. Use `format: "text", variant: "extracted"` for concise
    reading; use `variant: "source"` when exact MIME text, signatures, or quoted history matter.
@@ -84,11 +123,21 @@ Common scope failures are explicit:
 - export raw IMAP/SMTP credentials: `mailbox:credentials` plus a paid plan (free accounts cannot export them)
 - outbound and review work: `mailbox:send`
 - change daily limit: `mailbox:quota`
+- read domain readiness and events: `domain:read` or `domain:manage`
+- connect domains, recheck DNS, or offboard: `domain:manage`
 - webhook management: `webhook:write` (legacy keys may use `mailbox:read`)
-- purchase domain: `domain:manage` plus the opt-in `domain:purchase`
+- quote or request a domain purchase/plan change: `commerce:request` (never approval authority)
 - reviewer actions: `review:act`
 
 A 401 means the credential was absent or rejected. A 403 means the credential is known but its tier, scope, ownership, or project ceiling does not authorize the action. Do not retry either with broader guessed identifiers.
+
+For commerce, `quote_domain` is non-spending. `request_domain_purchase` and `request_plan_change`
+create durable requests; they do not approve or execute them. Recover and poll with
+`list_commerce_requests` and `get_commerce_request`, or withdraw the agent's own pending request with
+`cancel_commerce_request`. Surface the platform approval URL and exact
+blocker to the human. Extrovert sends the billing owner a notification automatically, but email
+content and replies cannot authorize a charge. Only the signed-in console or a bounded policy the
+human created earlier can do that.
 
 ## Choose event delivery
 

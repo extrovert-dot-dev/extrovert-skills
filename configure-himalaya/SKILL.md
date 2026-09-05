@@ -7,6 +7,12 @@ description: Configure Himalaya or another standard mail client for an Extrovert
 
 Call `export_email_config` for the inbox only with an explicitly granted `mailbox:credentials` key on a paid account. Free accounts cannot export these credentials. Never guess a host, username, port, encryption mode, or password. Treat the response as a secret.
 
+Receiving credentials does not enable direct SMTP. Check the inbox's
+`direct_smtp_enabled` value first. It defaults to false, a signed-in human
+controls it per inbox, and it is effective only while paid entitlement remains
+active. The same password can authenticate IMAP and SMTP, but the mail server
+rejects raw SMTP when the effective setting is false.
+
 <!-- authorization:start -->
 | Row | Tools | Required scope | Boundary |
 |---|---|---|---|
@@ -17,7 +23,7 @@ For Himalaya, request `format: "himalaya"`. Back up an existing `~/.config/himal
 
 ## Critical outbound warning
 
-Direct SMTP sends do not pass through Extrovert review, suppression or contact-list checks, List-Unsubscribe injection, or Extrovert billing and accounting. Prefer Extrovert MCP/API send, reply, and forward tools whenever those controls matter. Do not describe Himalaya SMTP as equivalent to an Extrovert reviewed send.
+Direct SMTP sends do not pass through Extrovert review, suppression or contact-list checks, List-Unsubscribe injection, or Extrovert billing and accounting. Extrovert API, SDK, and MCP send, reply, and forward calls always remain governed by the Review Loop, regardless of `direct_smtp_enabled`. Do not describe Himalaya SMTP as equivalent to an Extrovert reviewed send.
 
 If the task only requires reading mail, configure IMAP and leave SMTP unused. If direct SMTP is genuinely required, confirm the user understands the bypass, keep recipient scope narrow, and never use it to evade a failed or pending review.
 

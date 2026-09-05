@@ -4,8 +4,8 @@ Nine standalone, task-first skills for Extrovert and provider-neutral agent-emai
 
 ## Install the complete Codex plugin
 
-The plugin installs these skills together with Extrovert's published MCP server. The local stdio
-server can start with no key, perform `sign_up` → `verify_signup`, store the resulting full key in a
+The plugin installs these skills together with Extrovert's published MCP server. Self-signup is
+currently disabled. Once enabled, the local stdio server can start with no key, perform `sign_up` → `verify_signup`, store the resulting full key in a
 permission-restricted credential file, and reuse it after a new session. No custom MCP client or
 JSON-RPC helper is required.
 
@@ -14,8 +14,8 @@ codex plugin marketplace add extrovert-dot-dev/extrovert-skills
 codex plugin add extrovert@extrovert
 ```
 
-Start a new Codex session after installation. Call `sign_up` if this agent does not have an account,
-or `whoami` when a credential already exists. The equivalent non-plugin setup is:
+Start a new Codex session after installation. Use an existing key or redeem an enrollment token,
+then call `whoami`. The equivalent non-plugin setup is:
 
 ```bash
 npx -y @extrovert.dev/mcp@next setup --host codex

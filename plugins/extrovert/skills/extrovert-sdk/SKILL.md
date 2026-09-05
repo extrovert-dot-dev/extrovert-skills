@@ -1,18 +1,18 @@
 ---
 name: extrovert-sdk
-description: Build or troubleshoot a TypeScript integration against the Extrovert REST API using the current SDK source and OpenAPI contract. Use for client construction, org/project/inbox addressing, pagination, error handling, reviewed sends, OTP waits, webhooks, streams, signature verification, or offline fixture tests.
+description: Build or troubleshoot a TypeScript integration against the Extrovert REST API using the current SDK source and OpenAPI contract. Use for client construction, org/project/inbox addressing, thread workflows, pagination, error handling, commerce requests, reviewed sends, OTP waits, webhooks, streams, signature verification, or offline fixture tests.
 ---
 
 # Extrovert TypeScript SDK
 
 The prerelease package is published under the explicit `next` dist-tag. Use
-`npm install @extrovert.dev/sdk@next`, or pin `@extrovert.dev/sdk@0.1.0-pre.6` for reproducible dogfood
+`npm install @extrovert.dev/sdk@next`, or pin `@extrovert.dev/sdk@0.1.0-pre.7` for reproducible dogfood
 tests. The public REST API and served OpenAPI remain the underlying contract. Do not imply that a
 hosted MCP route substitutes for the SDK; use the SDK for direct TypeScript application integration.
 
 ## Choose the smallest mode
 
-- Basic client, authentication, inbox handles, project addressing, pagination, metadata, or errors: read [references/core-client.md](references/core-client.md).
+- Basic client, authentication, inbox handles, thread reads/search, project addressing, pagination, metadata, commerce requests, or errors: read [references/core-client.md](references/core-client.md).
 - Sending, replying, forwarding, durable review events, revisions, or rules: read [references/review-loop.md](references/review-loop.md).
 - Webhooks, signature verification, SSE, or offline fixtures: read [references/events-and-testing.md](references/events-and-testing.md).
 
