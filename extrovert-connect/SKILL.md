@@ -66,7 +66,7 @@ credential when an explicit key is needed. Do not place an org administrator cre
 
 The MCP prerelease is published under the explicit `next` dist-tag. Prefer the hosted stateless
 Streamable HTTP endpoint and OAuth when the client supports remote MCP. For a local stdio host, run
-`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.9` and supply only a scoped
+`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.10` and supply only a scoped
 agent key.
 
 ## Verify immediately

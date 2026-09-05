@@ -29,10 +29,18 @@ An explicit “inspect only,” “report only,” or “do not continue” requ
 
 Handle the immediate result exactly:
 
-- `sent`: delivery completed. Finish any outstanding reusable-feedback learning before reporting completion.
+- `sent`: released to the mail queue, not proof of recipient arrival. If `submission_id` is present,
+  use `get_submission` to check recipient transport state without sending again. Finish any
+  outstanding reusable-feedback learning before reporting completion.
 - `queued_for_review`: retain the review id and continue. Nothing has been delivered.
 - `intent_required`: add truthful reviewer context and resubmit; do not route around review.
 - ambiguous timeout: reconcile the stable retry identity before trying again. Never generate a fresh key for the same mutation.
+
+For outbound-only follow-ups, reread the thread after each accepted reply and keep using its canonical
+`thread_id`. No incoming reply is required. A recipient in `waiting_for_parent` continues automatically
+when the previous message's delivery identity is ready. `unknown` needs reconciliation, not a new send.
+The submission's `sent_message_id` is a nullable message-detail selector; the legacy `message_id` may
+instead be an RFC header value. A missing Sent copy must never prompt automatic resending.
 
 ## Own the send until it is sent
 

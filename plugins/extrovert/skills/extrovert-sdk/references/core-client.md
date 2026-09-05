@@ -8,7 +8,7 @@ Install the explicit prerelease tag:
 npm install @extrovert.dev/sdk@next
 ```
 
-Pin `@extrovert.dev/sdk@0.1.0-pre.9` when a test needs a reproducible contract. The public REST fallback
+Pin `@extrovert.dev/sdk@0.1.0-pre.10` when a test needs a reproducible contract. The public REST fallback
 is `https://api.extrovert.dev/v1`; obtain the current schema from the service's OpenAPI endpoint
 rather than copying a stale schema.
 
@@ -64,6 +64,16 @@ An `InboxHandle` provides the same workflow as `inbox.threads(...)`,
 message's `extracted_text` / `extracted_html` for concise reasoning and fall back to `text` / `html`
 when extraction is absent or exact source evidence is required. Do not derive reply recipients or
 RFC threading headers yourself; reply with `thread_id` and let the service derive them.
+
+This also works before the other party replies: get the thread after each accepted send and continue
+with `inbox.reply`. A rapid follow-up may wait automatically for its preceding message. Do not start a
+new message with the same subject or construct transport Message-IDs yourself.
+
+If an accepted outcome includes `submission_id`, check `inbox.getSubmission(id)` or
+`client.projects.inboxes.getSubmission(projectId, inboxId, id)`. `accepted` means accepted for onward
+delivery, not confirmed arrival; `waiting_for_parent` is automatic and `unknown` needs reconciliation.
+Use `sent_message_id` (nullable) for message navigation. The legacy `message_id` may be an RFC header
+value when the Sent copy is unavailable. A status read never sends again.
 Pass `last_message_id` back as `expected_last_message_id` to detect a thread that advanced after your
 read. On 409, fetch the thread and reconsider the reply. The guard is checked at submission; it is not
 an atomic lock through review and delivery.
