@@ -66,7 +66,7 @@ credential when an explicit key is needed. Do not place an org administrator cre
 
 The MCP prerelease is published under the explicit `next` dist-tag. Prefer the hosted stateless
 Streamable HTTP endpoint and OAuth when the client supports remote MCP. For a local stdio host, run
-`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.8` and supply only a scoped
+`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.9` and supply only a scoped
 agent key.
 
 ## Verify immediately
@@ -152,6 +152,8 @@ Keep keys out of shell history, source files, issue text, and logs. Rotate a cre
 Use `agent-email-architecture` when the task is choosing a topology or reviewing trust boundaries, and `extrovert-sdk` for direct TypeScript integration.
 
 ## Resume outstanding sends
+
+When an outbound task resumes, recover existing authorized sends before creating anything new. An ambiguous request for “feedback” calls for distinguishing review feedback from inbound replies and continuing authorized sends; explicit inspection-only requests permit reads only.
 
 After confirming identity, drain `list_review_events` and use `list_reviews` with
 `composer: "me"` to recover this agent's pending sends. Load `extrovert-send-email` when

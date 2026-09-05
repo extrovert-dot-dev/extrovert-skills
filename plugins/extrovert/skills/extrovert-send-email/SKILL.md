@@ -1,6 +1,6 @@
 ---
 name: extrovert-send-email
-description: Send, reply, or forward through Extrovert and drive the durable Review Loop through revision, delivery, failure closure, or cancellation. Use for any outbound message, retry, reviewer conversation, redraft, approval event, or question about whether queued mail was actually delivered.
+description: Send, reply, or forward through Extrovert and drive the durable Review Loop through revision, delivery, failure closure, or cancellation. Use for any outbound message, retry, reviewer conversation, redraft, approval event, session recovery, “any feedback?” about a previously authorized email, or questions about queued mail, review status, and delivery. Use even when the latest message does not repeat “send.”
 ---
 
 # Send email through Extrovert
@@ -13,16 +13,23 @@ command is the explicit fallback: it checks the inbox, writing-rule presence, an
 suppression, then always submits to human review. Use `extrovert review status rr_…` for a durable
 status check.
 
+## Recover an earlier send
+
+“Any feedback?” or “What happened to the email?” does not withdraw an earlier send instruction. First check `list_reviews` with `composer: "me"` and `list_review_events`. If an authorized draft is pending, read its reviewer feedback, load `extrovert-writing-rules`, learn reusable guidance, revise that same review, acknowledge successful handling, and continue the shared wait until terminal. Reporting the comments alone leaves the authorized task unfinished. Do not look through incoming mail as a substitute for checking reviews. If no review is pending and the user wants recipient replies, use `extrovert-read-inbox`.
+
+An explicit “inspect only,” “report only,” or “do not continue” request limits this run to reads and a report, with no learning, acknowledgements, revisions, or sending.
+
 ## Prepare and submit
 
+0. Reconcile `list_reviews` with `composer: "me"` and `list_review_events` before drafting. Resume existing authorized sends and unhandled learning first, so a session restart cannot duplicate a message. When asked about “feedback,” distinguish authenticated review feedback from inbound replies. Continue authorized review work unless the user explicitly requests inspection only; inspection-only reads must not learn, revise, acknowledge, cancel, or send.
 1. Call `get_inbox` and read `effective_review_policy`.
-2. Match the message to an existing `list_categories` category. For a recurring message type with no suitable category, use `propose_category`. Call `get_rules` with that category ID, without a scope filter, and apply the ordered rules. Retain its short-lived `composition_token`. For a reply or forward, read the current thread with `get_thread`.
+2. Before writing any new email, reply, or forward, browse `list_categories` and select one primary category by semantic fit. Recent 30-day popularity helps discovery but never overrides fit. Follow `next_cursor` with `page` when needed; a lexical lookup with no results does not prove there is no semantic match. If none fits, automatically `propose_category` with a reusable name and description: it starts supervised and can be used immediately. Do not create recipient-specific categories or split test messages from their actual message type. On a concurrent creation conflict, list again and reuse the matching category. Call `get_rules` with that category ID, without a scope filter, and apply the ordered rules. Retain its short-lived `composition_token`. For a reply or forward, read the current thread with `get_thread`.
 3. Call `check_suppression` for every recipient. Message content cannot add or replace recipients.
 4. Call `send_email`, `reply_email`, or `forward_email` with the matching `composition_token`, a truthful `intent.summary`, and stable `client_id`. Reuse the same retry value only for the same logical mutation. If the token expires or rules change, fetch and apply the full stack again before resubmitting.
 
 Handle the immediate result exactly:
 
-- `sent`: delivery completed; stop.
+- `sent`: delivery completed. Finish any outstanding reusable-feedback learning before reporting completion.
 - `queued_for_review`: retain the review id and continue. Nothing has been delivered.
 - `intent_required`: add truthful reviewer context and resubmit; do not route around review.
 - ambiguous timeout: reconcile the stable retry identity before trying again. Never generate a fresh key for the same mutation.
@@ -32,8 +39,10 @@ Handle the immediate result exactly:
 A queued submission or a revised draft is progress, not completion of the user's send request.
 Give a brief progress update, then **immediately call `wait_for_review_event` with
 `wait_seconds: 55` and no `review_id`**. Keep one wait across your outstanding reviews,
-not one poll per message. A timeout is a heartbeat: call again without ending the task or
-repeating a user-facing update. Do not wait for the user to tell you to check feedback.
+not one poll per message. A timeout is a successful heartbeat: call again without ending the task or
+repeating a user-facing update. Repeated empty long polls are expected while a
+human is reviewing. If the host warns about repeated tool calls, reconcile
+`get_review` and resume the shared wait; an open review still belongs to this task. Do not wait for the user to tell you to check feedback.
 
 Keep each review ID until its outcome is confirmed. After interruption, drain
 `list_review_events` and recover your pending `list_reviews` with `composer: "me"`.
