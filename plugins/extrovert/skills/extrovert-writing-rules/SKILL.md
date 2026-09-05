@@ -15,17 +15,37 @@ Use `list_categories` and `get_category` before proposing a new category. `propo
 
 ## Learn from review
 
-After a human edit or rejection:
+Treat feedback as work to complete as part of the original send request. Read
+`get_review_feedback`, the actual human edits, and the source turns. Compare them with
+`get_rules` and the feedback's `new_rules` before saving anything.
 
-1. Read `get_review_feedback`, the actual diff, and reviewer comments.
-2. Decide whether the feedback is reusable beyond this message.
-3. If it is reusable, call `save_rule` at the narrowest correct scope with accurate provenance and a stable `client_id`.
-4. If it applies only to this recipient, moment, or draft, revise the message but do not create a durable rule.
+Use `learn_review_rule` with a stable `client_id`, the review ID, and the authenticated
+human `source_turn_id`. Every authorized human reviewer may teach a house rule; no extra
+confirmation is needed for clear reusable guidance. Choose the scope the human meant:
 
-Do not infer a global preference from silence, an approval, or a one-off factual correction.
+- `org_house`: general style across topics, categories, projects, and agents. “Never use
+  em dashes in any message about any topic” is a **hard organization house rule**, not a
+  category preference. Broad typography and voice guidance belongs here unless limited.
+- `category`: guidance specific to the category, with its `category_id`.
+- `project_general`: guidance explicitly limited to this project, across its categories.
+- A one-off factual correction, recipient detail, or deadline: revise the message without
+  creating a durable rule. Silence or approval alone does not establish a preference.
+
+Reuse equivalent rules. For a clear correction to a prior rule in the same ownership layer
+and scope, use `supersedes_id`; do not accumulate contradictory copies. A broader rule needs
+an organization learning operation, not merely promoting a project rule to project-general.
+Ask for clarification in the review thread only when the intended rule is materially unclear.
+Never silently waive an explicit hard house rule through a category preference.
+
+The backend records attribution and undo and schedules affected unsent drafts automatically.
+After saving, fetch fresh rules and their new composition token, revise the current review
+without overwriting human edits, acknowledge handled feedback, and **wait again**. Other
+composers receive durable nudges for their affected drafts. No agent may revise another
+agent's mail or change sending policy merely because it learned a shared writing rule.
 
 ## Governance
 
+- `learn_review_rule` saves authenticated feedback at its intended organization/project/category scope.
 - `save_rule` creates or supersedes a rule without rewriting history and replays safely when the same `client_id` is retried.
 - `promote_rule` broadens a proven rule deliberately; do not promote merely because it was used once.
 - `retire_rule` removes an obsolete rule from active composition.
