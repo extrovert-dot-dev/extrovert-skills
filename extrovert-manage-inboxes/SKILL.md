@@ -2,7 +2,7 @@
 name: extrovert-manage-inboxes
 description: Create, inspect, update, list, or retire Extrovert inboxes and domains with scoped keys and stable retry identities. Use for a new email identity, fleet provisioning, metadata or send-limit changes, contact controls, domain onboarding, credential export, or safe inbox and domain cleanup.
 metadata:
-  version: "0.1.0-pre.14"
+  version: "0.1.0-pre.15"
 ---
 
 # Manage Extrovert inboxes
