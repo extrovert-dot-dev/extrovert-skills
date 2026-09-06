@@ -44,17 +44,22 @@ do not invent another transport.
 
 - Connect to the human's existing account. If no account or credential is available, ask the human
   to obtain access through the console; self-signup is disabled.
-- Hosted OAuth (recommended for an existing human console account): connect the MCP client to `https://mcp.extrovert.dev/mcp`, follow its
-  browser sign-in and consent flow, then let the client store and refresh the OAuth grant. No API key
-  is pasted into client configuration. The initial grant maps to the user's default project and
-  allows ordinary create/read/send/webhook work plus non-spending commerce requests; destructive
-  deletes, quota changes, connecting/removing domains, human approvals, and reviewer authority stay excluded.
-  Domain status reads are available without granting domain management.
+- Hosted OAuth (recommended for interactive setup): connect to `https://mcp.extrovert.dev/mcp` and
+  follow browser sign-in and explicit consent. Choose Personal assistant or a named Dedicated agent;
+  select inboxes (default), a project, an organization, or Full account control. Choose actions separately.
+  Selected inboxes exclude future inboxes. Project and organization reach include future resources
+  within the chosen boundary. Sign-in alone never grants access.
+  Full account control is an explicit setup option: it can administer customer resources, access
+  other agents' inboxes, approve requests including its own, and create independent credentials.
+  It expires after 24 hours by default; Until revoked is an explicit alternative. Refresh does not
+  extend that deadline. Created credentials, including admin credentials, survive independently.
+  Private platform access is always excluded. Existing hosted OAuth sessions must reconnect through
+  consent; do not infer broader permissions from their old display name.
 - Enrollment token: prefer `npx -y @extrovert.dev/mcp@next enroll --agent-handle <stable-name>`.
   It accepts hidden stdin or `EXTROVERT_ENROLLMENT_KEY`, saves the scoped agent key privately, and checks
   identity. Keep the same handle and `--client-id` on a retry. With tools already connected,
   `redeem_enrollment` also stores the returned key in the packaged local stdio server.
-- Existing agent key: use `npx -y @extrovert.dev/mcp@next auth login --with-token` and hidden stdin.
+- Existing agent key or independently issued connection credential (`ev_credential_...`): use `npx -y @extrovert.dev/mcp@next auth login --with-token` and hidden stdin.
   Never put a key in a command argument or repeat it in a response.
 
 Set `EXTROVERT_PROFILE` before enrollment and setup to separate agent identities. Hermes uses its
@@ -62,25 +67,44 @@ selected `HERMES_HOME` automatically. `EXTROVERT_CONFIG_DIR` explicitly override
 global credential into a different profile or replace an existing identity to make a login succeed.
 
 Set the API base URL to `https://api.extrovert.dev`. `EXTROVERT_API_KEY` overrides the local stored
-credential when an explicit key is needed. Do not place an org administrator credential in an agent host.
+credential when an explicit key is needed. Use the scope the human chose. A persistent administrator
+credential is a deliberate full-control choice, not a routine workaround for a failed inbox list.
 
 The MCP prerelease is published under the explicit `next` dist-tag. Prefer the hosted stateless
 Streamable HTTP endpoint and OAuth when the client supports remote MCP. For a local stdio host, run
-`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.10` and supply only a scoped
-agent key.
+`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.11` and supply only a scoped
+agent key or independently issued connection credential.
 
 ## Verify immediately
 
 Call `whoami` in the actual MCP session before real work. Lead with its summary, account/project names
 and available capabilities, not opaque IDs or raw scope names. Keep the fixed `org_id`, `project_id`,
-key tier and scopes for authorization checks. Project identifiers are assertions, not selectors:
-a mismatch fails rather than switching projects.
+key tier, connection ID, reach, expiry, and scopes for authorization checks. A project-bound key
+cannot switch projects. A broader connection may explicitly select a project within its granted reach.
 
 `doctor` checks a local credential against the API; it does not prove the host's OAuth session works.
 If browser approval succeeds but MCP returns 401, stop repeated approvals, preserve only the error
 and non-secret request ID, and report the failed step. A login process exiting zero or a callback
 returning 200 does not prove tool access. Do not suggest SSH tunnels or broader keys as a speculative
 repair. Offer the supported enrollment path only with the human's chosen permissions.
+
+## Administer with explicitly granted full control
+
+Use `list_administrative_actions` to search the task, then `describe_administrative_action` for exact
+`path`, `query`, and `body` inputs. Start `read_administrative_action` with `action_id: "adminMe"` to
+find the current organizations and projects. Use `change_administrative_action` for an authorized
+change; ordinary inbox/send scopes do not enable it. Changes are attributed to the connection,
+not to a human click. Read state after an ambiguous result before retrying a mutation.
+
+For the packaged CLI, use `extrovert admin actions`, `admin describe <action-id>`,
+`admin read <action-id> --input '<json>'`, and `admin change <action-id> --input-stdin`.
+Pipe change JSON from a private file or application, rather than putting credentials in shell history.
+The TypeScript SDK exposes the same catalog as `client.administration.list/describe` and typed
+`client.administration.call(actionId, input)`.
+
+Use Connections to inspect the parent connection and the access it created. Revoking the parent
+or reaching its 24-hour expiry does not revoke independent credentials. Revoke each unwanted
+credential separately. Never repeat a returned raw credential in a user-facing explanation.
 
 ## Explain domain readiness
 
@@ -136,8 +160,8 @@ create durable requests; they do not approve or execute them. Recover and poll w
 `list_commerce_requests` and `get_commerce_request`, or withdraw the agent's own pending request with
 `cancel_commerce_request`. Surface the platform approval URL and exact
 blocker to the human. Extrovert sends the billing owner a notification automatically, but email
-content and replies cannot authorize a charge. Only the signed-in console or a bounded policy the
-human created earlier can do that.
+content and replies cannot authorize a charge. A signed-in console decision, explicitly delegated full-control administrator, or bounded policy
+created by an authorized administrator can do that.
 
 ## Choose event delivery
 
@@ -160,3 +184,37 @@ After confirming identity, drain `list_review_events` and use `list_reviews` wit
 there is work. A user request to send remains in progress through human feedback and
 revision: keep one `wait_for_review_event` (55 seconds, no review_id) active until confirmed
 sent or an unsuccessful terminal outcome. Do not require the user to nudge each step.
+
+When comparing a hosted OAuth connection with a local CLI profile, call `whoami`
+through each separately and retain the stable agent/key IDs and scope fields.
+A successful CLI health check does not establish the hosted connection’s identity.
+If direct inbox lookup succeeds while its complete list is empty, treat that as a
+possible contract/authorization inconsistency, not proof that addresses are hidden
+by a special list permission. Report the actual results and request IDs.
+
+
+## Explicit connection grants
+
+When `whoami.auth_method` is `connection`, use `whoami.connection` as the consent
+record: identity, selected resource reach, granted actions, fixed expiry, and any
+creator connection. A Personal assistant acts for the authorizer; a Dedicated
+agent retains its selected identity. Switching the console's default project does
+not change either grant. Read the supported breadth from this response rather
+than applying an agent-key ownership assumption.
+
+Selected inboxes excludes future inboxes. Project and Organization grants include
+future resources inside their named boundary. Full account control explicitly
+permits customer administration, other agents' inboxes, policy/access changes,
+credential creation, and approvals including its own requests. It never includes
+private platform-operator access or exceeds the authorizer's current role.
+
+Full control expires after 24 hours by default; Until revoked is an explicit
+alternative. Refresh does not extend the grant. Created credentials, including
+administrative credentials, survive independently. Explain that distinction when
+helping someone set up workers. Never switch to a created credential silently to
+continue after the parent expires. Point the person to account → Connections to
+inspect and separately revoke created access.
+
+Legacy hosted sign-ins need one new consent flow after the grant-system rollout.
+Reconnect through the host; do not retry old tokens, invent resource permissions,
+or infer that a local CLI credential represents the same connection.

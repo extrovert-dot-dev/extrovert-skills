@@ -16,7 +16,7 @@ rejects raw SMTP when the effective setting is false.
 <!-- authorization:start -->
 | Row | Tools | Required scope | Boundary |
 |---|---|---|---|
-| inbox-credentials | `export_email_config` | `mailbox:credentials` plus a paid plan | Owner-only portable secret export; free accounts cannot export IMAP/SMTP credentials even if a key carries the scope. |
+| inbox-credentials | `export_email_config` | `mailbox:credentials` plus a paid plan | Connections may export only within their resource grant. Legacy keys retain ownership checks. Credential export does not confer mail-reading authority. |
 <!-- authorization:end -->
 
 For Himalaya, request `format: "himalaya"`. Back up an existing `~/.config/himalaya/config.toml`, then merge the returned account block instead of overwriting the file. Restrict file permissions to the current user. Test IMAP by listing a folder before attempting SMTP.

@@ -56,11 +56,13 @@ ask the human to restore the returned entries and warn that sending/receiving
 may be disrupted. Extrovert checks automatically and notifies verified owners
 or administrators. Never delete or recreate inboxes to repair delegation.
 
-Agents cannot purchase domains by default and cannot approve their own requests.
+Ordinary scoped agents cannot purchase domains by default or approve their own requests. An
+explicit Full account control connection can approve through the administrative action tools,
+including its own requests, under current customer-admin authority. See `extrovert-connect`.
 
 1. Call `quote_domain` and report the exact annual registration and renewal price, currency, quote expiry, premium status, required plan, required plan's maximum monthly price, and blockers. When a plan change is required, make clear that its immediate charge is prorated and the approval covers the combined maximum. A quote is not a reservation or purchase.
 2. With the human's requested domain or an independently justified need, call `request_domain_purchase` using one stable idempotency key. Use `request_plan_change` for a standalone upgrade or downgrade. Reuse the same key only when retrying the same intent.
-3. Surface the returned approval URL and `agent_next_action`. Extrovert emails the verified billing owner automatically. You may also email the same approval URL to the human by activating `extrovert-send-email`; the email cannot approve the request, and only the signed-in console decision counts.
+3. Surface the returned approval URL and `agent_next_action`. Extrovert emails the verified billing owner automatically. You may also email the same approval URL to the human by activating `extrovert-send-email`; the email cannot approve the request, and only an authenticated console decision, explicitly delegated full-control decision, or applicable spend policy counts.
 4. Poll `get_commerce_request` no faster than `poll_after_seconds`. Use `list_commerce_requests` to recover a lost request id. Report the exact named limit, capacity, payment, or price blocker; never replace it with a generic failure.
 5. Do not claim that anything was charged, registered, upgraded, downgraded, or ready until the durable state says so. `payment_action_required` still needs the human. Registration is complete only at `ready`; a plan change is complete at `completed` or explicitly scheduled at `scheduled`.
 6. If the purchase or plan change is no longer wanted, call `cancel_commerce_request` with the exact request id and report only the returned durable state. Cancellation cannot approve or replace a request; a settled-payment race moves to reconciliation instead of silently continuing from cancelled authority.
@@ -74,15 +76,34 @@ Confirm the exact opaque id and impact before `delete_inbox`. Verify the result 
 <!-- authorization:start -->
 | Row | Tools | Required scope | Boundary |
 |---|---|---|---|
-| inbox-create | `create_inbox` | `mailbox:create` | Fixed project ceiling; the creating agent owns the inbox. |
-| inbox-read | `list_inboxes`, `get_inbox` | `mailbox:read` | Owner-only inbox access; org-tier bare lists must choose breadth. |
-| inbox-credentials | `export_email_config` | `mailbox:credentials` plus a paid plan | Owner-only portable secret export; free accounts cannot export IMAP/SMTP credentials even if a key carries the scope. |
-| inbox-update | `update_inbox` except daily limit | `mailbox:create` + `mailbox:read` | Owner-only; request project id cannot switch authority. |
-| inbox-quota | `update_inbox` daily limit | `mailbox:quota` + `mailbox:read` | Opt-in throttle authority; owner and project checks still apply. |
-| inbox-delete | `delete_inbox` | `mailbox:delete` or lifecycle fallback `mailbox:create` | Owner-only and irreversible; verify the exact opaque id. |
-| domain-read | `list_domains`, `get_domain`, `wait_for_domain`, `list_domain_events` | `domain:read` or `domain:manage` | Read-only within the fixed project ceiling; inbox-tier keys cannot inspect project domains. Counts include only visible inboxes. |
+| inbox-create | `create_inbox` | `mailbox:create` | An explicit connection needs project or organization reach; selected-inbox reach excludes future creations. Legacy keys retain their fixed project ceiling. |
+| inbox-read | `list_inboxes`, `get_inbox` | `mailbox:read` | Connections discover all readable inboxes within their selected-ID, project, organization, or full-account grant. Legacy project keys retain agent ownership; org keys choose list breadth. |
+| inbox-credentials | `export_email_config` | `mailbox:credentials` plus a paid plan | Connections may export only within their resource grant. Legacy keys retain ownership checks. Credential export does not confer mail-reading authority. |
+| inbox-update | `update_inbox` except daily limit | `mailbox:create` (legacy paths may also require read) | The authenticated grant or key ceiling bounds the inbox; a project selector can only narrow it. |
+| inbox-quota | `update_inbox` daily limit | `mailbox:quota` (legacy paths may also require read) | Opt-in throttle authority within the resource grant or legacy owner/project ceiling. |
+| inbox-delete | `delete_inbox` | `mailbox:delete` (legacy keys also accept `mailbox:create`) | Connections require explicit deletion authority and a reachable inbox. Verify the exact opaque id. |
+| domain-read | `list_domains`, `get_domain`, `wait_for_domain`, `list_domain_events` | `domain:read` or `domain:manage` | Connection resource grants or legacy ceilings bound domain visibility. Inbox counts report their visible scope; a count never proves additional mailbox access. |
 | domain-manage | `onboard_domain`, `verify_domain`, `offboard_domain`, `get_job` | `domain:manage` | Adds or manages only shared and customer-controlled domains; it cannot register a new domain. Privileged project/org boundaries still apply. |
-| domain-purchase | `quote_domain`, `request_domain_purchase`, `request_plan_change`, `get_commerce_request`, `cancel_commerce_request`, `list_commerce_requests` | `commerce:request` | Quote, request, cancel, and status only. The agent cannot approve, charge, register, bypass a spend control, or treat an email as approval; a signed-in human or pre-existing bounded policy must authorize. |
+| domain-purchase | `quote_domain`, `request_domain_purchase`, `request_plan_change`, `get_commerce_request`, `cancel_commerce_request`, `list_commerce_requests` | `commerce:request` | This scope grants quotes, requests, cancel, and status only. Explicit full-account account:admin can approve through administrative actions; otherwise a human or bounded policy authorizes spending. Email content never authorizes it. |
 <!-- authorization:end -->
 
 Keep keys and exported passwords out of logs, prompts, commits, and shared terminals. Rotate anything that may have been exposed.
+
+## Discovery and readiness diagnostics
+
+Use `list_inboxes domain="example.com"` for an exact domain filter. Follow
+`next_cursor` with the same filters to enumerate further pages; a page length is
+not an account-wide total. A malformed response or a backend error is unavailable
+inventory, not zero inboxes. Do not create a replacement inbox just because a list
+failed or returned no matches.
+
+If a known address is readable but missing from a complete list under the same
+connection and breadth, report a list/read inconsistency. Compare `whoami` agent_id,
+key_id, auth_method, key_tier, inbox_scope, org_id, and project_id separately for
+hosted MCP and CLI. Connection names alone do not prove identical authority.
+Do not infer a permissions cause from an empty list or domain count alone.
+
+Inbox lifecycle, sender setup, and review policy are different facts. Missing
+`sender_verified` is unknown, not pending. It does not justify refusing a user’s
+send request; follow the documented send/review workflow and use its explicit
+errors or outcome. Do not claim delivery or receipt from readiness alone.

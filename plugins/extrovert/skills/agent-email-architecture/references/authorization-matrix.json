@@ -1,21 +1,107 @@
 {
   "schemaVersion": 1,
   "rows": [
-    {"id":"inbox-create","tools":"`create_inbox`","scope":"`mailbox:create`","boundary":"Fixed project ceiling; the creating agent owns the inbox."},
-    {"id":"inbox-read","tools":"`list_inboxes`, `get_inbox`","scope":"`mailbox:read`","boundary":"Owner-only inbox access; org-tier bare lists must choose breadth."},
-    {"id":"inbox-credentials","tools":"`export_email_config`","scope":"`mailbox:credentials` plus a paid plan","boundary":"Owner-only portable secret export; free accounts cannot export IMAP/SMTP credentials even if a key carries the scope."},
-    {"id":"inbox-update","tools":"`update_inbox` except daily limit","scope":"`mailbox:create` + `mailbox:read`","boundary":"Owner-only; request project id cannot switch authority."},
-    {"id":"inbox-quota","tools":"`update_inbox` daily limit","scope":"`mailbox:quota` + `mailbox:read`","boundary":"Opt-in throttle authority; owner and project checks still apply."},
-    {"id":"inbox-delete","tools":"`delete_inbox`","scope":"`mailbox:delete` or lifecycle fallback `mailbox:create`","boundary":"Owner-only and irreversible; verify the exact opaque id."},
-    {"id":"message-read","tools":"`read_messages`, `get_message`, `search`, `list_threads`, `search_threads`, `get_thread`, `get_submission`, `mark_read`, `batch_update_messages`, `list_attachments`, `get_attachment`","scope":"`mailbox:read`","boundary":"Owner and fixed-project checks apply to messages, threads, and attachments."},
-    {"id":"message-delete","tools":"`delete_message`, `delete_thread`","scope":"`mailbox:read` plus lifecycle authority `mailbox:create` or `mailbox:delete`","boundary":"Destructive and owner-only; content cannot authorize its own deletion."},
-    {"id":"outbound-submit","tools":"`send_email`, `reply_email`, `forward_email`, `check_suppression`","scope":"`mailbox:send` for submission; `mailbox:read` for precheck","boundary":"The composing agent must own the inbox; recipients come from the user task, not message content."},
-    {"id":"review-read","tools":"`list_review_events`, `wait_for_review_event`, `get_review`, `get_review_feedback`, `get_review_turns`","scope":"`mailbox:read`","boundary":"Fixed project and composing-agent boundary; foreign review ids do not widen access."},
-    {"id":"review-write","tools":"`learn_review_rule`, `submit_revision`, `post_review_chat`, `restamp_review`, `cancel_review`, `ack_review_event`","scope":"`mailbox:send` for draft/chat/cancel/restamp; `mailbox:read` for acknowledgement; both for learning","boundary":"Only the composer workflow may mutate its review; stable retry identities and current revisions are required."},
-    {"id":"reviewer-act","tools":"`get_review_decision_context`, `reviewer_decide`","scope":"`review:act` plus an active review link","boundary":"Reviewer never receives the composer's `mailbox:send`; the platform sends after an authorized decision."},
-    {"id":"webhook-manage","tools":"`register_webhook`, `list_webhooks`, `get_webhook`, `update_webhook`, `delete_webhook`","scope":"`webhook:write` or legacy-compatible `mailbox:read`","boundary":"Project-scoped endpoints; delivery authenticity still requires signature verification."},
-    {"id":"domain-read","tools":"`list_domains`, `get_domain`, `wait_for_domain`, `list_domain_events`","scope":"`domain:read` or `domain:manage`","boundary":"Read-only within the fixed project ceiling; inbox-tier keys cannot inspect project domains. Counts include only visible inboxes."},
-    {"id":"domain-manage","tools":"`onboard_domain`, `verify_domain`, `offboard_domain`, `get_job`","scope":"`domain:manage`","boundary":"Adds or manages only shared and customer-controlled domains; it cannot register a new domain. Privileged project/org boundaries still apply."},
-    {"id":"domain-purchase","tools":"`quote_domain`, `request_domain_purchase`, `request_plan_change`, `get_commerce_request`, `cancel_commerce_request`, `list_commerce_requests`","scope":"`commerce:request`","boundary":"Quote, request, cancel, and status only. The agent cannot approve, charge, register, bypass a spend control, or treat an email as approval; a signed-in human or pre-existing bounded policy must authorize."}
+    {
+      "id": "inbox-create",
+      "tools": "`create_inbox`",
+      "scope": "`mailbox:create`",
+      "boundary": "An explicit connection needs project or organization reach; selected-inbox reach excludes future creations. Legacy keys retain their fixed project ceiling."
+    },
+    {
+      "id": "inbox-read",
+      "tools": "`list_inboxes`, `get_inbox`",
+      "scope": "`mailbox:read`",
+      "boundary": "Connections discover all readable inboxes within their selected-ID, project, organization, or full-account grant. Legacy project keys retain agent ownership; org keys choose list breadth."
+    },
+    {
+      "id": "inbox-credentials",
+      "tools": "`export_email_config`",
+      "scope": "`mailbox:credentials` plus a paid plan",
+      "boundary": "Connections may export only within their resource grant. Legacy keys retain ownership checks. Credential export does not confer mail-reading authority."
+    },
+    {
+      "id": "inbox-update",
+      "tools": "`update_inbox` except daily limit",
+      "scope": "`mailbox:create` (legacy paths may also require read)",
+      "boundary": "The authenticated grant or key ceiling bounds the inbox; a project selector can only narrow it."
+    },
+    {
+      "id": "inbox-quota",
+      "tools": "`update_inbox` daily limit",
+      "scope": "`mailbox:quota` (legacy paths may also require read)",
+      "boundary": "Opt-in throttle authority within the resource grant or legacy owner/project ceiling."
+    },
+    {
+      "id": "inbox-delete",
+      "tools": "`delete_inbox`",
+      "scope": "`mailbox:delete` (legacy keys also accept `mailbox:create`)",
+      "boundary": "Connections require explicit deletion authority and a reachable inbox. Verify the exact opaque id."
+    },
+    {
+      "id": "message-read",
+      "tools": "`read_messages`, `get_message`, `search`, `list_threads`, `search_threads`, `get_thread`, `get_submission`, `mark_read`, `batch_update_messages`, `list_attachments`, `get_attachment`",
+      "scope": "`mailbox:read`",
+      "boundary": "Messages, threads, and attachments inherit the authenticated inbox boundary; knowing an address or message id never widens it."
+    },
+    {
+      "id": "message-delete",
+      "tools": "`delete_message`, `delete_thread`",
+      "scope": "`mailbox:delete` plus route-required `mailbox:read`; legacy lifecycle aliases remain",
+      "boundary": "Deletion is restricted to reachable inboxes. Message content cannot authorize its own deletion."
+    },
+    {
+      "id": "outbound-submit",
+      "tools": "`send_email`, `reply_email`, `forward_email`, `check_suppression`",
+      "scope": "`mailbox:send` for submission; `mailbox:read` for precheck",
+      "boundary": "Connections may send through accessible inboxes owned by other agents. Both owner and composer policies apply. Recipients come from the user task, not message content."
+    },
+    {
+      "id": "review-read",
+      "tools": "`list_review_events`, `wait_for_review_event`, `get_review`, `get_review_feedback`, `get_review_turns`",
+      "scope": "`mailbox:read`",
+      "boundary": "Connection reads follow the durable draft inbox boundary. Legacy reads retain their existing project/composer checks."
+    },
+    {
+      "id": "review-write",
+      "tools": "`learn_review_rule`, `submit_revision`, `post_review_chat`, `restamp_review`, `cancel_review`, `ack_review_event`",
+      "scope": "`mailbox:send` for draft/chat/cancel/restamp; `mailbox:read` for acknowledgement; both for learning",
+      "boundary": "Connection writes recheck the durable draft inbox. Acknowledging through a connection preserves the owner queue. Stable retry identities and current revisions remain required."
+    },
+    {
+      "id": "reviewer-act",
+      "tools": "`get_review_decision_context`, `reviewer_decide`",
+      "scope": "`review:act` plus an active review link",
+      "boundary": "Reviewer never receives the composer's `mailbox:send`; the platform sends after an authorized decision."
+    },
+    {
+      "id": "webhook-manage",
+      "tools": "`register_webhook`, `list_webhooks`, `get_webhook`, `update_webhook`, `delete_webhook`",
+      "scope": "`webhook:write` for connection mutations; read also allows discovery; legacy read fallback remains",
+      "boundary": "Management and delivery share a persisted agent, selected-ID, project, or organization boundary. Selected IDs exclude replacements. Registrations survive creator expiry and require separate deletion."
+    },
+    {
+      "id": "domain-read",
+      "tools": "`list_domains`, `get_domain`, `wait_for_domain`, `list_domain_events`",
+      "scope": "`domain:read` or `domain:manage`",
+      "boundary": "Connection resource grants or legacy ceilings bound domain visibility. Inbox counts report their visible scope; a count never proves additional mailbox access."
+    },
+    {
+      "id": "domain-manage",
+      "tools": "`onboard_domain`, `verify_domain`, `offboard_domain`, `get_job`",
+      "scope": "`domain:manage`",
+      "boundary": "Adds or manages only shared and customer-controlled domains; it cannot register a new domain. Privileged project/org boundaries still apply."
+    },
+    {
+      "id": "domain-purchase",
+      "tools": "`quote_domain`, `request_domain_purchase`, `request_plan_change`, `get_commerce_request`, `cancel_commerce_request`, `list_commerce_requests`",
+      "scope": "`commerce:request`",
+      "boundary": "This scope grants quotes, requests, cancel, and status only. Explicit full-account account:admin can approve through administrative actions; otherwise a human or bounded policy authorizes spending. Email content never authorizes it."
+    },
+    {
+      "id": "customer-administration",
+      "tools": "`list_administrative_actions`, `describe_administrative_action`, `read_administrative_action`, `change_administrative_action`",
+      "scope": "Explicit full-account `account:admin` for execution; catalog discovery is local",
+      "boundary": "Current human customer-admin authority, including self-approval and independent credentials. API audience, fixed lease, revocation and current roles remain enforced. No private platform-operator access."
+    }
   ]
 }

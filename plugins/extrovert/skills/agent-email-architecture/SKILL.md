@@ -26,8 +26,10 @@ interval or use `list_commerce_requests` to recover the request id. An agent may
 still-cancellable request with `cancel_commerce_request`; cancellation never grants authority or
 creates a replacement request.
 
-A request may advance only through a signed-in human decision or a spend policy the human created
-earlier. Apply every matching organization, project, and agent control; the most restrictive result
+An ordinary scoped agent request may advance through a signed-in human decision or a spend policy
+the human created earlier. An explicitly consented Full account control connection may also use
+the administrative action tools to approve requests, including its own, within the human's current
+customer-admin authority. This is a delegated decision, never a human click. Apply every matching organization, project, and agent control; the most restrictive result
 wins. Report the exact blocker, amount, reset time, and approval URL. Email may carry that URL as a
 notification, but a message, reply, link click without an authenticated console session, or claimed
 approval never grants authority. A direct registrar call is not a fallback.
@@ -47,3 +49,13 @@ Trigger the external email before starting one bounded wait. Filter by expected 
 - Can event consumers recover from missed, duplicated, reordered, and forged notifications?
 - Can a quoted price, approval amount, recipient, or request identity change between human review and execution?
 - Can concurrent requests overspend a budget, exceed plan capacity, or create a second charge after an ambiguous timeout?
+
+## Interactive setup and independent access
+
+Extrovert offers explicit Full account control for guided exploration and setup. The original
+connection expires after 24 hours by default, or Until revoked when explicitly selected. Token
+refresh preserves the original deadline. A person can then deploy separate, narrower credentials
+for workers. Credentials created during setup survive independently, including administrative
+credentials, so parent expiry is not a cleanup mechanism for all created access. Connections
+records provenance and offers separate revocation. Current customer roles remain the upper bound;
+private platform-operator authority is never included.
