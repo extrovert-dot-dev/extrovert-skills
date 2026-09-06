@@ -2,27 +2,51 @@
 
 Nine standalone, task-first skills for Extrovert and provider-neutral agent-email design.
 
-## Install the complete Codex plugin
+## Start with your agent
 
-The plugin installs these skills together with Extrovert's published MCP server. Self-signup is
-currently disabled. Once enabled, the local stdio server can start with no key, perform `sign_up` → `verify_signup`, store the resulting full key in a
-permission-restricted credential file, and reuse it after a new session. No custom MCP client or
-JSON-RPC helper is required.
+Paste this into your agent:
+
+> Read https://docs.extrovert.dev/llms.txt, connect Extrovert using my existing account if I have one, and help me send my first email.
+
+The agent checks current guidance, connects the intended account, and verifies its access before
+using an inbox. Interactive setup prefers hosted MCP with OAuth consent. An unattended worker uses
+an existing scoped credential or enrollment token. New-account signup depends on live availability
+and requires the supplied human email to be verified.
+
+To install the initial skills across supported hosts:
+
+```bash
+npx --yes --prefer-online skills@latest add extrovert-dot-dev/extrovert-skills --skill extrovert-connect extrovert-send-email
+```
+
+Choose the intended host and project or user scope in the installer. Skills provide instructions;
+they do not configure or authenticate MCP. For a host with local execution, the setup entry point is:
+
+```bash
+npx --yes --prefer-online @extrovert.dev/mcp@next setup --host auto
+```
+
+Follow the reported host selection, native configuration commands, and authentication steps. Reload
+the connection or start a new session when required, then call `whoami` in that session. See
+[host configuration](https://docs.extrovert.dev/mcp/client-configuration/) for explicit adapters.
+
+## Complete Codex plugin
+
+The optional Codex plugin installs all nine skills together with the packaged stdio MCP server:
 
 ```bash
 codex plugin marketplace add extrovert-dot-dev/extrovert-skills
 codex plugin add extrovert@extrovert
 ```
 
-For interactive hosted OAuth, follow [host configuration](https://docs.extrovert.dev/mcp/client-configuration/).
-Start a new Codex session after installation. For local stdio, use an existing key or redeem an enrollment token,
-then call `whoami`. The equivalent non-plugin setup is:
+Start a new Codex session after installation. For local stdio, use an existing credential or redeem
+an enrollment token, then call `whoami`. The equivalent explicit local setup is:
 
 ```bash
-npx -y @extrovert.dev/mcp@next setup --host codex
+npx --yes --prefer-online @extrovert.dev/mcp@next setup --host codex --transport stdio
 ```
 
-Start a new session after either installation path.
+Start a new session after either local installation path.
 
 | Skill | Purpose |
 |---|---|
@@ -47,13 +71,13 @@ This bundle is published as a prerelease from
 List all nine skills without installing them:
 
 ```bash
-npx skills add extrovert-dot-dev/extrovert-skills --list
+npx --yes --prefer-online skills@latest add extrovert-dot-dev/extrovert-skills --list
 ```
 
-Install one skill for dogfooding:
+Install an additional workflow skill:
 
 ```bash
-npx skills add extrovert-dot-dev/extrovert-skills --skill extrovert-send-email
+npx --yes --prefer-online skills@latest add extrovert-dot-dev/extrovert-skills --skill extrovert-read-inbox
 ```
 
 The repository is directly installable through the open `skills` CLI. Search indexing on skills.sh
@@ -63,6 +87,21 @@ The `@extrovert.dev/sdk` and `@extrovert.dev/mcp` npm prereleases are published 
 dist-tag. The hosted stateless MCP endpoint is `https://mcp.extrovert.dev/mcp`; compatible clients
 discover Extrovert OAuth and open browser sign-in and explicit consent, while scoped agent-key bearer authentication remains
 available for clients configured explicitly.
+
+## Keep guidance current
+
+Each current Extrovert skill instructs the agent to check `agent_context` on first use, after an hour
+of continued use, and after schema errors. Hosts must load that guidance for it to take effect.
+The same public context is available through the packaged CLI's `agent status --json`
+and the [HTTPS contract](https://mcp.extrovert.dev/.well-known/agent-contract.json). It reports release
+information, skill digests, current signup availability, and guide URLs.
+Each skill includes `metadata.version` for comparison with the live skill version. A difference is a
+refresh signal, not a compatibility verdict or an instruction to downgrade.
+
+Refresh only the Extrovert skills installed through the original manager and scope, when permitted.
+Preserve pins and local edits. Updates do not reload instructions already in a conversation or a
+running stdio server. Follow the [update guide](https://docs.extrovert.dev/operating/agent-updates/)
+for targeted commands and reconnect behavior.
 
 ## From setup to deployed workers
 

@@ -1,9 +1,32 @@
 ---
 name: agent-email-architecture
 description: Design or review provider-neutral email architecture for AI agents, including capability authorization, inbox ownership, event delivery, multi-agent topology, OTP handling, retries, and hostile-content defenses. Use before choosing an email provider or when tracing trust boundaries and failure modes across an agent-email system.
+metadata:
+  version: "0.1.0-pre.14"
 ---
 
 # Agent email architecture
+
+## Check current guidance
+
+Apply this check only when the task uses Extrovert; provider-neutral design needs no Extrovert connection.
+On first Extrovert use in this session, after one hour (or a shorter returned freshness interval),
+and after an unknown-tool or schema error, call `agent_context`. If unavailable, fetch
+https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
+An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
+policy permits an unpinned CLI, use
+`npx --yes --prefer-online @extrovert.dev/mcp@next agent status --json`.
+Read the live guide for current product behavior and use the host's current tool schemas. If a
+schema remains stale, refresh the catalog or reconnect before continuing; inspect state before
+retrying an uncertain mutation.
+
+Compare this skill's `metadata.version` with its version in live context. A difference signals a
+refresh to consider, not incompatibility, permission to downgrade, or authorization to install.
+Preserve explicit pins, local edits, the installation manager, and scope; refresh only the installed
+Extrovert skills when permitted. Updating files does not reload instructions already in context or a running MCP
+process. Use live guidance for this task and reload when needed. If freshness is unavailable, report
+that condition without treating it as disabled signup or permission to guess new behavior. See
+[updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
 
 Start from authority and failure semantics, not a provider feature checklist.
 

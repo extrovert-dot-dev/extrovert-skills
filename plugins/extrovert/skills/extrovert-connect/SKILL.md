@@ -1,33 +1,55 @@
 ---
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
+metadata:
+  version: "0.1.0-pre.14"
 ---
 
 # Connect to Extrovert
+
+## Check current guidance
+
+On first Extrovert use in this session, after one hour (or a shorter returned freshness interval),
+and after an unknown-tool or schema error, call `agent_context`. If unavailable, fetch
+https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
+An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
+policy permits an unpinned CLI, use
+`npx --yes --prefer-online @extrovert.dev/mcp@next agent status --json`.
+Read the live guide for current product behavior and use the host's current tool schemas. If a
+schema remains stale, refresh the catalog or reconnect before continuing; inspect state before
+retrying an uncertain mutation.
+
+Compare this skill's `metadata.version` with its version in live context. A difference signals a
+refresh to consider, not incompatibility, permission to downgrade, or authorization to install.
+Preserve explicit pins, local edits, the installation manager, and scope; refresh only the installed
+Extrovert skills when permitted. Updating files does not reload instructions already in context or a running MCP
+process. Use live guidance for this task and reload when needed. If freshness is unavailable, report
+that condition without treating it as disabled signup or permission to guess new behavior. See
+[updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
 
 ## Ensure the native tools exist
 
 Before authentication work, inspect the host's tool catalog for `whoami`. A skill explains how to use tools; installing a skill alone does not install an MCP
 transport.
 
-Self-signup is currently disabled. Use hosted OAuth for an existing account, an existing
-credential, or an enrollment token. Do not start signup or create a second account for an existing customer.
+Use the existing account and profile first: hosted OAuth, an existing credential, or an enrollment
+token. Read live signup availability before offering account creation. Never create a second account
+or replace an existing identity to repair access.
 
 If the Extrovert tools are absent, do not write a JSON-RPC client, a custom stdio helper, a temporary
-HTTP script, or a `curl | jq` workflow. Install one supported connection and start a new session:
+HTTP script, or a `curl | jq` workflow. Use the supported setup command, then complete the reported
+host connection and authentication steps:
 
 ```bash
-# Complete Codex plugin: skills + packaged stdio MCP
-codex plugin marketplace add extrovert-dot-dev/extrovert-skills
-codex plugin add extrovert@extrovert
-
-# Or configure the packaged MCP server directly
-npx -y @extrovert.dev/mcp@next setup --host codex
-
-# Or use hosted OAuth when the human already has an Extrovert console account
-codex mcp add extrovert --url https://mcp.extrovert.dev/mcp
-codex mcp login extrovert
+npx --yes --prefer-online @extrovert.dev/mcp@next setup --host auto
 ```
+
+Automatic host selection prefers hosted MCP. When selection is ambiguous, choose the intended host
+explicitly with `--transport hosted`; follow returned native commands when configuration needs a
+handoff. A saved configuration is not authentication or tool discovery. Reconnect or start a new
+session when the host requires it, then call `whoami`. Installation of skills alone does not configure
+MCP. The [host guide](https://docs.extrovert.dev/mcp/client-configuration/) also covers the complete
+Codex plugin and clients without local execution.
 
 For Hermes, select its intended profile first (the corresponding `HERMES_HOME`), then use
 `npx -y @extrovert.dev/mcp@next setup --host hermes --transport hosted` followed by
@@ -42,8 +64,8 @@ do not invent another transport.
 
 ## Choose credentials
 
-- Connect to the human's existing account. If no account or credential is available, ask the human
-  to obtain access through the console; self-signup is disabled.
+- Connect to the human's existing account. If no account or credential is available, use the
+  new-account flow below only when live signup availability is enabled and account creation is intended.
 - Hosted OAuth (recommended for interactive setup): connect to `https://mcp.extrovert.dev/mcp` and
   follow browser sign-in and explicit consent. Choose Personal assistant or a named Dedicated agent;
   select inboxes (default), a project, an organization, or Full account control. Choose actions separately.
@@ -71,9 +93,37 @@ credential when an explicit key is needed. Use the scope the human chose. A pers
 credential is a deliberate full-control choice, not a routine workaround for a failed inbox list.
 
 The MCP prerelease is published under the explicit `next` dist-tag. Prefer the hosted stateless
-Streamable HTTP endpoint and OAuth when the client supports remote MCP. For a local stdio host, run
-`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.13` and supply only a scoped
-agent key or independently issued connection credential.
+Streamable HTTP endpoint and OAuth when the client supports remote MCP. For an unpinned local stdio
+host, run `npx --yes --prefer-online @extrovert.dev/mcp@next`; preserve deliberate version pins.
+Supply only the agent key or independently issued connection credential intended for that worker.
+
+## New accounts and human verification
+
+Read `signup.status` from live context: `enabled` permits offering self-signup; `disabled` means use
+the console or an enrollment invitation; `unavailable` means the check failed, not that signup is
+enabled. Do not loop on signup errors. Use the current onboarding guide to resolve status.
+For bootstrap without an existing credential, use the packaged local stdio server or CLI's `signup`
+and `verify` commands; hosted OAuth signs into an existing console account. Inspect installed CLI
+help for its exact inputs and preserve any existing profile rather than replacing it.
+
+In an interactive session, obtain the human's email if it is not already supplied, explain that a
+code will arrive there, and use `sign_up` only for the intended new account. In an unattended worker,
+use the human email supplied by its authorized setup; never invent one. Prefer an already issued
+scoped credential or enrollment token for unattended work. If human verification is needed, retain
+the pending state and report the human action through the configured interaction channel. Do not
+promise to wake up later without a running task, or send a separate email without authorization.
+
+The temporary signup key has verification authority only. Use `verify_signup` with the code the
+human supplies; successful verification replaces it with the durable credential. Preserve the same
+profile and pending account throughout. Check `whoami` afterward before mailbox work. An account
+created or verification email queued is not a verified account or a sent first message.
+
+If the human did not receive the code, confirm the destination and suggest **Spam or Junk**. The
+verification email comes from the newly created inbox: use the `address` returned by signup, or
+explicit sender information returned by the service, rather than guessing a fixed no-reply address.
+For an authorized resend, repeat signup with the same human email; this rotates the temporary key
+and code. Keep only the latest pending state and honor rate-limit/retry guidance. Never create a
+different account or bypass verification to recover missing mail.
 
 ## Verify immediately
 

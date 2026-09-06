@@ -1,9 +1,31 @@
 ---
 name: wait-for-otp
 description: Retrieve a one-time passcode, verification code, magic link, or email 2FA challenge from an Extrovert inbox using wait_for_email. Use during signup, login, account confirmation, or device verification when an agent needs one matching message and structured OTP or link extraction without writing a polling loop.
+metadata:
+  version: "0.1.0-pre.14"
 ---
 
 # Wait for an OTP or verification link
+
+## Check current guidance
+
+On first Extrovert use in this session, after one hour (or a shorter returned freshness interval),
+and after an unknown-tool or schema error, call `agent_context`. If unavailable, fetch
+https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
+An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
+policy permits an unpinned CLI, use
+`npx --yes --prefer-online @extrovert.dev/mcp@next agent status --json`.
+Read the live guide for current product behavior and use the host's current tool schemas. If a
+schema remains stale, refresh the catalog or reconnect before continuing; inspect state before
+retrying an uncertain mutation.
+
+Compare this skill's `metadata.version` with its version in live context. A difference signals a
+refresh to consider, not incompatibility, permission to downgrade, or authorization to install.
+Preserve explicit pins, local edits, the installation manager, and scope; refresh only the installed
+Extrovert skills when permitted. Updating files does not reload instructions already in context or a running MCP
+process. Use live guidance for this task and reload when needed. If freshness is unavailable, report
+that condition without treating it as disabled signup or permission to guess new behavior. See
+[updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
 
 1. Use an existing Extrovert inbox or create one with `extrovert-manage-inboxes`.
 2. Trigger the external service's email.
