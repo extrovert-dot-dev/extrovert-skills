@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.15"
+  version: "0.1.0-pre.16"
 ---
 
 # Connect to Extrovert
@@ -10,7 +10,8 @@ metadata:
 ## Check current guidance
 
 On first Extrovert use in this session, after one hour (or a shorter returned freshness interval),
-and after an unknown-tool or schema error, call `agent_context`. If unavailable, fetch
+and after an unknown-tool or schema error, inspect the current tool catalog. Call `agent_context`
+only if present; otherwise fetch
 https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
 An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
 policy permits an unpinned CLI, use
@@ -22,45 +23,46 @@ retrying an uncertain mutation.
 Compare this skill's `metadata.version` with its version in live context. A difference signals a
 refresh to consider, not incompatibility, permission to downgrade, or authorization to install.
 Preserve explicit pins, local edits, the installation manager, and scope; refresh only the installed
-Extrovert skills when permitted. Updating files does not reload instructions already in context or a running MCP
-process. Use live guidance for this task and reload when needed. If freshness is unavailable, report
+Extrovert skills when permitted. Updating files requires two separate reloads: reload and re-read each changed `SKILL.md`, then
+restart changed local MCP processes or refresh hosted discovery. If a new session is needed, report
+that pending step; use live guidance for this task. If freshness is unavailable, report
 that condition without treating it as disabled signup or permission to guess new behavior. See
 [updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
 
-## Ensure the native tools exist
+## Connect in this order
 
-Before authentication work, inspect the host's tool catalog for `whoami`. A skill explains how to use tools; installing a skill alone does not install an MCP
-transport.
-
-Use the existing account and profile first: hosted OAuth, an existing credential, or an enrollment
-token. Read live signup availability before offering account creation. Never create a second account
-or replace an existing identity to repair access.
-
-If the Extrovert tools are absent, do not write a JSON-RPC client, a custom stdio helper, a temporary
-HTTP script, or a `curl | jq` workflow. Use the supported setup command, then complete the reported
-host connection and authentication steps:
+1. Read live context as above. With no Extrovert MCP, fetch the HTTPS contract; do not call
+   unavailable `agent_context`. This read needs no account or MCP installation.
+2. Check this host for Extrovert tools. If absent, run the supported setup command below when
+   installation is allowed. Follow its host-selection or native-command handoff in this same host.
+3. Complete authentication: setup only configures MCP. Follow its returned native sign-in command
+   or host OAuth action (Claude Code: `/mcp`). Have the person sign in to the existing account and
+   approve access before `whoami`. Local stdio/CLI uses `extrovert auth login`; this does not
+   authenticate the host's separate hosted OAuth connection.
+4. Reload the MCP connection when required and call `whoami` in that actual session before work.
+   For CLI-only work, use its `whoami`. Saved configuration or pending login is not connected.
 
 ```bash
 npx --yes --prefer-online @extrovert.dev/mcp@next setup --host auto
 ```
 
-Automatic host selection prefers hosted MCP. When selection is ambiguous, choose the intended host
-explicitly with `--transport hosted`; follow returned native commands when configuration needs a
-handoff. A saved configuration is not authentication or tool discovery. Reconnect or start a new
-session when the host requires it, then call `whoami`. Installation of skills alone does not configure
-MCP. The [host guide](https://docs.extrovert.dev/mcp/client-configuration/) also covers the complete
-Codex plugin and clients without local execution.
+Automatic selection prefers hosted MCP. If selection is ambiguous, choose the intended host
+explicitly with `--transport hosted`; an explicit host without a transport retains the stdio default.
+Preserve existing server entries and profile credentials. Installing a skill alone does not configure
+MCP. Do not build a custom JSON-RPC transport or install a similarly named product.
+See [host setup](https://docs.extrovert.dev/mcp/client-configuration/) for exact adapters and plugins.
 
-For Hermes, select its intended profile first (the corresponding `HERMES_HOME`), then use
-`npx -y @extrovert.dev/mcp@next setup --host hermes --transport hosted` followed by
-`hermes mcp login extrovert`. For local enrollment use `--transport stdio` instead. The setup command
-preserves other servers and refuses to overwrite an existing Extrovert entry. A saved configuration
-does not mean authentication or tool enablement succeeded: start a new Hermes session and call `whoami`.
+For local access, use `npx --yes --prefer-online @extrovert.dev/mcp@next auth login`.
+Without an interactive terminal, use `auth login --no-browser --json`, show the returned
+`authorization_url` when pending, then run `auth complete --json` in the same profile with the
+website's completion code on private stdin. Never put the code in arguments, chat, or logs.
+Follow [current login guidance](https://docs.extrovert.dev/quickstart/authentication/#local-cli-and-stdio-sign-in)
+for browser fallback, cancellation, existing credentials, and recovery. A completion code is not an
+access token or proof that login succeeded; verify the completed connection.
 
-For Claude Code, use `npx -y @extrovert.dev/mcp@next setup --host claude`; Cursor and generic-host
-configuration are at `https://docs.extrovert.dev/mcp/client-configuration/`. If host configuration is
-not writable, report that exact blocker and use the packaged `extrovert` CLI as the explicit fallback;
-do not invent another transport.
+If configuration is not writable, report that exact blocker and use the packaged CLI as the explicit
+fallback. Never create a second account or replace an existing identity to repair access. Read live
+signup availability before offering account creation.
 
 ## Choose credentials
 
@@ -77,6 +79,9 @@ do not invent another transport.
   extend that deadline. Created credentials, including admin credentials, survive independently.
   Private platform access is always excluded. Existing hosted OAuth sessions must reconnect through
   consent; do not infer broader permissions from their old display name.
+- Local CLI/stdio OAuth: `auth login` signs in to an existing account and saves a separate local
+  connection. Refresh respects the granted identity, reach, actions, and expiry. Hosted MCP OAuth
+  remains managed by the host; do not copy its tokens into local API credentials.
 - Enrollment token: prefer `npx -y @extrovert.dev/mcp@next enroll --agent-handle <stable-name>`.
   It accepts hidden stdin or `EXTROVERT_ENROLLMENT_KEY`, saves the scoped agent key privately, and checks
   identity. Keep the same handle and `--client-id` on a retry. With tools already connected,
@@ -84,7 +89,7 @@ do not invent another transport.
 - Existing agent key or independently issued connection credential (`ev_credential_...`): use `npx -y @extrovert.dev/mcp@next auth login --with-token` and hidden stdin.
   Never put a key in a command argument or repeat it in a response.
 
-Set `EXTROVERT_PROFILE` before enrollment and setup to separate agent identities. Hermes uses its
+Set `EXTROVERT_PROFILE` before login, enrollment, and setup to separate agent identities. Hermes uses its
 selected `HERMES_HOME` automatically. `EXTROVERT_CONFIG_DIR` explicitly overrides both. Do not copy a
 global credential into a different profile or replace an existing identity to make a login succeed.
 

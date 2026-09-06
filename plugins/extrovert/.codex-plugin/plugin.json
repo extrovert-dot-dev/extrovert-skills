@@ -1,6 +1,6 @@
 {
   "name": "extrovert",
-  "version": "0.1.0-pre.15",
+  "version": "0.1.0-pre.16",
   "description": "A persistent, scoped inbox for coding agents, with reviewed outbound mail and native MCP tools.",
   "author": {
     "name": "Extrovert",
@@ -21,7 +21,7 @@
     "capabilities": ["Read", "Write"],
     "websiteURL": "https://extrovert.dev",
     "defaultPrompt": [
-      "Create an Extrovert account and connect this session.",
+      "Connect Extrovert using my existing account, or help me create one if needed.",
       "Check my Extrovert inbox and summarize unread mail.",
       "Draft an email and submit it for human review."
     ],

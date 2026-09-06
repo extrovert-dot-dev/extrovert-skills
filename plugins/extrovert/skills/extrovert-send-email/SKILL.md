@@ -2,7 +2,7 @@
 name: extrovert-send-email
 description: Send, reply, or forward through Extrovert and drive the durable Review Loop through revision, delivery, failure closure, or cancellation. Use for any outbound message, retry, reviewer conversation, redraft, approval event, session recovery, “any feedback?” about a previously authorized email, or questions about queued mail, review status, and delivery. Use even when the latest message does not repeat “send.”
 metadata:
-  version: "0.1.0-pre.15"
+  version: "0.1.0-pre.16"
 ---
 
 # Send email through Extrovert
@@ -10,7 +10,8 @@ metadata:
 ## Check current guidance
 
 On first Extrovert use in this session, after one hour (or a shorter returned freshness interval),
-and after an unknown-tool or schema error, call `agent_context`. If unavailable, fetch
+and after an unknown-tool or schema error, inspect the current tool catalog. Call `agent_context`
+only if present; otherwise fetch
 https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
 An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
 policy permits an unpinned CLI, use
@@ -22,8 +23,9 @@ retrying an uncertain mutation.
 Compare this skill's `metadata.version` with its version in live context. A difference signals a
 refresh to consider, not incompatibility, permission to downgrade, or authorization to install.
 Preserve explicit pins, local edits, the installation manager, and scope; refresh only the installed
-Extrovert skills when permitted. Updating files does not reload instructions already in context or a running MCP
-process. Use live guidance for this task and reload when needed. If freshness is unavailable, report
+Extrovert skills when permitted. Updating files requires two separate reloads: reload and re-read each changed `SKILL.md`, then
+restart changed local MCP processes or refresh hosted discovery. If a new session is needed, report
+that pending step; use live guidance for this task. If freshness is unavailable, report
 that condition without treating it as disabled signup or permission to guess new behavior. See
 [updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
 
