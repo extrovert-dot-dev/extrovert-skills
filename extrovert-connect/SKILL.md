@@ -1,6 +1,6 @@
 ---
 name: extrovert-connect
-description: Connect an agent runtime to Extrovert and diagnose authentication, key-tier, scope, MCP transport, webhook, polling, or event-stream problems. Use for first-time setup, self-signup, enrollment redemption, whoami verification, MCP host configuration, a 401 or 403, or deciding how inbound and review events should reach an agent.
+description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 ---
 
 # Connect to Extrovert
@@ -10,8 +10,8 @@ description: Connect an agent runtime to Extrovert and diagnose authentication, 
 Before authentication work, inspect the host's tool catalog for `whoami`. A skill explains how to use tools; installing a skill alone does not install an MCP
 transport.
 
-Self-signup is currently disabled. Use an existing agent key or an enrollment
-token. Do not start signup or create a second account for an existing customer.
+Self-signup is currently disabled. Use hosted OAuth for an existing account, an existing
+credential, or an enrollment token. Do not start signup or create a second account for an existing customer.
 
 If the Extrovert tools are absent, do not write a JSON-RPC client, a custom stdio helper, a temporary
 HTTP script, or a `curl | jq` workflow. Install one supported connection and start a new session:
@@ -72,7 +72,7 @@ credential is a deliberate full-control choice, not a routine workaround for a f
 
 The MCP prerelease is published under the explicit `next` dist-tag. Prefer the hosted stateless
 Streamable HTTP endpoint and OAuth when the client supports remote MCP. For a local stdio host, run
-`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.12` and supply only a scoped
+`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.13` and supply only a scoped
 agent key or independently issued connection credential.
 
 ## Verify immediately
@@ -105,6 +105,24 @@ The TypeScript SDK exposes the same catalog as `client.administration.list/descr
 Use Connections to inspect the parent connection and the access it created. Revoking the parent
 or reaching its 24-hour expiry does not revoke independent credentials. Revoke each unwanted
 credential separately. Never repeat a returned raw credential in a user-facing explanation.
+
+## Finish setup and hand off
+
+For an authorized setup task, use full control to configure the requested resources, then give
+workers their own identity and resource/action scope. Use enrollment to create an agent, an agent
+key for an existing agent, or a separately consented connection for selected/shared inbox access.
+Inspect the administrative catalog for exact credential-issuance inputs; never guess IDs or print
+one-time secrets. Full control does not mean every worker needs an administrative credential.
+
+Verify `whoami` and the intended inbox list in each worker's actual runtime before ending setup.
+Review the parent's created credentials in Connections and revoke unwanted access separately.
+End the setup connection when finished or let its fixed deadline expire. Settings, webhooks,
+exported credentials, and independent keys can outlast it; expiry does not undo setup.
+
+Independent `ev_credential_...` credentials work with the API and packaged stdio/CLI. They are
+not hosted MCP bearer tokens. Hosted MCP uses its own OAuth audience or a scoped agent key.
+Read [Connections and access](https://docs.extrovert.dev/concepts/connections-and-access/) for the
+complete human-facing walkthrough.
 
 ## Explain domain readiness
 

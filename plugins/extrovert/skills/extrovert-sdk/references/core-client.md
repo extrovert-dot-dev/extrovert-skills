@@ -8,7 +8,7 @@ Install the explicit prerelease tag:
 npm install @extrovert.dev/sdk@next
 ```
 
-Pin `@extrovert.dev/sdk@0.1.0-pre.12` when a test needs a reproducible contract. The public REST fallback
+Pin `@extrovert.dev/sdk@0.1.0-pre.13` when a test needs a reproducible contract. The public REST fallback
 is `https://api.extrovert.dev/v1`; obtain the current schema from the service's OpenAPI endpoint
 rather than copying a stale schema.
 
@@ -27,7 +27,10 @@ const page = await client.projects.inboxes.list(me.project_id!, { limit: 50 });
 for await (const inbox of page) console.log(inbox.id);
 ```
 
-The key fixes the org, project, tier, and scopes. An org-tier key uses an explicit project or `"-"` wildcard; a bare org list fails with `breadth_required`. Never parse cursors or opaque ids.
+For a legacy key, the org, project, tier, and scopes are fixed. An org-tier key uses an explicit
+project or `"-"` wildcard; a bare org list fails with `breadth_required`. For an explicit connection,
+inspect `me.connection` and use only projects inside its granted reach. Do not default a missing
+project ID to wildcard access. Never parse cursors or opaque IDs.
 
 Use `ApiError.problemCode` and typed subclasses such as `ForbiddenScopeError` and `BreadthRequiredError`. Propagate request cancellation. Keep bounded pages and use `collect()` only when an intentionally bounded complete result is required.
 

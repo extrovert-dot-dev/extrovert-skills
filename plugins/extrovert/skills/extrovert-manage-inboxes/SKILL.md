@@ -25,8 +25,9 @@ Use `list_inboxes` within the key's tier. An org-tier key must explicitly choose
 When the domain is omitted, paid accounts receive an `extrovertmail.com`
 address and free accounts receive a `free.extrovertmail.com` address. Platform
 shared local parts must be at least five characters and cannot use reserved
-role or operator names. `direct_smtp_enabled` is read-only to agents: raw SMTP
-is disabled by default, a signed-in human controls it per inbox, and it is
+role or operator names. `direct_smtp_enabled` is read-only through ordinary inbox tools: raw SMTP
+is disabled by default, an authorized customer administrator or explicitly granted Full account
+control connection controls it per inbox, and it is
 effective only while the inbox has a paid entitlement. Exported credentials do
 not imply SMTP access. API, SDK, and MCP sends continue through the Review Loop
 regardless.

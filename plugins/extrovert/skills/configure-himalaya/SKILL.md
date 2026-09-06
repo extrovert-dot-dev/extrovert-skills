@@ -8,8 +8,9 @@ description: Configure Himalaya or another standard mail client for an Extrovert
 Call `export_email_config` for the inbox only with an explicitly granted `mailbox:credentials` key on a paid account. Free accounts cannot export these credentials. Never guess a host, username, port, encryption mode, or password. Treat the response as a secret.
 
 Receiving credentials does not enable direct SMTP. Check the inbox's
-`direct_smtp_enabled` value first. It defaults to false, a signed-in human
-controls it per inbox, and it is effective only while paid entitlement remains
+`direct_smtp_enabled` value first. It defaults to false; an authorized customer administrator
+or explicitly granted Full account control connection can change it per inbox. Ordinary mail
+permissions cannot. It is effective only while paid entitlement remains
 active. The same password can authenticate IMAP and SMTP, but the mail server
 rejects raw SMTP when the effective setting is false.
 

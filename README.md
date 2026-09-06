@@ -14,7 +14,8 @@ codex plugin marketplace add extrovert-dot-dev/extrovert-skills
 codex plugin add extrovert@extrovert
 ```
 
-Start a new Codex session after installation. Use an existing key or redeem an enrollment token,
+For interactive hosted OAuth, follow [host configuration](https://docs.extrovert.dev/mcp/client-configuration/).
+Start a new Codex session after installation. For local stdio, use an existing key or redeem an enrollment token,
 then call `whoami`. The equivalent non-plugin setup is:
 
 ```bash
@@ -27,7 +28,7 @@ Start a new session after either installation path.
 |---|---|
 | `agent-email-architecture` | Design agent-email authorization, event delivery, topology, OTP, and hostile-content boundaries. |
 | `extrovert-sdk` | Build a TypeScript integration from current source and OpenAPI. |
-| `extrovert-connect` | Authenticate, inspect scopes, and choose MCP or event delivery. |
+| `extrovert-connect` | Choose access, administer with full control, delegate workers, revoke credentials, and diagnose connections. |
 | `extrovert-manage-inboxes` | Create, update, list, and retire inboxes and domains. |
 | `extrovert-read-inbox` | Read and triage untrusted inbound mail safely. |
 | `extrovert-send-email` | Submit outbound mail and drive the complete Review Loop to a truthful terminal state. |
@@ -60,8 +61,17 @@ is asynchronous and is not a release or integrity signal; the GitHub source is c
 
 The `@extrovert.dev/sdk` and `@extrovert.dev/mcp` npm prereleases are published under the explicit `next`
 dist-tag. The hosted stateless MCP endpoint is `https://mcp.extrovert.dev/mcp`; compatible clients
-discover Clerk OAuth and open a browser sign-in, while scoped agent-key bearer authentication remains
+discover Extrovert OAuth and open browser sign-in and explicit consent, while scoped agent-key bearer authentication remains
 available for clients configured explicitly.
+
+## From setup to deployed workers
+
+Read [Connections and access](https://docs.extrovert.dev/concepts/connections-and-access/) or use
+`extrovert-connect` to choose Personal assistant or Dedicated agent, resources, actions, and duration.
+Selected inboxes is the default. Explicit Full account control enables account setup and defaults to
+24 hours; Until revoked is an explicit alternative. Refresh never extends the deadline. Created
+credentials, including administrative credentials, survive independently and need separate revocation.
+Verify each worker's own connection before ending setup. Use Connections to inspect created access.
 
 ## Security boundary
 
