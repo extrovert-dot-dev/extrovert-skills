@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.16"
+  version: "0.1.0-pre.17"
 ---
 
 # Connect to Extrovert
@@ -257,6 +257,26 @@ After confirming identity, drain `list_review_events` and use `list_reviews` wit
 there is work. A user request to send remains in progress through human feedback and
 revision: keep one `wait_for_review_event` (55 seconds, no review_id) active until confirmed
 sent or an unsuccessful terminal outcome. Do not require the user to nudge each step.
+
+### Incoming-email activation
+
+Check signup availability before offering a new free account. When `sign_up` returns
+`activation_method: incoming_email`, keep its limited key and tell the human:
+“Your agent’s inbox is almost ready. Send an email from {human_email} to {address}
+to activate it and link it to your human email.” Any message works. Call
+`check_activation`; after it reports `proven`, call `verify_signup` without an OTP.
+Do not try to read the pending inbox or ask the human to retrieve a code from it.
+
+A mismatched sender does not replace the expected human. Use `correct_activation_email`
+with the current revision to fix a typo, then request a fresh email; the original
+24-hour expiry stays fixed. A verified matching console login with explicit approval
+is the fallback. Existing account owners enroll agents through their console. Use an
+OTP only for a legacy response that actually issued one.
+
+Storage warnings are structured from 90% usage. Mention cleanup or asking the human
+for more space when first warned, when pressure increases, or when an operation is
+blocked. Do not repeat upgrade suggestions on every mail read. Reads and deletion
+remain available when storage is full.
 
 When comparing a hosted OAuth connection with a local CLI profile, call `whoami`
 through each separately and retain the stable agent/key IDs and scope fields.
