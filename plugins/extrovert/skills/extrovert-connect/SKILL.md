@@ -72,7 +72,7 @@ credential is a deliberate full-control choice, not a routine workaround for a f
 
 The MCP prerelease is published under the explicit `next` dist-tag. Prefer the hosted stateless
 Streamable HTTP endpoint and OAuth when the client supports remote MCP. For a local stdio host, run
-`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.11` and supply only a scoped
+`npx -y @extrovert.dev/mcp@next` or pin `@extrovert.dev/mcp@0.1.0-pre.12` and supply only a scoped
 agent key or independently issued connection credential.
 
 ## Verify immediately

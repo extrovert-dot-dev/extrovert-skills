@@ -5,7 +5,9 @@ description: Create, inspect, update, list, or retire Extrovert inboxes and doma
 
 # Manage Extrovert inboxes
 
-Authenticate first and call `whoami`. Scope is fixed by the key; request project ids are assertions, not selectors.
+Authenticate first and call `whoami`. Existing agent keys retain their fixed ceiling; a connection
+can select resources only within its consented reach. Never infer ownership or permissions from a
+name, an address, or another connection's output.
 
 ## Create and inspect
 
