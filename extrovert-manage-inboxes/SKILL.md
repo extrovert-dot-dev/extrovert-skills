@@ -2,7 +2,7 @@
 name: extrovert-manage-inboxes
 description: Create, inspect, update, list, or retire Extrovert inboxes and domains with scoped keys and stable retry identities. Use for a new email identity, fleet provisioning, metadata or send-limit changes, contact controls, domain onboarding, credential export, or safe inbox and domain cleanup.
 metadata:
-  version: "0.1.0-pre.21"
+  version: "0.1.0-pre.22"
 ---
 
 # Manage Extrovert inboxes
@@ -134,3 +134,24 @@ Inbox lifecycle, sender setup, and review policy are different facts. Missing
 `sender_verified` is unknown, not pending. It does not justify refusing a user’s
 send request; follow the documented send/review workflow and use its explicit
 errors or outcome. Do not claim delivery or receipt from readiness alone.
+
+## Sender display names
+
+Use inbox `display_name` for the sender name on API mail. Set it with `create_inbox`
+or `update_inbox` (SDK inbox create/update); do not put a full `Name <address>` in
+`from` or try `headers.From`. Up to 60 Unicode characters after normalization;
+use a clear personal or organization name without emoji, invisible characters,
+embedded addresses, styled letters or fake thread markers. Ordinary `Support`
+and bilingual names are valid. An error is a request to correct the name, not to
+encode, escape or obfuscate it to bypass validation. Ask for a safe replacement
+when the requested identity cannot be represented safely.
+
+Create omission/empty defaults to `Agent {username}`: `agent007` becomes `Agent 007`
+and `alice_bot` becomes `Agent alice-bot`. If a generated default cannot pass validation, it falls back to `Agent`.
+Invalid explicit names are rejected. Only generated defaults replace underscores
+with hyphens; explicit custom names must pass validation as entered. Update omission leaves unchanged and
+`display_name: ""` clears to bare-address API mail. Read the normalized result.
+Existing reviews retain their captured name. SMTP uses the client's own validated
+From name, including an intentionally bare address; changing the inbox name does
+not rewrite that SMTP name. Neither setting changes the authorized sender address,
+review requirement, plan entitlement or proves identity/delivery.

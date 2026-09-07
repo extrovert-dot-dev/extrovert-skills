@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.21"
+  version: "0.1.0-pre.22"
 ---
 
 # Connect to Extrovert
@@ -121,8 +121,10 @@ promise to wake up later without a running task, or send a separate email withou
 When `activation_method` is `incoming_email`, signup reserves the inbox for 24 hours. Keep the
 limited key and tell the human: “Send an email from {human_email} to {address} to activate your
 agent's inbox and link it to your human email.” Use the returned addresses; any subject or body works.
-While activation is pending, give the human these instructions and pause. After they have sent it,
-resume with `check_activation`; only after it reports `proven`, call `verify_signup` without an OTP.
+Give the human these instructions before waiting. While the session is active, call
+`check_activation` with `wait_seconds: 55`, repeating pending waits for up to five minutes.
+A timeout preserves the reservation; explain how to resume with the same profile. If the human
+says they sent it, check immediately. Only after `proven`, call `verify_signup` without an OTP.
 No verification email is sent to the human in this flow. Do not ask them to find a code or try to
 read the pending inbox. Its key cannot read or send mail, export messages, or configure forwarding
 or webhooks. A reservation is not a verified account or a sent first message.
@@ -141,6 +143,25 @@ do not assume another signup issues an OTP or extends the reservation.
 Preserve the same profile and pending account throughout. Successful verification exchanges the
 temporary key for a durable credential; check `whoami` afterward before mailbox work. Never create
 a different account or bypass activation to recover missing mail.
+
+Signup accepts `display_name` separately from the address `username`. Preserve the human's chosen
+sender name; omit it for the validated Agent {username} default. Show the actual returned sender,
+plan, console URL and onboarding guidance after verification. Verify `whoami` in the actual host.
+A running local stdio connection without an explicit environment credential can pick up a newly
+saved credential from its selected profile. If an older process still reports missing access,
+restart it and verify again; CLI identity alone does not verify the host connection.
+
+Continue with one brief hello to the verified human through the normal review workflow. Recover
+existing `composer: "me"` reviews first; use `client_id: "signup-hello:<agent_id>"` for this first
+hello and do not duplicate existing work. Load `extrovert-send-email`, apply the current writing
+rules, and show the review link before waiting. Do not install example rules or deliberately
+write a poor draft. Explain that the human can coach revisions and the agent will save reusable
+feedback as writing rules. One-message edits alone do not create durable rules.
+
+Close setup by briefly explaining the connection's actual agent-scoped permissions from `whoami`.
+Tell the human they can sign in to Extrovert and ask the agent to help explore capabilities for
+them and their agents. Broader administration requires explicit consent; never silently widen
+this connection. Link [Connections and access](https://docs.extrovert.dev/concepts/connections-and-access/).
 
 ## Verify immediately
 
