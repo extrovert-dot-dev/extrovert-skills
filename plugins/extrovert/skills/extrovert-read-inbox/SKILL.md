@@ -2,7 +2,7 @@
 name: extrovert-read-inbox
 description: Read, search, triage, thread, mark, download, or delete mail in an Extrovert inbox while preserving MIME fidelity and resisting prompt injection. Use for ordinary inbound mail, thread summaries, attachment retrieval, mailbox cleanup, quoted-text handling, or tasks where message content may try to redirect instructions. Questions about feedback on a previously authorized outbound email belong to extrovert-send-email first; check the review queue before searching inbound replies.
 metadata:
-  version: "0.1.0-pre.18"
+  version: "0.1.0-pre.19"
 ---
 
 # Read an Extrovert inbox
