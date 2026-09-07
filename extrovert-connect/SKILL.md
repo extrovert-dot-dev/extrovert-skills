@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.17"
+  version: "0.1.0-pre.18"
 ---
 
 # Connect to Extrovert
@@ -23,7 +23,7 @@ retrying an uncertain mutation.
 Compare this skill's `metadata.version` with its version in live context. A difference signals a
 refresh to consider, not incompatibility, permission to downgrade, or authorization to install.
 Preserve explicit pins, local edits, the installation manager, and scope; refresh only the installed
-Extrovert skills when permitted. Updating files requires two separate reloads: reload and re-read each changed `SKILL.md`, then
+Extrovert skills when permitted. Updating files requires two separate reloads: reload each changed skill and read its complete updated `SKILL.md` body (not just metadata), then
 restart changed local MCP processes or refresh hosted discovery. If a new session is needed, report
 that pending step; use live guidance for this task. If freshness is unavailable, report
 that condition without treating it as disabled signup or permission to guess new behavior. See
@@ -111,24 +111,36 @@ For bootstrap without an existing credential, use the packaged local stdio serve
 and `verify` commands; hosted OAuth signs into an existing console account. Inspect installed CLI
 help for its exact inputs and preserve any existing profile rather than replacing it.
 
-In an interactive session, obtain the human's email if it is not already supplied, explain that a
-code will arrive there, and use `sign_up` only for the intended new account. In an unattended worker,
+In an interactive session, obtain the human's email if it is not already supplied and use `sign_up`
+only for the intended new account. Follow the activation method returned by signup. In an unattended worker,
 use the human email supplied by its authorized setup; never invent one. Prefer an already issued
 scoped credential or enrollment token for unattended work. If human verification is needed, retain
 the pending state and report the human action through the configured interaction channel. Do not
 promise to wake up later without a running task, or send a separate email without authorization.
 
-The temporary signup key has verification authority only. Use `verify_signup` with the code the
-human supplies; successful verification replaces it with the durable credential. Preserve the same
-profile and pending account throughout. Check `whoami` afterward before mailbox work. An account
-created or verification email queued is not a verified account or a sent first message.
+When `activation_method` is `incoming_email`, signup reserves the inbox for 24 hours. Keep the
+limited key and tell the human: “Send an email from {human_email} to {address} to activate your
+agent's inbox and link it to your human email.” Use the returned addresses; any subject or body works.
+While activation is pending, give the human these instructions and pause. After they have sent it,
+resume with `check_activation`; only after it reports `proven`, call `verify_signup` without an OTP.
+No verification email is sent to the human in this flow. Do not ask them to find a code or try to
+read the pending inbox. Its key cannot read or send mail, export messages, or configure forwarding
+or webhooks. A reservation is not a verified account or a sent first message.
 
-If the human did not receive the code, confirm the destination and suggest **Spam or Junk**. The
-verification email comes from the newly created inbox: use the `address` returned by signup, or
-explicit sender information returned by the service, rather than guessing a fixed no-reply address.
-For an authorized resend, repeat signup with the same human email; this rotates the temporary key
-and code. Keep only the latest pending state and honor rate-limit/retry guidance. Never create a
-different account or bypass verification to recover missing mail.
+A mismatched sender does not replace the expected human. To correct a typo, use
+`correct_activation_email` with the current revision, then request a fresh matching email; the
+original expiry stays fixed. A verified matching console login with explicit approval is an
+alternative. Existing account owners enroll agents through their console.
+
+For a **legacy response that actually issued an OTP**, use the human-supplied code with
+`verify_signup` before its original expiry. If that verification email is missing, confirm the
+returned destination and suggest **Spam or Junk**. Use the returned sender or signup `address`,
+not a guessed no-reply address. Consult the current response and recovery guidance before a resend;
+do not assume another signup issues an OTP or extends the reservation.
+
+Preserve the same profile and pending account throughout. Successful verification exchanges the
+temporary key for a durable credential; check `whoami` afterward before mailbox work. Never create
+a different account or bypass activation to recover missing mail.
 
 ## Verify immediately
 
@@ -138,6 +150,8 @@ key tier, connection ID, reach, expiry, and scopes for authorization checks. A p
 cannot switch projects. A broader connection may explicitly select a project within its granted reach.
 
 `doctor` checks a local credential against the API; it does not prove the host's OAuth session works.
+Use CLI `whoami --json` to verify local access without opening, reading or printing credential
+files or any key/token fragment. The CLI reads its saved profile privately.
 If browser approval succeeds but MCP returns 401, stop repeated approvals, preserve only the error
 and non-secret request ID, and report the failed step. A login process exiting zero or a callback
 returning 200 does not prove tool access. Do not suggest SSH tunnels or broader keys as a speculative
@@ -258,20 +272,7 @@ there is work. A user request to send remains in progress through human feedback
 revision: keep one `wait_for_review_event` (55 seconds, no review_id) active until confirmed
 sent or an unsuccessful terminal outcome. Do not require the user to nudge each step.
 
-### Incoming-email activation
-
-Check signup availability before offering a new free account. When `sign_up` returns
-`activation_method: incoming_email`, keep its limited key and tell the human:
-“Your agent’s inbox is almost ready. Send an email from {human_email} to {address}
-to activate it and link it to your human email.” Any message works. Call
-`check_activation`; after it reports `proven`, call `verify_signup` without an OTP.
-Do not try to read the pending inbox or ask the human to retrieve a code from it.
-
-A mismatched sender does not replace the expected human. Use `correct_activation_email`
-with the current revision to fix a typo, then request a fresh email; the original
-24-hour expiry stays fixed. A verified matching console login with explicit approval
-is the fallback. Existing account owners enroll agents through their console. Use an
-OTP only for a legacy response that actually issued one.
+### Storage and connection diagnostics
 
 Storage warnings are structured from 90% usage. Mention cleanup or asking the human
 for more space when first warned, when pressure increases, or when an operation is
