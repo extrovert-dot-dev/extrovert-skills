@@ -1,8 +1,8 @@
 ---
 name: configure-himalaya
-description: Configure Himalaya or another standard mail client for an Extrovert inbox from export_email_config output. Use when an agent runtime needs IMAP and SMTP settings, a mailbox login, a terminal email client, or raw credentials, and make the direct-SMTP review and compliance bypass explicit before enabling outbound mail.
+description: Configure Himalaya or another standard mail client for an Extrovert inbox from export_email_config output. Use when an agent runtime needs IMAP and SMTP settings, a mailbox login, a terminal email client, or raw credentials, and explain SMTP review holds, delivery status and safe retries before enabling outbound mail.
 metadata:
-  version: "0.1.0-pre.19"
+  version: "0.1.0-pre.20"
 ---
 
 # Configure Himalaya
@@ -46,11 +46,27 @@ rejects raw SMTP when the effective setting is false.
 
 For Himalaya, request `format: "himalaya"`. Back up an existing `~/.config/himalaya/config.toml`, then merge the returned account block instead of overwriting the file. Restrict file permissions to the current user. Test IMAP by listing a folder before attempting SMTP.
 
-## Critical outbound warning
+## Outbound review and delivery
 
-Direct SMTP sends do not pass through Extrovert review, suppression or contact-list checks, List-Unsubscribe injection, or Extrovert billing and accounting. Extrovert API, SDK, and MCP send, reply, and forward calls always remain governed by the Review Loop, regardless of `direct_smtp_enabled`. Do not describe Himalaya SMTP as equivalent to an Extrovert reviewed send.
+Direct SMTP follows the inbox and account review policies. A required human review
+is held in the Extrovert review thread; approval, edits, rejection and feedback
+happen there. An SMTP `250` response means accepted custody, not delivery. Check
+review status before describing the message as sent. A client's original Sent
+copy is not proof of delivery, and review edits do not rewrite that local copy.
 
-If the task only requires reading mail, configure IMAP and leave SMTP unused. If direct SMTP is genuinely required, confirm the user understands the bypass, keep recipient scope narrow, and never use it to evade a failed or pending review.
+Keep the same Message-ID and content when retrying an uncertain SMTP submission.
+The retry resolves to the same review, including after approval or rejection.
+Changed content needs a new Message-ID. Never work around a pending or rejected
+review by submitting a new identity without authorization for a new message.
+
+SMTP supports up to 8 MiB of plain text/HTML MIME and ordinary attachments.
+Signed/encrypted messages, inline/CID content, embedded messages and unsupported
+MIME are refused before acceptance. To/Cc/Bcc and supported attachment bytes are
+preserved. Recipient restrictions, suppression, unsubscribe policy and billing
+apply at final dispatch. SMTP does not supply the structured intent, category or
+writing-rule attestation available through API/MCP composition tools.
+
+If the task only requires reading mail, configure IMAP and leave SMTP unused.
 
 ## Credential safety
 

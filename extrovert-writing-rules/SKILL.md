@@ -2,7 +2,7 @@
 name: extrovert-writing-rules
 description: Read Extrovert writing rules before composing and turn reusable human feedback into governed rules. Use for get_rules, category matching, saving or superseding a preference, promotion, retirement, audit, undo, risk-dial inspection, or proposing graduation without confusing one reviewer's edit with a universal rule.
 metadata:
-  version: "0.1.0-pre.19"
+  version: "0.1.0-pre.20"
 ---
 
 # Extrovert writing rules
