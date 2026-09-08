@@ -107,7 +107,9 @@ for targeted commands and reconnect behavior.
 
 Read [Connections and access](https://docs.extrovert.dev/concepts/connections-and-access/) or use
 `extrovert-connect` to choose Personal assistant or Dedicated agent, resources, actions, and duration.
-Selected inboxes is the default. Explicit Full account control enables account setup and defaults to
+For ordinary mail, choose Dedicated agent, Selected inboxes, and Read and send.
+See the [installation guide](https://docs.extrovert.dev/quickstart/install/).
+Explicit Full account control enables account administration and defaults to
 24 hours; Until revoked is an explicit alternative. Refresh never extends the deadline. Created
 credentials, including administrative credentials, survive independently and need separate revocation.
 Verify each worker's own connection before ending setup. Use Connections to inspect created access.

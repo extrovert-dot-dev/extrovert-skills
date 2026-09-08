@@ -2,7 +2,7 @@
 name: agent-email-architecture
 description: Design or review provider-neutral email architecture for AI agents, including capability authorization, inbox ownership, event delivery, multi-agent topology, OTP handling, retries, and hostile-content defenses. Use before choosing an email provider or when tracing trust boundaries and failure modes across an agent-email system.
 metadata:
-  version: "0.1.0-pre.24"
+  version: "0.1.0-pre.25"
 ---
 
 # Agent email architecture
@@ -77,7 +77,8 @@ Trigger the external email before starting one bounded wait. Filter by expected 
 
 ## Interactive setup and independent access
 
-Extrovert offers explicit Full account control for guided exploration and setup. The original
+Ordinary email setup uses a dedicated agent with selected inboxes and the required mail actions.
+Extrovert offers explicit Full account control for broader account administration. The original
 connection expires after 24 hours by default, or Until revoked when explicitly selected. Token
 refresh preserves the original deadline. A person can then deploy separate, narrower credentials
 for workers. Credentials created during setup survive independently, including administrative

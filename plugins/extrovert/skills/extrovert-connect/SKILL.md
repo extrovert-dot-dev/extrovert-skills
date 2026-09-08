@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.24"
+  version: "0.1.0-pre.25"
 ---
 
 # Connect to Extrovert
@@ -28,6 +28,22 @@ restart changed local MCP processes or refresh hosted discovery. If a new sessio
 that pending step; use live guidance for this task. If freshness is unavailable, report
 that condition without treating it as disabled signup or permission to guess new behavior. See
 [updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
+
+## Ordinary setup uses limited access
+
+Read https://docs.extrovert.dev/quickstart/install/ for the common installation flow.
+A console handoff means the human already has an account. Reuse working credentials
+or resume pending setup. Missing local credentials are not evidence of a new customer;
+ask about account intent when unknown. Do not create a replacement account.
+Recommend Dedicated agent, Selected inboxes, and Read and send for an email agent.
+The person selects the named agent and exact inboxes. Identity, reach and actions
+are independent; Personal assistant can also be narrow. For inbox creation, request
+suitable project/organization reach and mailbox:create, not full account control.
+Full account control is only for explicitly requested administration. Never request
+it merely to install, reconnect, troubleshoot visibility, or send a first message.
+Native hosted OAuth and local CLI login are alternatives, not two required logins.
+For a connection-only request, verify access and offer a first email; do not send one
+without authorization. Resume existing authorized reviews under the same composer.
 
 ## Connect in this order
 
