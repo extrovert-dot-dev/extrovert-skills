@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.27"
+  version: "0.1.0-pre.28"
 ---
 
 # Connect to Extrovert
@@ -378,3 +378,32 @@ inspect and separately revoke created access.
 Legacy hosted sign-ins need one new consent flow after the grant-system rollout.
 Reconnect through the host; do not retry old tokens, invent resource permissions,
 or infer that a local CLI credential represents the same connection.
+
+
+### Project managers and resource transfers
+
+For a manager that creates its own team, request Project reach and the explicit
+Project manager preset. Verify the project ID and `agent:manage` /
+`credential:delegate` scopes through `whoami`. Add mail actions explicitly when
+workers need them: the manager can delegate only its own actions within that project.
+Use administrative discovery for `createAgent`, `adminCreateInbox`, `issueAgentKey`,
+and `createConnectionCredential`. Use `whoami` for project IDs; `adminMe` is full-control only.
+Submanagers require their own explicit project connection with delegation scopes.
+Ordinary workers should not receive delegation permission.
+
+Workers survive parent expiry or normal revocation. To stop descendants too, use
+`revokeConnection` with `include_workers: true` only when the user authorized stopping
+those workers. The recursive action is atomic and bounded to 10,000 records.
+
+Ordinary domains belong to one project; unspecified account-level creation uses
+Default. Only platform-designated shared domains cross project boundaries, and their
+individual inboxes remain project-owned. Conversations aggregates the selected
+project; Inboxes is a directory with Open inbox and Manage inbox controls.
+
+Human administrators and Full account control can use `previewProjectTransfer` and
+`executeProjectTransfer` for same-organization moves. Review all listed resources,
+resolve mixed ownership, and pass the preview token plus a stable client_id. Worker
+access retains its actions and resource ceiling. Whole-project managers stay at the
+source unless their original authorizer separately consents to the entire destination.
+Pending drafts need fresh review; active reviews/sends block transfer. See the
+[access walkthrough](https://docs.extrovert.dev/concepts/connections-and-access/).
