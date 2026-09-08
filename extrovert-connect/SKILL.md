@@ -35,7 +35,7 @@ that condition without treating it as disabled signup or permission to guess new
    unavailable `agent_context`. This read needs no account or MCP installation.
 2. Check this host for Extrovert tools. If absent, run the supported setup command below when
    installation is allowed. Follow its host-selection or native-command handoff in this same host.
-3. Complete authentication: setup only configures MCP. Follow its returned native sign-in command
+3. Complete authentication: setup only configures MCP. A pending signup takes precedence over browser login: resume `check_activation` and `verify_signup` after proof for incoming email, or `verify_signup` with the human-supplied code for legacy OTP. The CLI equivalent is `extrovert verify`. Do not start `auth login` or OAuth for that pending profile. Otherwise follow its returned native sign-in command
    or host OAuth action (Claude Code: `/mcp`). Have the person sign in to the existing account and
    approve access before `whoami`. Local stdio/CLI uses `extrovert auth login`; this does not
    authenticate the host's separate hosted OAuth connection.
