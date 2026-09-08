@@ -7,6 +7,12 @@ metadata:
 
 # Send email through Extrovert
 
+When continuing an email the user already asked you to send, finish the existing review loop.
+A feedback summary is a progress update, not completion. After handling and acknowledging
+feedback, wait again. Before your final answer, read the latest state of every email in this
+task. Report sent only with its confirmed message ID. Stop earlier only for an explicit stop
+or inspection-only request, or a genuine access or runtime blocker.
+
 ## Check current guidance
 
 On first Extrovert use in this session, after one hour (or a shorter returned freshness interval),
