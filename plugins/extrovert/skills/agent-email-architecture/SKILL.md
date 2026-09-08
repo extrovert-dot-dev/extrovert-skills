@@ -2,7 +2,7 @@
 name: agent-email-architecture
 description: Design or review provider-neutral email architecture for AI agents, including capability authorization, inbox ownership, event delivery, multi-agent topology, OTP handling, retries, and hostile-content defenses. Use before choosing an email provider or when tracing trust boundaries and failure modes across an agent-email system.
 metadata:
-  version: "0.1.0-pre.22"
+  version: "0.1.0-pre.23"
 ---
 
 # Agent email architecture

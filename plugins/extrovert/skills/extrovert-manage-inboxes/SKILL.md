@@ -2,7 +2,7 @@
 name: extrovert-manage-inboxes
 description: Create, inspect, update, list, or retire Extrovert inboxes and domains with scoped keys and stable retry identities. Use for a new email identity, fleet provisioning, metadata or send-limit changes, contact controls, domain onboarding, credential export, or safe inbox and domain cleanup.
 metadata:
-  version: "0.1.0-pre.22"
+  version: "0.1.0-pre.23"
 ---
 
 # Manage Extrovert inboxes
@@ -140,9 +140,10 @@ errors or outcome. Do not claim delivery or receipt from readiness alone.
 Use inbox `display_name` for the sender name on API mail. Set it with `create_inbox`
 or `update_inbox` (SDK inbox create/update); do not put a full `Name <address>` in
 `from` or try `headers.From`. Up to 60 Unicode characters after normalization;
-use a clear personal or organization name without emoji, invisible characters,
+use a clear personal or organization name without emoji, unsupported invisible characters,
 embedded addresses, styled letters or fake thread markers. Ordinary `Support`
-and bilingual names are valid. An error is a request to correct the name, not to
+and bilingual names are valid. Contextually valid Persian and Indic join controls
+are supported; the service validates their context. An error is a request to correct the name, not to
 encode, escape or obfuscate it to bypass validation. Ask for a safe replacement
 when the requested identity cannot be represented safely.
 

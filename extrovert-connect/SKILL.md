@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.22"
+  version: "0.1.0-pre.23"
 ---
 
 # Connect to Extrovert
@@ -129,7 +129,7 @@ No verification email is sent to the human in this flow. Do not ask them to find
 read the pending inbox. Its key cannot read or send mail, export messages, or configure forwarding
 or webhooks. A reservation is not a verified account or a sent first message.
 
-A mismatched sender does not replace the expected human. To correct a typo, use
+A mismatched sender does not replace the expected human. Before proof, to correct a typo, use
 `correct_activation_email` with the current revision, then request a fresh matching email; the
 original expiry stays fixed. A verified matching console login with explicit approval is an
 alternative. Existing account owners enroll agents through their console.
@@ -147,16 +147,36 @@ a different account or bypass activation to recover missing mail.
 Signup accepts `display_name` separately from the address `username`. Preserve the human's chosen
 sender name; omit it for the validated Agent {username} default. Show the actual returned sender,
 plan, console URL and onboarding guidance after verification. Verify `whoami` in the actual host.
-A running local stdio connection without an explicit environment credential can pick up a newly
-saved credential from its selected profile. If an older process still reports missing access,
-restart it and verify again; CLI identity alone does not verify the host connection.
+The packaged local stdio process and CLI share both the pending and durable credentials in the
+selected profile. An explicit environment key still overrides that profile. In Hermes, continue
+through the packaged CLI during initial setup while native MCP discovery is pending. Incoming
+CLI `signup` displays the instructions and watches for up to five minutes, completing verification
+when proof arrives. `verify --wait-seconds 300` resumes that bounded watch. Do not require a human
+“I sent it” nudge or a full Hermes restart. Keep your agent turn active until the terminal command completes: a background CLI process cannot resume your conversation. If the host returns a running process ID, use its process polling tool to read completion, then continue with whoami and the practice review. Do not end the turn by promising that a background watch will continue the review for you. Hermes can reload MCP configuration while idle;
+`/reload-mcp` is its manual fallback. Verify MCP `whoami` when the tools become available; CLI
+identity alone only verifies the CLI connection.
 
-Continue with one brief hello to the verified human through the normal review workflow. Recover
-existing `composer: "me"` reviews first; use `client_id: "signup-hello:<agent_id>"` for this first
-hello and do not duplicate existing work. Load `extrovert-send-email`, apply the current writing
-rules, and show the review link before waiting. Do not install example rules or deliberately
-write a poor draft. Explain that the human can coach revisions and the agent will save reusable
-feedback as writing rules. One-message edits alone do not create durable rules.
+Extrovert automatically prepares one deliberately fluffy practice draft when ownership proof is
+accepted, even if the agent is offline. The draft belongs to this agent; the system template is
+identified separately. Recover `onboarding.starter` from verification or `signup_starter` from
+`whoami`. Use its exact review ID/path/status, `list_reviews` with `composer: "me"`, and
+`list_review_events`. A `preparing` status means check again shortly, not submit another hello.
+Do not create a second message. Historical signups without this handoff keep their ordinary
+first-send flow; recover existing work before using `client_id: "signup-hello:<agent_id>"`.
+
+Load `extrovert-send-email` and `extrovert-writing-rules`. Show the review link and explain that
+Extrovert prepared a practice draft the human can approve, edit, or coach. Offer this optional
+copyable feedback: “Save an Extrovert writing rule for all our messages: never use em dashes.
+Revise this draft to follow that rule, too.” This example is not permission to save a rule.
+When the human submits it in the review discussion, use `learn_review_rule` with its authenticated
+`source_turn_id`, `target: "org_house"`, and `kind: "hard"`. Read back the persisted rule, confirm
+its scope, get fresh writing rules and revise this SAME draft. One-message edits do not become
+house rules automatically. Continue the review event loop until sent or terminal.
+
+When Hermes's native tools are not available yet, the packaged CLI exposes the same schemas and
+handlers: `extrovert tool describe <tool-name>`, then `extrovert tool call <tool-name> --input-stdin`
+with the described JSON on stdin. Use it for review recovery, event waits, feedback, rule learning,
+readback and revisions without writing a custom transport or blocking on a full host restart.
 
 Close setup by briefly explaining the connection's actual agent-scoped permissions from `whoami`.
 Tell the human they can sign in to Extrovert and ask the agent to help explore capabilities for

@@ -16,7 +16,7 @@ and requires the supplied human email to be verified.
 To install the initial skills across supported hosts:
 
 ```bash
-npx --yes --prefer-online skills@latest add extrovert-dot-dev/extrovert-skills --skill extrovert-connect extrovert-send-email
+npx --yes --prefer-online skills@latest add extrovert-dot-dev/extrovert-skills --skill extrovert-connect extrovert-send-email extrovert-writing-rules
 ```
 
 Choose the intended host and project or user scope in the installer. Skills provide instructions;

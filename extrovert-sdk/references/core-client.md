@@ -131,9 +131,10 @@ price: the approval binds both values and the combined maximum, while the immedi
 Use inbox `display_name` for the sender name on API mail. Use the inbox management workflow
 (or SDK inbox create/update) to set it; do not put a full `Name <address>` in
 `from` or try `headers.From`. Up to 60 Unicode characters after normalization;
-use a clear personal or organization name without emoji, invisible characters,
+use a clear personal or organization name without emoji, unsupported invisible characters,
 embedded addresses, styled letters or fake thread markers. Ordinary `Support`
-and bilingual names are valid. An error is a request to correct the name, not to
+and bilingual names are valid. Contextually valid Persian and Indic join controls
+are supported; the service validates their context. An error is a request to correct the name, not to
 encode, escape or obfuscate it to bypass validation. Ask for a safe replacement
 when the requested identity cannot be represented safely.
 
