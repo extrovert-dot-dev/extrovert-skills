@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.25"
+  version: "0.1.0-pre.26"
 ---
 
 # Connect to Extrovert
@@ -201,6 +201,14 @@ them and their agents. Broader administration requires explicit consent; never s
 this connection. Link [Connections and access](https://docs.extrovert.dev/concepts/connections-and-access/).
 
 ## Verify immediately
+
+Report the observed milestone with one next action. **Inbox claimed** means human
+ownership is proven; exchange the limited credential and verify the connection.
+**Agent connected** requires successful `whoami` in that actual connection; check
+the intended inbox access and recover its draft. **Draft awaiting review** means
+show the review link before waiting for feedback. **Message sent** requires a
+confirmed sent outcome; ask the human to check receipt. Avoid “setup complete.”
+Saved configuration and a local CLI identity do not verify a separate hosted MCP.
 
 Call `whoami` in the actual MCP session before real work. Lead with its summary, account/project names
 and available capabilities, not opaque IDs or raw scope names. Keep the fixed `org_id`, `project_id`,
