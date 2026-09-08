@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.23"
+  version: "0.1.0-pre.24"
 ---
 
 # Connect to Extrovert
@@ -125,6 +125,7 @@ Give the human these instructions before waiting. While the session is active, c
 `check_activation` with `wait_seconds: 55`, repeating pending waits for up to five minutes.
 A timeout preserves the reservation; explain how to resume with the same profile. If the human
 says they sent it, check immediately. Only after `proven`, call `verify_signup` without an OTP.
+If a resumed `whoami` has only `signup:verify`, finish this same exchange first, even when a practice review already exists. Use `check_activation`, then `verify_signup` after proof; the CLI equivalent is `extrovert verify`. Missing mail permissions at this stage do not require OAuth, broader access, or a full host restart.
 No verification email is sent to the human in this flow. Do not ask them to find a code or try to
 read the pending inbox. Its key cannot read or send mail, export messages, or configure forwarding
 or webhooks. A reservation is not a verified account or a sent first message.
