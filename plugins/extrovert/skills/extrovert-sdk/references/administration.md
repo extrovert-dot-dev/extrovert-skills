@@ -10,7 +10,8 @@ local schemas only; describe each action to inspect its required authority.
 import { Extrovert } from "@extrovert.dev/sdk";
 
 const client = new Extrovert({ apiKey: process.env.EXTROVERT_API_KEY! });
-const identity = await client.administration.call("adminMe", {});
+// Use whoami for project connections; adminMe requires Full account control.
+const identity = await client.whoami();
 const page = client.administration.list({ search: "credential", limit: 10 });
 const schema = client.administration.describe("createConnectionCredential");
 ```
