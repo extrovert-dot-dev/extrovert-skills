@@ -2,7 +2,7 @@
 name: extrovert-sdk
 description: Build or troubleshoot a TypeScript integration against the Extrovert REST API using the current SDK source and OpenAPI contract. Use for delegated administrative workflows, client construction, org/project/inbox addressing, thread workflows, pagination, error handling, commerce requests, reviewed sends, OTP waits, webhooks, streams, signature verification, or offline fixture tests.
 metadata:
-  version: "0.1.0-pre.26"
+  version: "0.1.0-pre.27"
 ---
 
 # Extrovert TypeScript SDK
@@ -35,6 +35,15 @@ tests. The public REST API and served OpenAPI remain the underlying contract. Do
 hosted MCP route substitutes for the SDK; use the SDK for direct TypeScript application integration.
 
 ## Choose the smallest mode
+
+Single-inbox reads expose `human_email_review`: the default-off account-wide option
+to skip review for exactly one To recipient at the verified human email, no Cc/Bcc
+or aliases. All writing rules, intent and sending limits still apply; other recipients
+keep their policy. The signup practice always requires review. Ordinary credentials
+can read this but cannot change it. Explicit Full account control can use the
+administrative review-policy PATCH with `skip_review_for_human`; omitted fields are
+unchanged and null is invalid. Use the returned settings_url for relevant discovery,
+not repeated prompts. See the live agent contract for details.
 
 - Basic client, authentication, inbox handles, thread reads/search, project addressing, pagination, metadata, commerce requests, or errors: read [references/core-client.md](references/core-client.md).
 - Customer administration, credential handoff, and revocation: read [references/administration.md](references/administration.md).

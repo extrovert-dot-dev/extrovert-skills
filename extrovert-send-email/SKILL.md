@@ -2,7 +2,7 @@
 name: extrovert-send-email
 description: Send, reply, or forward through Extrovert and drive the durable Review Loop through revision, delivery, failure closure, or cancellation. Use for any outbound message, retry, reviewer conversation, redraft, approval event, session recovery, “any feedback?” about a previously authorized email, or questions about queued mail, review status, and delivery. Use even when the latest message does not repeat “send.”
 metadata:
-  version: "0.1.0-pre.26"
+  version: "0.1.0-pre.27"
 ---
 
 # Send email through Extrovert
@@ -34,7 +34,8 @@ A successful submission can mean `queued_for_review`; that is not delivery. Use 
 If the named MCP tools are absent, load `extrovert-connect` and install the supported plugin or
 packaged MCP server; do not write a custom MCP, stdio, or HTTP bridge. The packaged `extrovert send`
 command is the explicit fallback: it checks the inbox, writing-rule presence, and recipient
-suppression, then always submits to human review. Use `extrovert review status rr_…` for a durable
+suppression, then submits in review mode under the server's policy and any enabled
+sole-human exception. Use `extrovert review status rr_…` for a durable
 status check.
 
 ## First signup practice review
@@ -57,6 +58,17 @@ The CLI supports the same review operations through `tool describe <name>` and
 An explicit “inspect only,” “report only,” or “do not continue” request limits this run to reads and a report, with no learning, acknowledgements, revisions, or sending.
 
 ## Prepare and submit
+
+Read `get_inbox.human_email_review` alongside the effective policy. The default-off
+“Skip review for emails to you” setting applies account-wide only when exactly one
+To recipient is the verified human email and Cc/Bcc are empty. No aliases or duplicate
+entries qualify; SMTP envelope must also match. Continue applying all writing rules,
+intent/composition requirements, suppression and limits. Other recipients keep their
+usual policy, including independently authorized category auto-send. The backend, not
+your assertion, approves as `human_recipient_auto`; this is not human approval or
+graduation evidence. Protected signup practice always requires review. Ordinary agents
+cannot enable the setting; use its settings_url when relevant, without repeatedly
+prompting the human. Only human administration or explicit Full account control can change it.
 
 0. Reconcile `list_reviews` with `composer: "me"` and `list_review_events` before drafting. Resume existing authorized sends and unhandled learning first, so a session restart cannot duplicate a message. When asked about “feedback,” distinguish authenticated review feedback from inbound replies. Continue authorized review work unless the user explicitly requests inspection only; inspection-only reads must not learn, revise, acknowledge, cancel, or send.
 1. Call `get_inbox` and read `effective_review_policy`.

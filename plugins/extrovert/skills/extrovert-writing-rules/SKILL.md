@@ -2,7 +2,7 @@
 name: extrovert-writing-rules
 description: Read Extrovert writing rules before composing and turn reusable human feedback into governed rules. Use for get_rules, category matching, saving or superseding a preference, promotion, retirement, audit, undo, risk-dial inspection, or proposing graduation without confusing one reviewer's edit with a universal rule.
 metadata:
-  version: "0.1.0-pre.26"
+  version: "0.1.0-pre.27"
 ---
 
 # Extrovert writing rules
@@ -32,6 +32,11 @@ that condition without treating it as disabled signup or permission to guess new
 Extrovert stores and orders rules; the connected agent applies judgment. The service does not compose or reconcile prose for you.
 
 ## Before composing
+
+Skipping review for emails to the verified account human never skips writing rules.
+Apply the full rule stack and composition-token workflow even when that default-off
+setting is enabled. A `human_recipient_auto` outcome is a deterministic system decision,
+not human feedback, a learned preference, or evidence for category graduation.
 
 Select one primary category before any new email, reply or forward, creating a reusable supervised category with `propose_category` when none fits. Call `get_rules` with the matched category and without a scope filter when composing. Preserve the returned order, provenance, and short-lived `composition_token`; pass that token with the resulting send or revision. If the token expires or a rule save invalidates it, fetch and apply the stack again. Apply the most specific relevant rule while honoring higher-priority house style. If rules conflict semantically, do not silently choose a permanent winner; ask for clarification through the review loop.
 

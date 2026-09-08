@@ -2,7 +2,7 @@
 name: configure-himalaya
 description: Configure Himalaya or another standard mail client for an Extrovert inbox from export_email_config output. Use when an agent runtime needs IMAP and SMTP settings, a mailbox login, a terminal email client, or raw credentials, and explain SMTP review holds, delivery status and safe retries before enabling outbound mail.
 metadata:
-  version: "0.1.0-pre.26"
+  version: "0.1.0-pre.27"
 ---
 
 # Configure Himalaya
