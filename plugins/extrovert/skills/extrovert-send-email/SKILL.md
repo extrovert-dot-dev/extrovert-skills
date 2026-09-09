@@ -2,7 +2,7 @@
 name: extrovert-send-email
 description: Send, reply, or forward through Extrovert and drive the durable Review Loop through revision, delivery, failure closure, or cancellation. Use for any outbound message, retry, reviewer conversation, redraft, approval event, session recovery, “any feedback?” about a previously authorized email, or questions about queued mail, review status, and delivery. Use even when the latest message does not repeat “send.”
 metadata:
-  version: "0.1.0-pre.32"
+  version: "0.1.0-pre.33"
 ---
 
 # Send email through Extrovert
@@ -114,6 +114,14 @@ Only claim to be monitoring while your host remains active; a stopped host needs
 For each review, handle events in sequence. Read the current `get_review` before acting;
 a later human change can make an older event obsolete. Acknowledge with `ack_review_event`
 only after the required action succeeds, never past unhandled feedback.
+
+A human can approve or edit-send the displayed draft while a rule/category recheck
+is pending. That explicit decision supersedes the recheck; it does not certify
+that your composition used the latest rules. Before revising or restamping, reread
+the review. If it is approved, stop modifying it and await the durable send outcome;
+if it is sent or cancelled, reconcile that outcome and stop. A conflict is never
+permission to overwrite the human's approved content or recipients.
+
 
 - `feedback_added`, `rejected`, or `redraft_requested`: read `get_review_feedback` and
   `get_review_turns`. Load `extrovert-writing-rules` and process reusable human guidance
