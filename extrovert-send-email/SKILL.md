@@ -2,7 +2,7 @@
 name: extrovert-send-email
 description: Send, reply, or forward through Extrovert and drive the durable Review Loop through revision, delivery, failure closure, or cancellation. Use for any outbound message, retry, reviewer conversation, redraft, approval event, session recovery, “any feedback?” about a previously authorized email, or questions about queued mail, review status, and delivery. Use even when the latest message does not repeat “send.”
 metadata:
-  version: "0.1.0-pre.31"
+  version: "0.1.0-pre.32"
 ---
 
 # Send email through Extrovert
