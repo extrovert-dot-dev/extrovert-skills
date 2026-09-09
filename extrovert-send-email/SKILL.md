@@ -2,7 +2,7 @@
 name: extrovert-send-email
 description: Send, reply, or forward through Extrovert and drive the durable Review Loop through revision, delivery, failure closure, or cancellation. Use for any outbound message, retry, reviewer conversation, redraft, approval event, session recovery, “any feedback?” about a previously authorized email, or questions about queued mail, review status, and delivery. Use even when the latest message does not repeat “send.”
 metadata:
-  version: "0.1.0-pre.30"
+  version: "0.1.0-pre.31"
 ---
 
 # Send email through Extrovert
@@ -125,7 +125,12 @@ only after the required action succeeds, never past unhandled feedback.
 - `rule_changed` or `propagate_general_rule`: fetch current rules and the latest draft;
   revise if needed, otherwise `restamp_review` honestly. Work in batches of three while
   sharing attention across reviews; the backend durably schedules the rest of the queue.
-- `recheck_category`: check the assignment and applicable rules, then revise or restamp.
+- `recheck_category`: load `extrovert-writing-rules`, browse current category descriptions
+  and rules, and consolidate eligible new semantic duplicates with `merge_categories`.
+  Read the latest review after any merge, follow the surviving category, and get fresh
+  rules before revising or honestly restamping. If the categories serve different
+  purposes, keep the assignment and recheck its actual rules. Never broaden rules
+  just to make unrelated categories share guidance.
 - `front_run_next`: reconcile the final review outcome and stop mutating that review.
 - `sent`: confirmed sending succeeded for this review. Process any final human edits for
   reusable learning, acknowledge the outcome, and continue other outstanding reviews.
@@ -181,3 +186,10 @@ Existing reviews retain their captured name. SMTP uses the client's own validate
 From name, including an intentionally bare address; changing the inbox name does
 not rewrite that SMTP name. Neither setting changes the authorized sender address,
 review requirement, plan entitlement or proves identity/delivery.
+
+
+## Internal email review exceptions
+
+Read `get_inbox.internal_email_review` (SDK: inbox detail) alongside the existing human-recipient exception. Project and organization exceptions start off. Every final To/Cc/Bcc recipient must resolve to an inbox in the sender's enabled project or exact organization. Shared domains, aliases, shared humans, child organizations, and mixed external recipients do not qualify. Organization enablement includes current and future projects; project-off does not override it. These settings grant no inbox access.
+
+Ordinary agents and project managers cannot enable these settings. A current owner/admin or explicitly delegated Full account control can change them using the existing administrative review-policy operation. Explain a returned settings URL when relevant, but do not repeatedly solicit enablement, widen your authority, or split recipients to evade review. Apply writing rules and intent, then submit normally and follow the returned sent/queued result. Sending limits and protected onboarding review remain in force. See https://docs.extrovert.dev/review-loop/agent-contract/#email-between-agents-without-review.

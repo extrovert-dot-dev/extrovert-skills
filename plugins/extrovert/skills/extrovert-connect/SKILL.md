@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.30"
+  version: "0.1.0-pre.31"
 ---
 
 # Connect to Extrovert
@@ -306,7 +306,19 @@ Common scope failures are explicit:
 - quote or request a domain purchase/plan change: `commerce:request` (never approval authority)
 - reviewer actions: `review:act`
 
-A 401 means the credential was absent or rejected. A 403 means the credential is known but its tier, scope, ownership, or project ceiling does not authorize the action. Do not retry either with broader guessed identifiers.
+A 401 means the credential was absent or rejected. A 403 can indicate either an access refusal or
+an exhausted quota; read the error reason and counts before choosing a recovery action. Do not
+retry with broader guessed identifiers.
+
+For inbox creation, `inbox_limit_exceeded` means billing account capacity across all organizations
+and projects sharing that account. `enrollment_token_mailbox_budget_exhausted` means the enrollment
+key lifetime creation allowance shared by its agents. A key at 5/7 can still hit an account at 10/10.
+Deleting unused inboxes frees account capacity but does not refund key slots; raising a key allowance
+does not raise the account cap. Neither count is send volume. Relay the exact reason and counts,
+not a plan limit inferred from your visible inboxes. An authorized administrator can remove unused
+inboxes or change the account plan. Plan-change requests and listing commerce requests require
+`commerce:request`; if absent, hand off these diagnostics instead of claiming an upgrade is mandatory.
+See [Rate limits and quotas](https://docs.extrovert.dev/operating/limits/#lifetime-inbox-creation).
 
 For commerce, `quote_domain` is non-spending. `request_domain_purchase` and `request_plan_change`
 create durable requests; they do not approve or execute them. Recover and poll with

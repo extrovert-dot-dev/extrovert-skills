@@ -2,7 +2,7 @@
 name: extrovert-sdk
 description: Build or troubleshoot a TypeScript integration against the Extrovert REST API using the current SDK source and OpenAPI contract. Use for delegated administrative workflows, client construction, org/project/inbox addressing, thread workflows, pagination, error handling, commerce requests, reviewed sends, OTP waits, webhooks, streams, signature verification, or offline fixture tests.
 metadata:
-  version: "0.1.0-pre.30"
+  version: "0.1.0-pre.31"
 ---
 
 # Extrovert TypeScript SDK
@@ -53,3 +53,10 @@ not repeated prompts. See the live agent contract for details.
 Use `whoami()` as the authority source. Prefer the canonical `projects.inboxes.*` chain when project breadth matters; inbox ids and cursors are opaque. A body `project_id` asserts the active project. Legacy keys keep their fixed project; a connection can select a project only within its consented reach. Use `whoami.connection` when present instead of applying legacy ownership assumptions.
 
 Keep the SDK, current OpenAPI, and backend behavior in lockstep. Parse typed problem responses rather than branching on message strings. Pass stable `idempotency_key` values for retryable mutations, and never report a queued review as delivered.
+
+
+## Internal email review exceptions
+
+Read `internal_email_review` in inbox detail alongside the existing human-recipient exception. Project and organization exceptions start off. Every final To/Cc/Bcc recipient must resolve to an inbox in the sender's enabled project or exact organization. Shared domains, aliases, shared humans, child organizations, and mixed external recipients do not qualify. Organization enablement includes current and future projects; project-off does not override it. These settings grant no inbox access.
+
+Ordinary agents and project managers cannot enable these settings. A current owner/admin or explicitly delegated Full account control can change them using the existing administrative review-policy operation. Explain a returned settings URL when relevant, but do not repeatedly solicit enablement, widen your authority, or split recipients to evade review. Apply writing rules and intent, then submit normally and follow the returned sent/queued result. Sending limits and protected onboarding review remain in force. See https://docs.extrovert.dev/review-loop/agent-contract/#email-between-agents-without-review.

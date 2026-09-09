@@ -2,7 +2,7 @@
 name: extrovert-writing-rules
 description: Read Extrovert writing rules before composing and turn reusable human feedback into governed rules. Use for get_rules, category matching, saving or superseding a preference, promotion, retirement, audit, undo, risk-dial inspection, or proposing graduation without confusing one reviewer's edit with a universal rule.
 metadata:
-  version: "0.1.0-pre.30"
+  version: "0.1.0-pre.31"
 ---
 
 # Extrovert writing rules
@@ -41,6 +41,26 @@ not human feedback, a learned preference, or evidence for category graduation.
 Select one primary category before any new email, reply or forward, creating a reusable supervised category with `propose_category` when none fits. Call `get_rules` with the matched category and without a scope filter when composing. Preserve the returned order, provenance, and short-lived `composition_token`; pass that token with the resulting send or revision. If the token expires or a rule save invalidates it, fetch and apply the stack again. Apply the most specific relevant rule while honoring higher-priority house style. If rules conflict semantically, do not silently choose a permanent winner; ask for clarification through the review loop.
 
 Use `list_categories` and `get_category` before proposing a new category. `propose_category` creates an immediately usable supervised category; `update_category` changes governed category metadata.
+
+## Converge new categories
+
+Concurrent composers can propose different names for the same purpose. After learning
+category feedback, and on `recheck_category`, browse the current registry and compare
+its descriptions and rules semantically. Do not assume your original category is still
+the best fit. Names alone do not establish a duplicate.
+
+Use `merge_categories` for genuine duplicates when both are agent-created, shared,
+supervised, less than 24 hours old, with matching policy and exclusive use in your
+project. Prefer the category already holding the relevant rules; otherwise prefer the
+older matching category. Supply the semantic reason. The server checks eligibility,
+keeps all rules and review history, and notifies affected composers. An ineligible
+merge needs human curation; do not work around it by broadening rule scope or copying
+rules into unrelated categories. On conflict, reread both categories and follow
+`merged_into`; a peer may already have completed the consolidation.
+
+After a merge, reread your review, fetch the survivor's full `get_rules` stack, then
+revise the same review or honestly restamp it. Never edit another composer's draft.
+The server only schedules work; you perform the semantic review and rewriting.
 
 ## Learn from review
 
@@ -86,3 +106,10 @@ agent's mail or change sending policy merely because it learned a shared writing
 Use `get_risk_dial` and `get_graduation_status` as evidence. `propose_graduation` records a proposal; it does not let the composing agent grant itself autonomous delivery.
 
 For a specific pending draft, return to `extrovert-send-email`: reread its current revision, apply the updated ordered rules, and revise or restamp without overwriting a human change.
+
+
+## Internal email review exceptions
+
+Read `internal_email_review` in inbox detail alongside the existing human-recipient exception. Project and organization exceptions start off. Every final To/Cc/Bcc recipient must resolve to an inbox in the sender's enabled project or exact organization. Shared domains, aliases, shared humans, child organizations, and mixed external recipients do not qualify. Organization enablement includes current and future projects; project-off does not override it. These settings grant no inbox access.
+
+Ordinary agents and project managers cannot enable these settings. A current owner/admin or explicitly delegated Full account control can change them using the existing administrative review-policy operation. Explain a returned settings URL when relevant, but do not repeatedly solicit enablement, widen your authority, or split recipients to evade review. Apply writing rules and intent, then submit normally and follow the returned sent/queued result. Sending limits and protected onboarding review remain in force. See https://docs.extrovert.dev/review-loop/agent-contract/#email-between-agents-without-review.
