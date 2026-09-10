@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.33"
+  version: "0.1.0-pre.34"
 ---
 
 # Connect to Extrovert
@@ -414,7 +414,16 @@ project; Inboxes is a directory with Open inbox and Manage inbox controls.
 
 Human administrators and Full account control can use `previewProjectTransfer` and
 `executeProjectTransfer` for same-organization moves. Review all listed resources,
-resolve mixed ownership, and pass the preview token plus a stable client_id. Worker
+resolve mixed ownership, and pass the preview token plus a stable client_id.
+Custom-domain inboxes always move with the entire domain group; only explicitly
+shared-domain inboxes move individually. Show every inbox and owner in `domain_groups`
+before asking for confirmation. If `requires_domain_confirmation` is true, pass
+`confirm_domain_transfer: true` only after the user confirms that exact group, with
+the matching preview token. On a changed preview, show the new membership and obtain
+confirmation again. `include_related` expands optional persona/grant/webhook
+relationships; it is separate from mandatory domain-group confirmation and separate
+project-connection destination consent. Split or missing domain ownership blocks the
+move and requires repair; never work around it by detaching an inbox. Worker
 access retains its actions and resource ceiling. Whole-project managers stay at the
 source unless their original authorizer separately consents to the entire destination.
 Pending drafts need fresh review; active reviews/sends block transfer. See the

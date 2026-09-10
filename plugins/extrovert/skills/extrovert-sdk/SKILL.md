@@ -2,7 +2,7 @@
 name: extrovert-sdk
 description: Build or troubleshoot a TypeScript integration against the Extrovert REST API using the current SDK source and OpenAPI contract. Use for delegated administrative workflows, client construction, org/project/inbox addressing, thread workflows, pagination, error handling, commerce requests, reviewed sends, OTP waits, webhooks, streams, signature verification, or offline fixture tests.
 metadata:
-  version: "0.1.0-pre.33"
+  version: "0.1.0-pre.34"
 ---
 
 # Extrovert TypeScript SDK
