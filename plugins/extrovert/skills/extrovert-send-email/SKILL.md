@@ -2,7 +2,7 @@
 name: extrovert-send-email
 description: Send, reply, or forward through Extrovert and drive the durable Review Loop through revision, delivery, failure closure, or cancellation. Use for any outbound message, retry, reviewer conversation, redraft, approval event, session recovery, “any feedback?” about a previously authorized email, or questions about queued mail, review status, and delivery. Use even when the latest message does not repeat “send.”
 metadata:
-  version: "0.1.0-pre.38"
+  version: "0.1.0-pre.39"
 ---
 
 # Send email through Extrovert
@@ -98,7 +98,7 @@ omit it unless supplying your numeric confidence from 0 to 1.
   submission ID) to check recipient transport state without sending again. There is no generic
   `id` argument. Inspect the current tool schema before calling it. Finish any
   outstanding reusable-feedback learning before reporting completion.
-- `queued_for_review`: retain the review id and continue. Nothing has been delivered. Show the returned review link to the human before waiting. Explain that they can approve, edit, or coach revisions in the review conversation. Sign in with their linked human email and link the workspace to their sign-in if prompted. Never assume the notification email arrived.
+- `queued_for_review`: retain the returned review id; nothing has been sent. Show its review link in an interim message, then immediately call `wait_for_review_event` (`wait_seconds: 55`, no `review_id`). Handle feedback and repeat the shared wait on this same review until confirmed `sent`, `send_failed`, or `cancelled`, or a genuine access/runtime blocker prevents continuation. A promise to monitor is not the wait action. Explain that the human can approve, edit, or coach revisions in the review conversation. Sign in with their linked human email and link the workspace to their sign-in if prompted. Never assume the notification email arrived.
 - `intent_required`: add truthful reviewer context and resubmit; do not route around review.
 - `reply_context_required`: read the complete conversation before writing; pass its version, not a guessed value.
 - `reply_context_changed`: new or changed conversation context invalidated the draft. Reread the whole thread, reconsider all outstanding points, and submit a revised response with the new context version. Never fetch a fresh version merely to attach it to stale text.
