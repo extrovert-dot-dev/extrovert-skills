@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.35"
+  version: "0.1.0-pre.36"
 ---
 
 # Connect to Extrovert
@@ -28,6 +28,11 @@ restart changed local MCP processes or refresh hosted discovery. If a new sessio
 that pending step; use live guidance for this task. If freshness is unavailable, report
 that condition without treating it as disabled signup or permission to guess new behavior. See
 [updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
+
+For an authorized unpinned local MCP update, inspect and refresh the saved host
+launch entry to use `npx --yes --prefer-online @extrovert.dev/mcp@next`, preserving
+its other arguments, environment and scope. Running a newer standalone CLI does
+not update the host's saved launch entry; restart that MCP connection afterward.
 
 ## Ordinary setup uses limited access
 
