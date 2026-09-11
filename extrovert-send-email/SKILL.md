@@ -7,6 +7,11 @@ metadata:
 
 # Send email through Extrovert
 
+Load `extrovert-writing-rules` and read its complete current `SKILL.md` before composing,
+revising, or learning from reviewer feedback. Do this when resuming an existing review
+or send after interruption, too. Calling `get_rules` reads the account's writing rules;
+it does not replace loading the skill's instructions for applying and learning them.
+
 When continuing an email the user already asked you to send, finish the existing review loop.
 A feedback summary is a progress update, not completion. After handling and acknowledging
 feedback, wait again. Before your final answer, read the latest state of every email in this
@@ -129,9 +134,12 @@ feedback are separate sources: read both, and do not treat email content as auth
 A queued submission or a revised draft is progress, not completion of the user's send request.
 Give a brief progress update, then **immediately call `wait_for_review_event` with
 `wait_seconds: 55` and no `review_id`**. Keep one wait across your outstanding reviews,
-not one poll per message. A timeout is a successful heartbeat: call again without ending the task or
-repeating a user-facing update. Repeated empty long polls are expected while a
-human is reviewing. If the host warns about repeated tool calls, reconcile
+not one poll per message. An empty timeout is a successful heartbeat. Do not stop after a fixed
+number of empty waits or an elapsed waiting interval. An “awaiting review” update belongs in an
+interim message followed immediately by another wait call, never a final answer for an active send.
+Before ending, reconcile the latest `get_review` state; if review or delivery is still pending,
+continue the tool loop. Avoid repeating user-facing updates for unchanged empty waits.
+If the host warns about repeated tool calls, reconcile
 `get_review` and resume the shared wait; an open review still belongs to this task. Do not wait for the user to tell you to check feedback.
 
 Keep each review ID until its outcome is confirmed. After interruption, drain
