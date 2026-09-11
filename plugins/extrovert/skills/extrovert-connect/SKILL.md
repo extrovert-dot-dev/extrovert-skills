@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect to Extrovert, choose access for setup or deployed workers, administer with explicit full control, and manage delegation, expiry, and revocation. Use for OAuth consent, enrollment, MCP host setup, identity or scope failures, and choosing event delivery.
 metadata:
-  version: "0.1.0-pre.36"
+  version: "0.1.0-pre.37"
 ---
 
 # Connect to Extrovert
@@ -60,6 +60,8 @@ without authorization. Resume existing authorized reviews under the same compose
    or host OAuth action (Claude Code: `/mcp`). Have the person sign in to the existing account and
    approve access before `whoami`. Local stdio/CLI uses `extrovert auth login`; this does not
    authenticate the host's separate hosted OAuth connection.
+   Address the handoff to the person in this chat. Name a human email only when they supplied it
+   or the current Extrovert flow returned it; a local or model-provider login is not their Extrovert identity.
 4. Reload the MCP connection when required and call `whoami` in that actual session before work.
    For CLI-only work, use its `whoami`. Saved configuration or pending login is not connected.
 
@@ -433,3 +435,21 @@ access retains its actions and resource ceiling. Whole-project managers stay at 
 source unless their original authorizer separately consents to the entire destination.
 Pending drafts need fresh review; active reviews/sends block transfer. See the
 [access walkthrough](https://docs.extrovert.dev/concepts/connections-and-access/).
+
+### Ownership transfers between accounts
+
+Cross-account ownership transfer is a separate human-only workflow, not a project
+move or an ordinary connection revocation. When available in the console, the
+current owner offers the standalone organization to a verified recipient, who
+reviews the consequences and accepts personally. Full account control does not
+authorize an agent to accept ownership or payment responsibility; direct the human
+to the [ownership transfer guide](https://docs.extrovert.dev/concepts/ownership-transfers/).
+
+An offer does not grant the recipient resource access. During cutover, paused or
+revoked access is not a reason to broaden permissions or retry with another old
+credential. A completed handoff removes the former owner's access to the transferred
+organization, including its independent credentials and integrations. The ordinary
+rule that workers survive parent-connection revocation does not preserve that access.
+Resume work only after the new owner explicitly reconnects the worker with fresh
+credentials, then verify `whoami` and the intended inbox permissions. Do not recreate
+the source account or infer new authority from unchanged organization or inbox IDs.
