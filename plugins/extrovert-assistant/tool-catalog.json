@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "extrovert/mcp",
-  "sourceSha256": "a5183dd5248f520e867ea5d89c6cceae9293f0afa007e1b2627102e0ff7e02f4",
-  "serverVersion": "0.1.0-pre.1",
+  "sourceSha256": "0004c2dd941b511a4e349c44b3bf9a3e8f36d5e95487747247cf72042a4a4c1d",
+  "serverVersion": "0.1.0-pre.2",
   "profile": "assistant",
   "fixtureMode": "offline",
   "tools": [
@@ -14,7 +14,7 @@
         "type": "object",
         "properties": {
           "acks": {
-            "description": "Per-review cursor advances; use the event’s review_id and seq, not its nudge id.",
+            "description": "Per-review cursor advances; use the event's review_id and seq, not its nudge id.",
             "maxItems": 100,
             "type": "array",
             "items": {
@@ -23,7 +23,7 @@
                 "review_id": {
                   "type": "string",
                   "minLength": 1,
-                  "description": "The review (rr_…) whose cursor to advance."
+                  "description": "The review (rr_...) whose cursor to advance."
                 },
                 "through_seq": {
                   "type": "integer",
@@ -145,7 +145,7 @@
               "type": "string",
               "minLength": 1
             },
-            "description": "Opaque message ids (msg_…), all in this inbox."
+            "description": "Opaque message ids (msg_...), all in this inbox."
           },
           "read": {
             "description": "Set (true) or clear (false) the read flag on each id.",
@@ -180,14 +180,14 @@
     {
       "name": "cancel_review",
       "title": "Withdraw a pending review",
-      "description": "Withdraw your own pending review (rr_…) to the terminal cancelled state: you decided not to send it after all. Only the composing agent may cancel its own review. It is also the ONLY legal close-out for a `failed` review: after a send_failed event the row cannot be retried by anyone, so cancel it and compose a NEW message.\n\nAn already-cancelled review returns its existing result and releases no quota twice. Sent/auto_sent answers 409 `terminal`: STOP, do not retry. An `approved` review answers 409 `wrong_state`: it is mid-delivery, so wait for the `sent` or `send_failed` event instead.",
+      "description": "Withdraw your own pending review (rr_...) to the terminal cancelled state: you decided not to send it after all. Only the composing agent may cancel its own review. It is also the ONLY legal close-out for a `failed` review: after a send_failed event the row cannot be retried by anyone, so cancel it and compose a NEW message.\n\nAn already-cancelled review returns its existing result and releases no quota twice. Sent/auto_sent answers 409 `terminal`: STOP, do not retry. An `approved` review answers 409 `wrong_state`: it is mid-delivery, so wait for the `sent` or `send_failed` event instead.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Review id (rr_…)."
+            "description": "Review id (rr_...)."
           },
           "client_id": {
             "description": "Stable Idempotency-Key for this cancellation. Reuse it after a transport timeout.",
@@ -284,7 +284,7 @@
                 }
               ]
             },
-            "description": "Arbitrary key-value metadata to store on the inbox (string/number/boolean values; ≤256 keys, ≤256 chars per key/string value; nested objects/arrays rejected; a key with a null value is dropped). Echoed back on the response and replayed on idempotent retries."
+            "description": "Arbitrary key-value metadata to store on the inbox (string/number/boolean values; <=256 keys, <=256 chars per key/string value; nested objects/arrays rejected; a key with a null value is dropped). Echoed back on the response and replayed on idempotent retries."
           },
           "project_id": {
             "description": "Optional project_id ASSERTION: must match the key's fixed bound project (see whoami). This is NOT a project selector; a mismatch is rejected. Omit unless you want the safety check.",
@@ -311,7 +311,7 @@
     {
       "name": "delete_contact_list_entry",
       "title": "Delete a contact allow/block entry",
-      "description": "Delete a contact-list entry by id (lst_…). The allow/block rule stops applying immediately.",
+      "description": "Delete a contact-list entry by id (lst_...). The allow/block rule stops applying immediately.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -323,7 +323,7 @@
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Entry id (lst_…) from add_contact_list_entry / list_contact_lists."
+            "description": "Entry id (lst_...) from add_contact_list_entry / list_contact_lists."
           }
         },
         "required": [
@@ -350,7 +350,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           }
         },
         "required": [
@@ -369,7 +369,7 @@
     {
       "name": "delete_message",
       "title": "Delete a message",
-      "description": "Delete one message by its opaque id (msg_…). By default it is moved to the Trash folder (a recoverable soft delete); pass expunge=true to permanently remove it. A message already in Trash is always expunged. The inbox owns the message. Returns {id, deleted, expunged, count}.",
+      "description": "Delete one message by its opaque id (msg_...). By default it is moved to the Trash folder (a recoverable soft delete); pass expunge=true to permanently remove it. A message already in Trash is always expunged. The inbox owns the message. Returns {id, deleted, expunged, count}.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -381,7 +381,7 @@
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Opaque message id (msg_…)."
+            "description": "Opaque message id (msg_...)."
           },
           "expunge": {
             "default": false,
@@ -406,7 +406,7 @@
     {
       "name": "delete_thread",
       "title": "Delete a thread",
-      "description": "Delete an entire conversation thread by its stable id (thr_…): every message in it (across INBOX and Sent). By default the messages are moved to Trash (recoverable); pass expunge=true to permanently remove them. The inbox owns the thread. Returns {id, deleted, expunged, count} where count is the number of messages removed.",
+      "description": "Delete an entire conversation thread by its stable id (thr_...): every message in it (across INBOX and Sent). By default the messages are moved to Trash (recoverable); pass expunge=true to permanently remove them. The inbox owns the thread. Returns {id, deleted, expunged, count} where count is the number of messages removed.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -418,7 +418,7 @@
           "thread_id": {
             "type": "string",
             "minLength": 1,
-            "description": "Stable thread id (thr_…) from list_threads or a message."
+            "description": "Stable thread id (thr_...) from list_threads or a message."
           },
           "expunge": {
             "default": false,
@@ -443,19 +443,19 @@
     {
       "name": "forward_email",
       "title": "Forward a message",
-      "description": "Forward an existing message (by its opaque id) to new recipients and submit it for HUMAN REVIEW: the default path, exactly like send_email and reply_email. Before writing, recover existing reviews, choose one semantic category with list_categories (propose_category if none fits), and apply get_rules for that category and house style. Optionally prepend a plain-text note.\n\nALWAYS pass `intent`. A forward is an outbound message to arbitrary NEW recipients that quotes an entire received thread, so the review policy binds it just as hard as a send: otherwise it would be the way around review, and a worse one, because it exfiltrates a conversation. Under the default `require_review` policy a forward with no intent is REFUSED with 422 intent_required (nothing sent, nothing queued); with one it normally returns 202 queued_for_review and a review id (rr_…). For a queued forward, first tell the human it has not been sent and share the returned review link for approval, edits or coaching; then immediately wait for review events. The subject and quoted body are materialized at SUBMIT, so the human reviews the exact bytes that go out and an approved forward delivers the reviewer's edit.\n\nOpt-outs: a forward to a suppressed recipient is ALWAYS rejected (recipient_suppressed 422). Forward gets NO solicited-response exception: that exception exists only for a reply answering an inbound message from the person who opted out.\n\nA forward is deliberately NOT threaded to its parent (no In-Reply-To): the new recipients were never part of that conversation. Internal project/organization exceptions are exposed by get_inbox.internal_email_review. They start off and require every final To/Cc/Bcc recipient to belong to the sender’s enabled project or exact organization. Other organizations, aliases, and mixed external recipients retain their usual policy. No inbox access is granted. Ordinary agents and project managers cannot enable them. Submit normally and follow the returned result; do not split recipients to evade review. get_inbox.human_email_review exposes the default-off exception for exactly one To recipient at the verified human email, no Cc/Bcc or aliases. Writing rules, intent and limits still apply; others keep their policy. Ordinary agents cannot enable it.",
+      "description": "Forward an existing message (by its opaque id) to new recipients and submit it for HUMAN REVIEW: the default path, exactly like send_email and reply_email. Before writing, recover existing reviews, choose one semantic category with list_categories (propose_category if none fits), and apply get_rules for that category and house style. Optionally prepend a plain-text note.\n\nALWAYS pass `intent`. A forward is an outbound message to arbitrary NEW recipients that quotes an entire received thread, so the review policy binds it just as hard as a send: otherwise it would be the way around review, and a worse one, because it exfiltrates a conversation. Under the default `require_review` policy a forward with no intent is REFUSED with 422 intent_required (nothing sent, nothing queued); with one it normally returns 202 queued_for_review and a review id (rr_...). For a queued forward, first tell the human it has not been sent and share the returned review link for approval, edits or coaching; then immediately wait for review events. The subject and quoted body are materialized at SUBMIT, so the human reviews the exact bytes that go out and an approved forward delivers the reviewer's edit.\n\nOpt-outs: a forward to a suppressed recipient is ALWAYS rejected (recipient_suppressed 422). Forward gets NO solicited-response exception: that exception exists only for a reply answering an inbound message from the person who opted out.\n\nA forward is deliberately NOT threaded to its parent (no In-Reply-To): the new recipients were never part of that conversation. Internal project/organization exceptions are exposed by get_inbox.internal_email_review. They start off and require every final To/Cc/Bcc recipient to belong to the sender's enabled project or exact organization. Other organizations, aliases, and mixed external recipients retain their usual policy. No inbox access is granted. Ordinary agents and project managers cannot enable them. Submit normally and follow the returned result; do not split recipients to evade review. get_inbox.human_email_review exposes the default-off exception for exactly one To recipient at the verified human email, no Cc/Bcc or aliases. Writing rules, intent and limits still apply; others keep their policy. Ordinary agents cannot enable it.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "message_id": {
             "type": "string",
             "minLength": 1,
-            "description": "Opaque id of the message to forward (msg_…)."
+            "description": "Opaque id of the message to forward (msg_...)."
           },
           "to": {
             "minItems": 1,
@@ -541,7 +541,7 @@
             "description": "Intent for the human reviewer. Required when the resolved mode is review."
           },
           "category_id": {
-            "description": "Opaque category id (cat_…) matched from the registry. Never a name.",
+            "description": "Opaque category id (cat_...) matched from the registry. Never a name.",
             "type": "string"
           },
           "category_confidence": {
@@ -588,17 +588,17 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "message_id": {
             "type": "string",
             "minLength": 1,
-            "description": "Opaque message id (msg_…) the attachment belongs to."
+            "description": "Opaque message id (msg_...) the attachment belongs to."
           },
           "attachment_id": {
             "type": "string",
             "minLength": 1,
-            "description": "Opaque attachment id (att_…) from list_attachments."
+            "description": "Opaque attachment id (att_...) from list_attachments."
           }
         },
         "required": [
@@ -619,14 +619,14 @@
     {
       "name": "get_backlog_status",
       "title": "Read the D19 backlog-reconciliation status",
-      "description": "Read the category's backlog reconciliation picture (D19/§8): how many of its QUEUED drafts are STALE (composed under older rules: they need a redraft) vs CURRENT-ENOUGH (within tolerance of the current rules-version) against the current category rules-version + house-style version. A pure $0-LLM integer compare. Read-only: you READ the picture; the human (console scan-backlog) or the graduate/rule-change hooks TRIGGER the actual sweep that releases current-enough drafts and nudges stale ones. Use it to see whether your queued drafts are about to be re-checked.",
+      "description": "Read the category's backlog reconciliation picture (D19/section 8): how many of its QUEUED drafts are STALE (composed under older rules: they need a redraft) vs CURRENT-ENOUGH (within tolerance of the current rules-version) against the current category rules-version + house-style version. A pure $0-LLM integer compare. Read-only: you READ the picture; the human (console scan-backlog) or the graduate/rule-change hooks TRIGGER the actual sweep that releases current-enough drafts and nudges stale ones. Use it to see whether your queued drafts are about to be re-checked.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Category id (cat_…)."
+            "description": "Category id (cat_...)."
           }
         },
         "required": [
@@ -645,14 +645,14 @@
     {
       "name": "get_category",
       "title": "Get category",
-      "description": "Fetch one category by id (cat_…): its name, description, scope, and graduation state.",
+      "description": "Fetch one category by id (cat_...): its name, description, scope, and graduation state.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Category id (cat_…) from list_categories."
+            "description": "Category id (cat_...) from list_categories."
           }
         },
         "required": [
@@ -714,14 +714,14 @@
     {
       "name": "get_graduation_status",
       "title": "Read a category's graduation status",
-      "description": "Read whether a category is ready to graduate to the NEXT rung (supervised→auto_notify→auto_silent). Reports the gates passed / still needed: clean approvals (N / needed), category age, the maturity gate (required for auto_silent, D16), the drift counter vs K, and can_graduate (would a human graduate succeed right now). Use this to decide when to propose_graduation: you can never flip the bit yourself (a human confirms; D16/D6).",
+      "description": "Read whether a category is ready to graduate to the NEXT rung (supervised->auto_notify->auto_silent). Reports the gates passed / still needed: clean approvals (N / needed), category age, the maturity gate (required for auto_silent, D16), the drift counter vs K, and can_graduate (would a human graduate succeed right now). Use this to decide when to propose_graduation: you can never flip the bit yourself (a human confirms; D16/D6).",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Category id (cat_…)."
+            "description": "Category id (cat_...)."
           }
         },
         "required": [
@@ -747,7 +747,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           }
         },
         "required": [
@@ -766,14 +766,14 @@
     {
       "name": "get_message",
       "title": "Get message",
-      "description": "Fetch one message by its opaque id (msg_…), as returned by read_messages / search / wait_for_email. The owning inbox is resolved from the id. Structured output carries nullable source text/HTML fields and their nullable best-effort extracted variants; choose the presentation format below.",
+      "description": "Fetch one message by its opaque id (msg_...), as returned by read_messages / search / wait_for_email. The owning inbox is resolved from the id. Structured output carries nullable source text/HTML fields and their nullable best-effort extracted variants; choose the presentation format below.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Opaque message id (msg_…)."
+            "description": "Opaque message id (msg_...)."
           },
           "format": {
             "default": "auto",
@@ -812,14 +812,14 @@
     {
       "name": "get_pacing_state",
       "title": "Read the demand-driven pacing state for a category",
-      "description": "Read the category's demand-driven pacing snapshot (M7 Slice B/§8): the human review CURSOR position, the effective lookahead window (freshness is guaranteed only for the next few drafts after the cursor), the HARD per-nudge fan-out ceiling (rework_batch_max: one nudge can never fan to 500), the per-agent nudge interval, and each queued draft's classification (behind_cursor | in_window_fresh | in_window_redrafting | ahead). A pure $0-LLM read; the cursor advances from the human's console approve/reject/edit actions. Use it to see which of your drafts are about to surface (and should be redrafted against current rules) vs already passed.",
+      "description": "Read the category's demand-driven pacing snapshot (M7 Slice B/section 8): the human review CURSOR position, the effective lookahead window (freshness is guaranteed only for the next few drafts after the cursor), the HARD per-nudge fan-out ceiling (rework_batch_max: one nudge can never fan to 500), the per-agent nudge interval, and each queued draft's classification (behind_cursor | in_window_fresh | in_window_redrafting | ahead). A pure $0-LLM read; the cursor advances from the human's console approve/reject/edit actions. Use it to see which of your drafts are about to surface (and should be redrafted against current rules) vs already passed.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Category id (cat_…)."
+            "description": "Category id (cat_...)."
           }
         },
         "required": [
@@ -838,14 +838,14 @@
     {
       "name": "get_review",
       "title": "Get review",
-      "description": "Fetch one review request by id (rr_…): its current state, `revision` (pass it as submit_revision's parent_revision), the proposed draft, the intent, the category, and (once sent) the sent body + diff.\n\nThis is the DEFINITIVE per-review 'am I done?' answer, and the poll-side companion to the event drain: use it after a crash, when your event cursor is gone. `closed` is true for sent, auto_sent, cancelled AND failed (failed is absorbing: nobody will ever move that row, so waiting on it hangs forever). `send_path` says how it got out; `send_error` says why it did not.",
+      "description": "Fetch one review request by id (rr_...): its current state, `revision` (pass it as submit_revision's parent_revision), the proposed draft, the intent, the category, and (once sent) the sent body + diff.\n\nThis is the DEFINITIVE per-review 'am I done?' answer, and the poll-side companion to the event drain: use it after a crash, when your event cursor is gone. `closed` is true for sent, auto_sent, cancelled AND failed (failed is absorbing: nobody will ever move that row, so waiting on it hangs forever). `send_path` says how it got out; `send_error` says why it did not.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Review id (rr_…) from list_reviews or a queued send/reply."
+            "description": "Review id (rr_...) from list_reviews or a queued send/reply."
           }
         },
         "required": [
@@ -864,14 +864,14 @@
     {
       "name": "get_review_decision_context",
       "title": "Get a review's decision context (reviewer)",
-      "description": "REVIEWER PLANE (review:act): fetch your read-only decision surface for a review (rr_…) you're linked to: the intent + current draft + the append-only thread + the TWO circuit-breaker budgets (hop_count vs max_hops, and the hard review_deadline). force_to_human=true means a reject would be FORCED to the human regardless of your intent (the human is the only terminal authority, D17). You can only see reviews your active review-link covers (per-inbox beats account-wide); review:act alone is not enough. Read this, then reviewer_decide. $0 LLM: pure assembly on our side.",
+      "description": "REVIEWER PLANE (review:act): fetch your read-only decision surface for a review (rr_...) you're linked to: the intent + current draft + the append-only thread + the TWO circuit-breaker budgets (hop_count vs max_hops, and the hard review_deadline). force_to_human=true means a reject would be FORCED to the human regardless of your intent (the human is the only terminal authority, D17). You can only see reviews your active review-link covers (per-inbox beats account-wide); review:act alone is not enough. Read this, then reviewer_decide. $0 LLM: pure assembly on our side.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Review id (rr_…) you are the linked reviewer for."
+            "description": "Review id (rr_...) you are the linked reviewer for."
           }
         },
         "required": [
@@ -890,14 +890,14 @@
     {
       "name": "get_review_feedback",
       "title": "Get the human's feedback on a review",
-      "description": "Fetch the human's assembled feedback for a review (rr_…): the unified + structured diff of the human's edit, the human comments / rejection feedback, the decision (edited|approved|rejected|…), and the rules already born from this review. Read this after a rejected/edited nudge to learn what the human wanted, then judge whether a generalizable rule exists (learn_review_rule with the authenticated source_turn_id) and/or submit_revision a redraft. $0 LLM: pure assembly on our side.",
+      "description": "Fetch the human's assembled feedback for a review (rr_...): the unified + structured diff of the human's edit, the human comments / rejection feedback, the decision (edited|approved|rejected|...), and the rules already born from this review. Read this after a rejected/edited nudge to learn what the human wanted, then judge whether a generalizable rule exists (learn_review_rule with the authenticated source_turn_id) and/or submit_revision a redraft. $0 LLM: pure assembly on our side.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Review id (rr_…)."
+            "description": "Review id (rr_...)."
           }
         },
         "required": [
@@ -916,14 +916,14 @@
     {
       "name": "get_review_turns",
       "title": "Get review thread turns",
-      "description": "Fetch the append-only thread turns for a review (rr_…): the intent, every draft revision, human comments/edits/decisions, captured diffs, and state changes: the full audit + learning trail.",
+      "description": "Fetch the append-only thread turns for a review (rr_...): the intent, every draft revision, human comments/edits/decisions, captured diffs, and state changes: the full audit + learning trail.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Review id (rr_…)."
+            "description": "Review id (rr_...)."
           }
         },
         "required": [
@@ -972,7 +972,7 @@
             ]
           },
           "entity_id": {
-            "description": "Narrow to one entity (rule_… or cat_…).",
+            "description": "Narrow to one entity (rule_... or cat_...).",
             "type": "string"
           }
         },
@@ -989,12 +989,12 @@
     {
       "name": "get_rules",
       "title": "Get the ordered writing-rule set",
-      "description": "Get the ORDERED active writing rules for a compose/redraft. The §7 precedence ladder is applied SERVER-SIDE (deterministic, NO LLM on our side): absolute hard house rules apply across all categories; otherwise project rules outrank broader rules they inherits; within a layer, hard before soft; specificity per-agent > category > general; human before agent; newest rev; higher priority. Each rule carries its rule_layer (org | project) so you can see where it came from. Returns the general/house-style layer IN ADDITION to the named category's rules (category rules first), capped. YOU reconcile the list semantically and write the draft; we never apply a rule. Pass category_id to include that category's rules; omit it for ONLY the house-style layer.",
+      "description": "Get the ORDERED active writing rules for a compose/redraft. The section 7 precedence ladder is applied SERVER-SIDE (deterministic, NO LLM on our side): absolute hard house rules apply across all categories; otherwise project rules outrank broader rules they inherits; within a layer, hard before soft; specificity per-agent > category > general; human before agent; newest rev; higher priority. Each rule carries its rule_layer (org | project) so you can see where it came from. Returns the general/house-style layer IN ADDITION to the named category's rules (category rules first), capped. YOU reconcile the list semantically and write the draft; we never apply a rule. Pass category_id to include that category's rules; omit it for ONLY the house-style layer.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "category_id": {
-            "description": "Category id (cat_…). Empty returns ONLY house-style/general rules.",
+            "description": "Category id (cat_...). Empty returns ONLY house-style/general rules.",
             "type": "string"
           },
           "scope": {
@@ -1026,7 +1026,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "submission_id": {
             "type": "string",
@@ -1051,24 +1051,28 @@
     {
       "name": "get_thread",
       "title": "Get thread",
-      "description": "Fetch one conversation thread by its stable id (thr_…), with all its messages oldest-first. Use this to read a full back-and-forth before replying. The inbox owns the thread.",
+      "description": "Read a full conversation, all messages oldest-first. If you already have a message, pass its exact message_id; the server resolves the thread for you. Otherwise pass an exact thread_id from list_threads. Provide exactly one selector and its owning inbox. Never decode, shorten or reconstruct opaque IDs. Read this full context before replying.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "thread_id": {
+            "description": "Exact stable thread id from list_threads. Omit when using message_id.",
             "type": "string",
-            "minLength": 1,
-            "description": "Stable thread id (thr_…) from list_threads or a message."
+            "minLength": 1
+          },
+          "message_id": {
+            "description": "Exact opaque message id from read_messages, search or get_message; resolves its full conversation. Omit thread_id.",
+            "type": "string",
+            "minLength": 1
           }
         },
         "required": [
-          "inbox",
-          "thread_id"
+          "inbox"
         ],
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false
@@ -1160,12 +1164,12 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "message_id": {
             "type": "string",
             "minLength": 1,
-            "description": "Opaque message id (msg_…) whose attachments to list."
+            "description": "Opaque message id (msg_...) whose attachments to list."
           }
         },
         "required": [
@@ -1415,7 +1419,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "before": {
             "type": "string"
@@ -1442,12 +1446,12 @@
     {
       "name": "list_review_events",
       "title": "Drain review events",
-      "description": "Non-blocking drain of the next un-acked review nudges for this agent, in FIFO order (strict per review), with the per-review cursors. The durable nudge queue is the authoritative liveness source. Side-effect free: re-calling returns the same frontier until you ack. After acting on an event, call ack_review_event to advance the cursor.\n\nHOW A LOOP TERMINATES: every review that reaches sent / auto_sent / failed / cancelled emits EXACTLY ONE terminal event: `sent`, `send_failed` or `cancelled`: and it is the last and highest-seq event that review will ever produce. Ack it and stop polling that review. `front_run_next` also means stop: you tried to mutate a review somebody already finished.\n\nNon-terminal reasons: `redraft_requested` and `rejected` (redraft via submit_revision), `feedback_added` (a HUMAN commented: answer or redraft), `rule_changed` and `propagate_general_rule` (re-read get_rules, then redraft or restamp_review), `recheck_category` (browse current category descriptions and rules, consolidate eligible semantic duplicates with merge_categories, then fetch fresh get_rules and revise or restamp). `staleness` and `approved` are RESERVED and never emitted. Handle any unknown reason by acking and ignoring it: the set grows additively.\n\nEach event's `payload` carries the actionable detail (the delivered message_id, the scrubbed send error, the current revision) and is printed with the event.",
+      "description": "Non-blocking drain of the next un-acked review nudges for this agent, in FIFO order (strict per review), with the per-review cursors. The durable nudge queue is the authoritative liveness source. Side-effect free: re-calling returns the same frontier until you ack. After acting on an event, call ack_review_event to advance the cursor.\n\nHOW A LOOP TERMINATES: every review that reaches sent / auto_sent / failed / cancelled emits EXACTLY ONE terminal event: `sent`, `send_failed` or `cancelled`: and it is the last and highest-seq event that review will ever produce. Ack it and stop polling that review. `front_run_next` also means stop: you tried to mutate a review somebody already finished.\n\nNon-terminal reasons: `redraft_requested` and `rejected` (redraft via submit_revision), `feedback_added` (a HUMAN commented: answer or redraft), `rule_changed` and `propagate_general_rule` (re-read get_rules, then redraft or restamp_review), `recheck_category` (browse current category descriptions and rules, consolidate eligible semantic duplicates with merge_categories, then fetch fresh get_rules and revise or restamp). `staleness` and `approved` are RESERVED and never emitted. For an unknown reason, inspect the current review before acknowledging; never skip unhandled human feedback merely because its reason is unfamiliar. The set grows additively.\n\nEach event's `payload` carries the actionable detail (the delivered message_id, the scrubbed send error, the current revision) and is printed with the event.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "review_id": {
-            "description": "Restrict the drain to one review's events (rr_…).",
+            "description": "Restrict the drain to one review's events (rr_...).",
             "type": "string"
           },
           "limit": {
@@ -1525,7 +1529,7 @@
             ]
           },
           "category_id": {
-            "description": "Filter by opaque category id (cat_…).",
+            "description": "Filter by opaque category id (cat_...).",
             "type": "string"
           },
           "inbox": {
@@ -1596,7 +1600,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "limit": {
             "default": 20,
@@ -1634,12 +1638,12 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Opaque message id (msg_…)."
+            "description": "Opaque message id (msg_...)."
           },
           "read": {
             "default": true,
@@ -1741,14 +1745,14 @@
     {
       "name": "post_review_chat",
       "title": "Post a chat turn on a review",
-      "description": "Ask the human reviewer a clarifying question on a review's thread (rr_…): append an agent_question turn.\n\nLEGAL FROM: needs_review, in_review, chatting. A question on a needs_review draft does NOT open it: the draft stays in the human queue, no reviewer is assigned, and no nudge is sent. Only an in_review draft flips to chatting. (A HUMAN comment on a needs_review draft DOES open it: that asymmetry is deliberate: an agent must not be able to pull a draft out of the queue by asking a question.)\n\nThe human sees your question on the console stream and replies with a comment (read it via get_review_turns / get_review_feedback). Idempotent on client_id (the Idempotency-Key). Use this when you are UNSURE what the human wants; otherwise just submit_revision a redraft. $0 LLM: YOU compose the question.",
+      "description": "Ask the human reviewer a clarifying question on a review's thread (rr_...): append an agent_question turn.\n\nLEGAL FROM: needs_review, in_review, chatting. A question on a needs_review draft does NOT open it: the draft stays in the human queue, no reviewer is assigned, and no nudge is sent. Only an in_review draft flips to chatting. (A HUMAN comment on a needs_review draft DOES open it: that asymmetry is deliberate: an agent must not be able to pull a draft out of the queue by asking a question.)\n\nThe human sees your question on the console stream and replies with a comment (read it via get_review_turns / get_review_feedback). Idempotent on client_id (the Idempotency-Key). Use this when you are UNSURE what the human wants; otherwise just submit_revision a redraft. $0 LLM: YOU compose the question.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Review id (rr_…)."
+            "description": "Review id (rr_...)."
           },
           "text": {
             "type": "string",
@@ -1784,7 +1788,7 @@
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Rule id (rule_…)."
+            "description": "Rule id (rule_...)."
           },
           "to_scope": {
             "type": "string",
@@ -1857,7 +1861,7 @@
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Category id (cat_…)."
+            "description": "Category id (cat_...)."
           },
           "evidence": {
             "description": "Optional structured evidence for the human (e.g. {approvals: 20, last_edits: 0}).",
@@ -1891,7 +1895,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "limit": {
             "default": 20,
@@ -1941,22 +1945,22 @@
     {
       "name": "reply_email",
       "title": "Reply to thread",
-      "description": "Compose a reply within an existing thread and submit it for HUMAN REVIEW: the default path, exactly like send_email. Before writing, recover existing reviews, choose one semantic category with list_categories (propose_category if none fits), and apply get_rules for that category and house style. Select the parent with thread_id (the latest message in that thread) OR message_id (that specific message, which must be the newest message). Before composing, read ALL messages in get_thread, including multiple consecutive inbound messages and corrections inside quoted text. Reply once to the newest message, incorporating every outstanding point. Check list_reviews with inbox and thread_id, without composer=me, to find existing drafts by any accessible composer; coordinate or revise the existing draft rather than create a duplicate. Preserve context_version as expected_context_version. On reply_already_pending, recover/coordinate the existing draft instead of retrying with a new key. On 409 reply_context_changed, reread and reconsider the body, never merely refresh the token. If the latest message is outbound, check whether the request was already answered. For broken threads, search bounded related correspondence and read relevant results; keep separate threads identified and never infer membership from subject alone. Recipients default from the parent; optional to replaces that list. Subject and In-Reply-To/References remain derived server-side.\n\nALWAYS pass `intent`. Under the default `require_review` policy a reply with no intent is REFUSED with 422 intent_required (nothing sent, nothing queued); with one it normally returns 202 queued_for_review and a review id (rr_…), and the reply has NOT gone out until a `sent` review event arrives. For a queued reply, first tell the human it has not been sent and share the returned review link for approval, edits or coaching; then immediately wait for review events. The envelope is resolved at submit, so the human reviews a message with its real subject and recipients. Internal project/organization exceptions are exposed by get_inbox.internal_email_review. They start off and require every final To/Cc/Bcc recipient to belong to the sender’s enabled project or exact organization. Other organizations, aliases, and mixed external recipients retain their usual policy. No inbox access is granted. Ordinary agents and project managers cannot enable them. Submit normally and follow the returned result; do not split recipients to evade review. get_inbox.human_email_review can expose a separately enabled exception: exactly one derived To recipient at the verified human email, no Cc/Bcc or aliases. Writing rules, intent and limits still apply; others keep their policy. This starts off and ordinary agents cannot enable it.\n\nOpt-outs: a reply to a suppressed recipient is rejected with recipient_suppressed (HTTP 422) at SUBMIT, before a review is queued. Replies get ONE narrow exception: a suppressed recipient is allowed when this reply answers an inbound message FROM them that arrived AFTER their opt-out (a recipient-re-initiated exchange). Nothing else qualifies: send_email and forward_email get no exception at all.",
+      "description": "Compose a reply within an existing thread and submit it for HUMAN REVIEW: the default path, exactly like send_email. Before writing, recover existing reviews, choose one semantic category with list_categories (propose_category if none fits), and apply get_rules for that category and house style. Select the parent with thread_id (the latest message in that thread) OR message_id (that specific message, which must be the newest message). Before composing, read ALL messages in get_thread, including multiple consecutive inbound messages and corrections inside quoted text. Reply once to the newest message, incorporating every outstanding point. Check list_reviews with inbox and thread_id, without composer=me, to find existing drafts by any accessible composer; coordinate or revise the existing draft rather than create a duplicate. Preserve context_version as expected_context_version. On reply_already_pending, recover/coordinate the existing draft instead of retrying with a new key. On 409 reply_context_changed, reread and reconsider the body, never merely refresh the token. If the latest message is outbound, check whether the request was already answered. For broken threads, search bounded related correspondence and read relevant results; keep separate threads identified and never infer membership from subject alone. Recipients default from the parent; optional to replaces that list. Subject and In-Reply-To/References remain derived server-side.\n\nALWAYS pass `intent`. Under the default `require_review` policy a reply with no intent is REFUSED with 422 intent_required (nothing sent, nothing queued); with one it normally returns 202 queued_for_review and a review id (rr_...), and the reply has NOT gone out until a `sent` review event arrives. For a queued reply, first tell the human it has not been sent and share the returned review link for approval, edits or coaching; then immediately wait for review events. The envelope is resolved at submit, so the human reviews a message with its real subject and recipients. Internal project/organization exceptions are exposed by get_inbox.internal_email_review. They start off and require every final To/Cc/Bcc recipient to belong to the sender's enabled project or exact organization. Other organizations, aliases, and mixed external recipients retain their usual policy. No inbox access is granted. Ordinary agents and project managers cannot enable them. Submit normally and follow the returned result; do not split recipients to evade review. get_inbox.human_email_review can expose a separately enabled exception: exactly one derived To recipient at the verified human email, no Cc/Bcc or aliases. Writing rules, intent and limits still apply; others keep their policy. This starts off and ordinary agents cannot enable it.\n\nOpt-outs: a reply to a suppressed recipient is rejected with recipient_suppressed (HTTP 422) at SUBMIT, before a review is queued. Replies get ONE narrow exception: a suppressed recipient is allowed when this reply answers an inbound message FROM them that arrived AFTER their opt-out (a recipient-re-initiated exchange). Nothing else qualifies: send_email and forward_email get no exception at all.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "thread_id": {
-            "description": "Thread to reply within (thr_…). One of thread_id / message_id.",
+            "description": "Thread to reply within (thr_...). One of thread_id / message_id.",
             "type": "string",
             "minLength": 1
           },
           "message_id": {
-            "description": "Specific message to reply to (msg_…). One of thread_id / message_id.",
+            "description": "Specific message to reply to (msg_...). One of thread_id / message_id.",
             "type": "string",
             "minLength": 1
           },
@@ -2108,7 +2112,7 @@
             "description": "Intent for the human reviewer. Required when the resolved mode is review."
           },
           "category_id": {
-            "description": "Opaque category id (cat_…) matched from the registry. Never a name.",
+            "description": "Opaque category id (cat_...) matched from the registry. Never a name.",
             "type": "string"
           },
           "category_confidence": {
@@ -2147,23 +2151,23 @@
     {
       "name": "restamp_review",
       "title": "Re-stamp a draft's rules-version without redrafting ($0)",
-      "description": "The $0 escape valve when a rule_changed/recheck nudge fires AND the draft genuinely already complies (D19/§8). Reread get_review first: a human can approve or edit-send during a pending recheck, superseding it. Never restamp an approved or terminal review. Use it ONLY for 'I read the new rules and no change is needed'. If the draft DOES need to change, use submit_revision: re-stamping a draft that should have been redrafted makes you lie to the born-stale accounting. Human approval is a separate explicit decision and does not depend on this compliance stamp. Instead of an expensive redraft, assert 'I reviewed this against rules vX and no change is needed': the server advances the draft's composed_* rules-versions to vX WITHOUT a new draft (no revision bump, no body change, no nudge). A born-stale draft re-stamped to the CURRENT version records that you checked the unchanged draft against those rules. against_version must NOT exceed the category's current rules-version (you can't claim a version that doesn't exist). Use submit_revision instead when the draft DOES need to change. $0 LLM: you judged.",
+      "description": "The $0 escape valve when a rule_changed/recheck nudge fires AND the draft genuinely already complies (D19/section 8). Reread get_review first: a human can approve or edit-send during a pending recheck, superseding it. Never restamp an approved or terminal review. Use it ONLY for 'I read the new rules and no change is needed'. If the draft DOES need to change, use submit_revision: re-stamping a draft that should have been redrafted makes you lie to the born-stale accounting. Human approval is a separate explicit decision and does not depend on this compliance stamp. Instead of an expensive redraft, assert 'I reviewed this against rules vX and no change is needed': the server advances the draft's composed_* rules-versions to vX WITHOUT a new draft (no revision bump, no body change, no nudge). A born-stale draft re-stamped to the CURRENT version records that you checked the unchanged draft against those rules. against_version must NOT exceed the category's current rules-version (you can't claim a version that doesn't exist). Use submit_revision instead when the draft DOES need to change. $0 LLM: you judged.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Review id (rr_…)."
+            "description": "Review id (rr_...)."
           },
           "against_version": {
             "type": "integer",
             "minimum": 0,
             "maximum": 9007199254740991,
-            "description": "The category rules-version you reviewed against (≤ the category's current rules-version)."
+            "description": "The category rules-version you reviewed against (<= the category's current rules-version)."
           },
           "house_style_version": {
-            "description": "Optional: re-stamp the house-style axis to this version (≤ the org's current house_style_version).",
+            "description": "Optional: re-stamp the house-style axis to this version (<= the org's current house_style_version).",
             "type": "integer",
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
@@ -2199,7 +2203,7 @@
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Rule id (rule_…)."
+            "description": "Rule id (rule_...)."
           }
         },
         "required": [
@@ -2218,14 +2222,14 @@
     {
       "name": "reviewer_decide",
       "title": "Decide a review as the linked reviewer",
-      "description": "REVIEWER PLANE (review:act): submit your decision on a review (rr_…) you're linked to. action=approve|edit|reject|escalate. approve/edit → the PLATFORM sends with the COMPOSER's credentials (you NEVER hold mailbox:send on an inbox you don't own: the credential boundary); edit also supplies a new subject/body. reject → back to the composer to redraft (hop_count++). escalate → straight to the human queue. revision is the CAS: it MUST equal the draft's current revision (from get_review_decision_context): a mismatch is a 409 STALE with NO change (re-read, re-decide; the human always wins, D17). The two circuit breakers (hop_count ≥ max_hops, or the hard review_deadline) FORCE a reject to the human regardless of your intent: the result's forced_by_breaker names it. $0 LLM: YOU judge; we route, send, and enforce the breakers.",
+      "description": "REVIEWER PLANE (review:act): submit your decision on a review (rr_...) you're linked to. action=approve|edit|reject|escalate. approve/edit -> the PLATFORM sends with the COMPOSER's credentials (you NEVER hold mailbox:send on an inbox you don't own: the credential boundary); edit also supplies a new subject/body. reject -> back to the composer to redraft (hop_count++). escalate -> straight to the human queue. revision is the CAS: it MUST equal the draft's current revision (from get_review_decision_context): a mismatch is a 409 STALE with NO change (re-read, re-decide; the human always wins, D17). The two circuit breakers (hop_count >= max_hops, or the hard review_deadline) FORCE a reject to the human regardless of your intent: the result's forced_by_breaker names it. $0 LLM: YOU judge; we route, send, and enforce the breakers.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Review id (rr_…)."
+            "description": "Review id (rr_...)."
           },
           "action": {
             "type": "string",
@@ -2287,7 +2291,7 @@
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Suppression row id (sup_…) from list_suppressions / check_suppression."
+            "description": "Suppression row id (sup_...) from list_suppressions / check_suppression."
           },
           "reason": {
             "type": "string",
@@ -2312,7 +2316,7 @@
     {
       "name": "save_rule",
       "title": "Save / edit a writing rule",
-      "description": "Maintain a project-level writing rule outside authenticated reviewer feedback. The audit log and undo preserve history. scope='general' iff category_id is empty (applies to this project’s categories); else category-scoped. Saves are ALWAYS project-layer: the new rule is bound to this key's fixed project (see whoami) and its rule_layer is 'project'. Use learn_review_rule for all authenticated reviewer feedback, including project and category guidance. For org-wide house rules, save_rule cannot create them. With supersedes_id the write is an EDIT (append-only by supersession: a new rev of the same lineage, the prior superseded). For ALL authenticated reviewer feedback use learn_review_rule instead. Use save_rule for explicit project-level rule maintenance. Returns the new active project rule.",
+      "description": "Maintain a project-level writing rule outside authenticated reviewer feedback. The audit log and undo preserve history. scope='general' iff category_id is empty (applies to this project's categories); else category-scoped. Saves are ALWAYS project-layer: the new rule is bound to this key's fixed project (see whoami) and its rule_layer is 'project'. Use learn_review_rule for all authenticated reviewer feedback, including project and category guidance. For org-wide house rules, save_rule cannot create them. With supersedes_id the write is an EDIT (append-only by supersession: a new rev of the same lineage, the prior superseded). For ALL authenticated reviewer feedback use learn_review_rule instead. Use save_rule for explicit project-level rule maintenance. Returns the new active project rule.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -2328,7 +2332,7 @@
             "description": "The rule body, e.g. 'no em-dashes' or 'be more pushy, we need MRR'."
           },
           "category_id": {
-            "description": "Category id (cat_…). Empty = house-style/general (D2).",
+            "description": "Category id (cat_...). Empty = house-style/general (D2).",
             "type": "string"
           },
           "scope": {
@@ -2354,15 +2358,15 @@
             "maximum": 9007199254740991
           },
           "source_review_id": {
-            "description": "Provenance: the review this rule was learned from (rr_…).",
+            "description": "Provenance: the review this rule was learned from (rr_...).",
             "type": "string"
           },
           "source_turn_id": {
-            "description": "Provenance: the thread turn (turn_…).",
+            "description": "Provenance: the thread turn (turn_...).",
             "type": "string"
           },
           "supersedes_id": {
-            "description": "Set to EDIT the prior version (rule_…).",
+            "description": "Set to EDIT the prior version (rule_...).",
             "type": "string"
           },
           "scope_agent_id": {
@@ -2408,7 +2412,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "limit": {
             "default": 20,
@@ -2441,7 +2445,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "query": {
             "type": "string",
@@ -2485,7 +2489,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "to": {
             "minItems": 1,
@@ -2625,7 +2629,7 @@
             "description": "Intent for the human reviewer. Required when the resolved mode is review."
           },
           "category_id": {
-            "description": "Opaque category id (cat_…) matched from the registry. Never a name.",
+            "description": "Opaque category id (cat_...) matched from the registry. Never a name.",
             "type": "string"
           },
           "category_confidence": {
@@ -2666,14 +2670,14 @@
     {
       "name": "submit_revision",
       "title": "Submit a redrafted revision",
-      "description": "Post a NEW draft for a review (rr_…) under a parent_revision CAS: the way to redraft after feedback, a chat answer, or a rule_changed / recheck_category nudge. Humans may approve or edit-send during a recheck, superseding that work. Reread get_review before acting; never revise an approved or terminal review. `parent_revision` MUST equal the draft's current `revision`, which get_review prints.\n\nLEGAL FROM: needs_review, in_review, chatting, rejected. needs_review IS legal: a reviewer reject, a born-stale rule change and a recheck_category nudge all hand the draft back to you sitting in needs_review, and redrafting it is exactly what you are being asked to do. On success the draft is re-rendered in place (revision++), stays/returns to needs_review, and the reviewer is nudged.\n\nThe three 409s are DIFFERENT errors: read `code`, not just the status:\n  • `stale`: your (revision, version) is no longer current and NOTHING was mutated. RETRY, bounded (≤3): re-read get_review + get_review_feedback, re-apply your edit on top of theirs, resubmit with the new parent_revision. The human always wins (D17).\n  • `wrong_state`: this verb is illegal from the current state but the draft is still live. NEVER retry it; read the allowed_action hints in the error and pick a legal verb.\n  • `terminal`: the review is sent/auto_sent/cancelled. STOP. Nothing will ever succeed, and a `front_run_next` event is waiting in your drain.\n\nPin `rules_version_seen` to the category's rule_high_water (get_category prints it). $0 LLM: YOU compose the redraft. For replies, reread the complete email thread (including new messages) and pass its expected_context_version before revising. This is separate from reviewer feedback. The composition_token must match the current review category from get_review (omit category_id in get_rules when the review is uncategorized). Learning a new category rule does not reclassify an existing draft.",
+      "description": "Post a NEW draft for a review (rr_...) under a parent_revision CAS: the way to redraft after feedback, a chat answer, or a rule_changed / recheck_category nudge. Humans may approve or edit-send during a recheck, superseding that work. Reread get_review before acting; never revise an approved or terminal review. `parent_revision` MUST equal the draft's current `revision`, which get_review prints.\n\nLEGAL FROM: needs_review, in_review, chatting, rejected. needs_review IS legal: a reviewer reject, a born-stale rule change and a recheck_category nudge all hand the draft back to you sitting in needs_review, and redrafting it is exactly what you are being asked to do. On success the draft is re-rendered in place (revision++), stays/returns to needs_review, and the reviewer is nudged.\n\nThe three 409s are DIFFERENT errors: read `code`, not just the status:\n  - `stale`: your (revision, version) is no longer current and NOTHING was mutated. RETRY, bounded (<=3): re-read get_review + get_review_feedback, re-apply your edit on top of theirs, resubmit with the new parent_revision. The human always wins (D17).\n  - `wrong_state`: this verb is illegal from the current state but the draft is still live. NEVER retry it; read the allowed_action hints in the error and pick a legal verb.\n  - `terminal`: the review is sent/auto_sent/cancelled. STOP. Nothing will ever succeed, and a `front_run_next` event is waiting in your drain.\n\nPin `rules_version_seen` to the category's rule_high_water (get_category prints it). $0 LLM: YOU compose the redraft. For replies, reread the complete email thread (including new messages) and pass its expected_context_version before revising. This is separate from reviewer feedback. The composition_token must match the current review category from get_review (omit category_id in get_rules when the review is uncategorized). Learning a new category rule does not reclassify an existing draft.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Review id (rr_…)."
+            "description": "Review id (rr_...)."
           },
           "expected_context_version": {
             "description": "Required when revising a reply: context_version from rereading its entire get_thread before redrafting. On 409 reread and reconsider; never restamp stale text.",
@@ -2808,14 +2812,14 @@
     {
       "name": "undo_rule_change",
       "title": "Undo a rule change",
-      "description": "Undo a rule change by its audit-row id (udo_…): restore the prior version as a NEW forward supersession (action='restore'). Agents may undo too (the audit safety net is in both planes: D11). Idempotent: a re-undo of an already-undone row is a clean 409. Find the udo_ id via get_rule_audit.",
+      "description": "Undo a rule change by its audit-row id (udo_...): restore the prior version as a NEW forward supersession (action='restore'). Agents may undo too (the audit safety net is in both planes: D11). Idempotent: a re-undo of an already-undone row is a clean 409. Find the udo_ id via get_rule_audit.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "udo_id": {
             "type": "string",
             "minLength": 1,
-            "description": "Audit row id to undo (udo_…)."
+            "description": "Audit row id to undo (udo_...)."
           }
         },
         "required": [
@@ -2841,7 +2845,7 @@
           "id": {
             "type": "string",
             "minLength": 1,
-            "description": "Category id (cat_…)."
+            "description": "Category id (cat_...)."
           },
           "name": {
             "description": "New display name.",
@@ -2875,7 +2879,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "display_name": {
             "description": "Sender name for future API mail, up to 60 Unicode characters after normalization. Empty string clears to a bare address; omission leaves unchanged. No emoji, unsupported invisibles, embedded addresses or thread markers. Contextually valid Persian and Indic join controls are supported. Queued reviews retain their name; SMTP uses its own validated name.",
@@ -2915,7 +2919,7 @@
                 "type": "null"
               }
             ],
-            "description": "Patch the inbox's metadata with a shallow merge: an object merges in (a key whose value is null DELETES that key); a top-level null clears ALL metadata; omit the field to leave it unchanged. Values are string/number/boolean; nested objects/arrays rejected; ≤256 keys, ≤256 chars each."
+            "description": "Patch the inbox's metadata with a shallow merge: an object merges in (a key whose value is null DELETES that key); a top-level null clears ALL metadata; omit the field to leave it unchanged. Values are string/number/boolean; nested objects/arrays rejected; <=256 keys, <=256 chars each."
           },
           "project_id": {
             "description": "Optional project_id ASSERTION: must match the key's fixed bound project (see whoami). This is NOT a project selector; a mismatch is rejected. Omit unless you want the safety check.",
@@ -3003,7 +3007,7 @@
           "inbox": {
             "type": "string",
             "minLength": 1,
-            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_...`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
           },
           "from": {
             "description": "Only match senders containing this substring (e.g. 'stripe.com').",
@@ -3050,12 +3054,12 @@
     {
       "name": "wait_for_review_event",
       "title": "Wait for a review event",
-      "description": "Long-poll (~25–55s) for the next review nudge: blocks until one is available OR the deadline, then returns like list_review_events (empty on timeout: re-call to keep watching). Use this for an always-on agent that wants to react to human feedback, delivery outcomes, writing-rule changes and category reconsideration; use list_review_events for recovery. After a newly queued send, first tell the human it has not been sent and share the returned review link for approval, edits or coaching. Immediately wait after that handoff and after every revision, including interactive Hermes sessions. Omit review_id to watch all reviews this caller may access with one durable attention wait. Unlike wait_for_email, this includes reviewer feedback and rule/category updates. No events are acknowledged by waiting; reconnect with the same identity to replay unhandled work, and acknowledge only after successful handling. Cancellation stops the wait, never the reviews. An empty timeout means call again, not finish the task.",
+      "description": "Long-poll (~25-55s) for the next review nudge: blocks until one is available OR the deadline, then returns like list_review_events (empty on timeout: re-call to keep watching). Use this for an always-on agent that wants to react to human feedback, delivery outcomes, writing-rule changes and category reconsideration; use list_review_events for recovery. After a newly queued send, first tell the human it has not been sent and share the returned review link for approval, edits or coaching. Immediately wait after that handoff and after every revision, including interactive Hermes sessions. Omit review_id to watch all reviews this caller may access with one durable attention wait. Unlike wait_for_email, this includes reviewer feedback and rule/category updates. No events are acknowledged by waiting; reconnect with the same identity to replay unhandled work, and acknowledge only after successful handling. Cancellation stops the wait, never the reviews. An empty timeout means call again, not finish the task.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "review_id": {
-            "description": "Restrict the wait to one review's events (rr_…).",
+            "description": "Restrict the wait to one review's events (rr_...).",
             "type": "string"
           },
           "wait_seconds": {

@@ -1,6 +1,6 @@
 {
   "profile": "assistant",
-  "version": "0.1.0-pre.1",
+  "version": "0.1.0-pre.2",
   "tools": [
     "ack_review_event",
     "add_contact_list_entry",
@@ -74,7 +74,7 @@
   ],
   "skills": {
     "extrovert-connect": {
-      "sha256": "b543a58e027ef230f712aba5e778b8b599880b370b4df2147fa1a12165ed848f",
+      "sha256": "09adb8b817c9ddab05bf9540efc8ae0e32abb9aa9c920bb1be96e873d4881182",
       "mcp_tools": [
         "agent_context",
         "list_inboxes",
@@ -84,7 +84,7 @@
       ]
     },
     "extrovert-manage-inboxes": {
-      "sha256": "2360ef7399a2ba87b8f04d8d9e117e741bd9a1192a27a76b02d384827be122a8",
+      "sha256": "ba539ab1678ead2e2bf40dbe588bbbd7340cf6b3e889ee1fe658d49702bbe775",
       "mcp_tools": [
         "add_contact_list_entry",
         "agent_context",
@@ -105,7 +105,7 @@
       ]
     },
     "extrovert-read-inbox": {
-      "sha256": "c465a9f9d94af519a5b8e8c397bb88e507fd736071fe81366467ede5ae8414d9",
+      "sha256": "ea70e2c2d0590d6d69449c3b8fd02eb9cae11c9b6197085961b59dec9abab34a",
       "mcp_tools": [
         "agent_context",
         "batch_update_messages",
@@ -128,7 +128,7 @@
       ]
     },
     "extrovert-send-email": {
-      "sha256": "d062f2f8e90425fe461a991e41463862a822fc4b44a3a3cc0a96cdb3d1912fed",
+      "sha256": "a0e91ea9f0fe0412a6fe63010581af9967ec25936daf2a732fbd063cc317e1e3",
       "mcp_tools": [
         "ack_review_event",
         "agent_context",
@@ -163,7 +163,7 @@
       ]
     },
     "extrovert-writing-rules": {
-      "sha256": "8fbb6af4675dcb8f719458fde6f24f13cea436da91c42148dc456c5dce14c388",
+      "sha256": "ad6b73b0d8244213789e1610f300b9afd68f35fe2cddfc15cde2032d64bd052e",
       "mcp_tools": [
         "agent_context",
         "get_category",
@@ -186,7 +186,7 @@
       ]
     },
     "wait-for-otp": {
-      "sha256": "97e66191c801c97113558e2bcdcd00a19958d615b2e04b176af44f76cb650d37",
+      "sha256": "e0bfdde0239362120e44dd9ce11b576b99eb963bdc8b8d37f47d90e2df2a8667",
       "mcp_tools": [
         "agent_context",
         "wait_for_email",

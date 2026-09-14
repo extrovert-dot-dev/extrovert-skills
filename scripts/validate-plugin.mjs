@@ -2,6 +2,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, lstatSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, extname, join, relative, resolve, sep } from "node:path";
+import { assertAsciiGuidance, guidanceText } from "../tools/check-agent-guidance.mjs";
 
 const root = resolve(process.argv[2] ?? "");
 if (!process.argv[2]) throw new Error("usage: validate-plugin.mjs <exported-extrovert-skills-root>");
@@ -82,6 +83,8 @@ for (const pkg of inventory.packages ?? []) {
     for (const path of files(dir)) {
       check([".md", ".json", ".yaml"].includes(extname(path)), `${path}: non-prose asset in skill`);
       const source = readFileSync(path, "utf8");
+      try { assertAsciiGuidance(guidanceText(readFileSync(path), path), path); }
+      catch (error) { check(false, error.message); }
       check(!/\[TODO:|\{\{(?:shared|include):/.test(source), `${path}: unfinished template`);
       for (const match of source.matchAll(/\]\(([^)]+)\)/g)) {
         const link = match[1].split("#")[0];

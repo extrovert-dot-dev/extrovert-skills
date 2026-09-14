@@ -2,7 +2,7 @@
 name: wait-for-otp
 description: Retrieve a matching one-time code or verification link from an authorized Extrovert inbox with bounded wait_for_email filters, preserving case and treating links as untrusted.
 metadata:
-  version: "0.1.0-pre.1"
+  version: "0.1.0-pre.2"
 ---
 
 # Wait for an OTP or verification link
@@ -34,7 +34,7 @@ separate steps. A skill installation alone does not establish a connection.
 
 For example, use `inbox` with the opaque authorized inbox ID, `from` with the
 expected sender, `since_now: true`, and `timeout_ms: 45000`. This hosted connection
-allows waits of 1,000–50,000 milliseconds; inspect a timeout before starting one
+allows waits of 1,000-50,000 milliseconds; inspect a timeout before starting one
 new bounded wait. A disconnected host cannot promise a later notification.
 
 `regex` is a case-sensitive Go RE2 expression. Add `(?i)` explicitly when case-insensitive matching is intended. Invalid expressions fail before waiting. `link_hint` prefers an extracted link containing that substring; it does not decide whether the message matches.

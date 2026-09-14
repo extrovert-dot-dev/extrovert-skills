@@ -2,7 +2,7 @@
 name: extrovert-manage-inboxes
 description: Create, inspect, update, list, or retire Extrovert inboxes and domains with scoped keys and stable retry identities. Use for a new email identity, fleet provisioning, metadata or send-limit changes, contact controls, domain onboarding, credential export, or safe inbox and domain cleanup.
 metadata:
-  version: "0.1.0-pre.40"
+  version: "0.1.0-pre.41"
 ---
 
 # Manage Extrovert inboxes
@@ -131,7 +131,7 @@ hosted MCP and CLI. Connection names alone do not prove identical authority.
 Do not infer a permissions cause from an empty list or domain count alone.
 
 Inbox lifecycle, sender setup, and review policy are different facts. Missing
-`sender_verified` is unknown, not pending. It does not justify refusing a user’s
+`sender_verified` is unknown, not pending. It does not justify refusing a user's
 send request; follow the documented send/review workflow and use its explicit
 errors or outcome. Do not claim delivery or receipt from readiness alone.
 

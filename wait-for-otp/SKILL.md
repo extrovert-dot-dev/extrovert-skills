@@ -2,7 +2,7 @@
 name: wait-for-otp
 description: Retrieve a one-time passcode, verification code, magic link, or email 2FA challenge from an Extrovert inbox using wait_for_email. Use during signup, login, account confirmation, or device verification when an agent needs one matching message and structured OTP or link extraction without writing a polling loop.
 metadata:
-  version: "0.1.0-pre.40"
+  version: "0.1.0-pre.41"
 ---
 
 # Wait for an OTP or verification link
@@ -40,7 +40,7 @@ Example arguments:
 
 ```json
 {
-  "inbox": "pmbx_…",
+  "inbox": "pmbx_...",
   "from": "security@example.com",
   "subject": "verification",
   "regex": "(?i)code[ :]+[A-Z0-9-]{4,10}",

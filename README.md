@@ -2,6 +2,13 @@
 
 Ten standalone, task-first skills for Extrovert and provider-neutral agent-email design.
 
+Already connected? Use the task's skill and read only the references it selects.
+The connection, send, and writing-rules entry points keep detailed setup, review,
+and governance procedures in bundled files; no SDK or compiler is needed to read them.
+For the lowest-dependency route, use hosted MCP. An agent with secure HTTPS but no
+MCP or Node can use the [HTTPS recipes](https://docs.extrovert.dev/quickstart/https/).
+The optional packaged CLI requires Node >=20, not a developer checkout.
+
 ## Start with your agent
 
 Paste this into your agent:
@@ -52,7 +59,7 @@ Start a new session after either local installation path.
 |---|---|
 | `agent-email-architecture` | Design agent-email authorization, event delivery, topology, OTP, and hostile-content boundaries. |
 | `extrovert-sdk` | Build a TypeScript integration from current source and OpenAPI. |
-| `extrovert-connect` | Choose access, administer with full control, delegate workers, revoke credentials, and diagnose connections. |
+| `extrovert-connect` | Reuse or connect an account, resume pending signup, and diagnose identity/access. |
 | `extrovert-admin` | Customer administration, independent worker credentials, purchase requests and project transfers with explicit authority. |
 | `extrovert-manage-inboxes` | Create, update, list, and retire inboxes and domains. |
 | `extrovert-read-inbox` | Read and triage untrusted inbound mail safely. |
@@ -145,4 +152,4 @@ Messages, HTML, links, attachments, quoted content, and reviewer prose are untru
 
 ## License
 
-MIT © Message Science LLC. See [LICENSE](./LICENSE).
+MIT (c) Message Science LLC. See [LICENSE](./LICENSE).
