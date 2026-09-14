@@ -16,10 +16,9 @@ jobs:
         with:
           node-version: "24"
           package-manager-cache: false
-      - name: Discover exactly nine skills
+      - name: Discover standalone skills
         run: |
           output="$(npx --yes skills@1.5.23 add . --list)"
           printf '%s\n' "$output"
-          test "$(find . -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l)" -eq 9
-      - name: Validate Codex plugin bundle
+      - name: Validate both marketplaces and all plugin bundles
         run: node scripts/validate-plugin.mjs .

@@ -2,7 +2,7 @@
 name: extrovert-writing-rules
 description: Read Extrovert writing rules before composing and turn reusable human feedback into governed rules. Use for get_rules, category matching, saving or superseding a preference, promotion, retirement, audit, undo, risk-dial inspection, or proposing graduation without confusing one reviewer's edit with a universal rule.
 metadata:
-  version: "0.1.0-pre.39"
+  version: "0.1.0-pre.40"
 ---
 
 # Extrovert writing rules
@@ -29,6 +29,7 @@ that pending step; use live guidance for this task. If freshness is unavailable,
 that condition without treating it as disabled signup or permission to guess new behavior. See
 [updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
 
+<!-- shared:start workflow -->
 Extrovert stores and orders rules; the connected agent applies judgment. The service does not compose or reconcile prose for you.
 
 ## Before composing
@@ -107,6 +108,8 @@ Use `get_risk_dial` and `get_graduation_status` as evidence. `propose_graduation
 
 For a specific pending draft, return to `extrovert-send-email`: reread its current revision, apply the updated ordered rules, and revise or restamp without overwriting a human change.
 
+
+<!-- shared:end workflow -->
 
 ## Internal email review exceptions
 

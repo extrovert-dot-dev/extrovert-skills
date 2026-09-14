@@ -1,0 +1,21 @@
+{
+  "name": "extrovert",
+  "owner": {
+    "name": "Extrovert"
+  },
+  "metadata": {
+    "description": "Extrovert hosted email plugins: full capabilities or the directory assistant profile."
+  },
+  "plugins": [
+    {
+      "name": "extrovert-full",
+      "source": "./plugins/extrovert-full",
+      "description": "Extrovert email and customer administration with hosted OAuth and explicitly scoped access."
+    },
+    {
+      "name": "extrovert-assistant",
+      "source": "./plugins/extrovert-assistant",
+      "description": "Read and manage authorized email, use owned domains, and send through Extrovert's Review Loop."
+    }
+  ]
+}

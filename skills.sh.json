@@ -5,6 +5,7 @@
     "agent-email-architecture",
     "extrovert-sdk",
     "extrovert-connect",
+    "extrovert-admin",
     "extrovert-manage-inboxes",
     "extrovert-read-inbox",
     "extrovert-send-email",
@@ -24,6 +25,7 @@
       "title": "Connect and manage",
       "skills": [
         "extrovert-connect",
+        "extrovert-admin",
         "extrovert-manage-inboxes",
         "configure-himalaya"
       ]

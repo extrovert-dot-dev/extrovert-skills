@@ -1,0 +1,20 @@
+{
+  "name": "extrovert-full",
+  "version": "0.1.0-pre.40",
+  "description": "Extrovert email and customer administration with hosted OAuth and explicitly scoped access.",
+  "author": {
+    "name": "Extrovert",
+    "url": "https://extrovert.dev"
+  },
+  "homepage": "https://docs.extrovert.dev",
+  "repository": "https://github.com/extrovert-dot-dev/extrovert-skills",
+  "license": "MIT",
+  "keywords": [
+    "email",
+    "inbox",
+    "mcp",
+    "review-loop"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json"
+}

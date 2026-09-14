@@ -1,0 +1,3102 @@
+{
+  "schemaVersion": 1,
+  "source": "extrovert/mcp",
+  "sourceSha256": "a5183dd5248f520e867ea5d89c6cceae9293f0afa007e1b2627102e0ff7e02f4",
+  "serverVersion": "0.1.0-pre.1",
+  "profile": "assistant",
+  "fixtureMode": "offline",
+  "tools": [
+    {
+      "name": "ack_review_event",
+      "title": "Ack review events",
+      "description": "For an event with review_id, use {acks:[{review_id: event.review_id, through_seq: event.seq}]}. Use broadcast_ids ONLY for events without review_id; never pass a review nudge ID there. Empty or unknown arguments are errors. Advance the agent's per-review cursor(s) to the supplied through_seq and/or mark broadcast nudges done. Idempotent and monotonic: re-acking an older seq is a no-op (exactly-once effect). Call this AFTER you have acted on the events from list_review_events / wait_for_review_event so the queue does not keep re-surfacing them. Acknowledgement completes event handling, not the email task. If any email in your current task lacks a confirmed terminal outcome, immediately call wait_for_review_event with wait_seconds:55 and no review_id. Then read each affected review. An empty event queue does not prove sending is complete.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "acks": {
+            "description": "Per-review cursor advances; use the event’s review_id and seq, not its nudge id.",
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "review_id": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "The review (rr_…) whose cursor to advance."
+                },
+                "through_seq": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 9007199254740991,
+                  "description": "Advance the cursor through this observed event seq (inclusive)."
+                }
+              },
+              "required": [
+                "review_id",
+                "through_seq"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "broadcast_ids": {
+            "description": "Only nudge ids for events WITHOUT review_id. Review events require acks instead.",
+            "maxItems": 100,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "add_contact_list_entry",
+      "title": "Add a contact allow/block entry",
+      "description": "Add an allow or block entry to an inbox's contact lists. A `block` entry rejects a send to a matching recipient; once any `allow` entry exists for an inbox, sends from it are restricted to recipients that match one of them (allowlist mode). `pattern` is a bare email address (matched in full) or a bare domain (matches any address in that domain). Returns the created entry (addressable by its opaque id for delete).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Owned inbox to attach the entry to (its sends are governed)."
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "allow",
+              "block"
+            ],
+            "description": "allow = permit; block = reject a matching recipient."
+          },
+          "direction": {
+            "description": "Traffic direction. Defaults to send (only send is enforced today).",
+            "type": "string",
+            "enum": [
+              "send",
+              "receive"
+            ]
+          },
+          "pattern": {
+            "type": "string",
+            "minLength": 1,
+            "description": "A bare email address (bob@acme.com) or a bare domain (acme.com)."
+          }
+        },
+        "required": [
+          "inbox",
+          "kind",
+          "pattern"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "agent_context",
+      "title": "Check current Extrovert guidance and release",
+      "description": "Describe this connection's available email workflows and fixed capability limits. Returns bundled guidance, not downloaded instructions, and does not authenticate or change access.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "batch_update_messages",
+      "title": "Batch update messages",
+      "description": "Mark read/unread and/or move folder for a list of message ids that all belong to one inbox, in a single call. Set read (true=read, false=unread) and/or folder (one of INBOX, Sent, Trash, Junk, Archive): at least one is required. Ids that are malformed or not owned by the inbox come back in `failed` rather than failing the batch. Returns {updated, failed}.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Owned inbox the messages belong to."
+          },
+          "ids": {
+            "minItems": 1,
+            "maxItems": 200,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": "Opaque message ids (msg_…), all in this inbox."
+          },
+          "read": {
+            "description": "Set (true) or clear (false) the read flag on each id.",
+            "type": "boolean"
+          },
+          "folder": {
+            "description": "Move each message to this folder.",
+            "type": "string",
+            "enum": [
+              "INBOX",
+              "Sent",
+              "Trash",
+              "Junk",
+              "Archive"
+            ]
+          }
+        },
+        "required": [
+          "inbox",
+          "ids"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "cancel_review",
+      "title": "Withdraw a pending review",
+      "description": "Withdraw your own pending review (rr_…) to the terminal cancelled state: you decided not to send it after all. Only the composing agent may cancel its own review. It is also the ONLY legal close-out for a `failed` review: after a send_failed event the row cannot be retried by anyone, so cancel it and compose a NEW message.\n\nAn already-cancelled review returns its existing result and releases no quota twice. Sent/auto_sent answers 409 `terminal`: STOP, do not retry. An `approved` review answers 409 `wrong_state`: it is mid-delivery, so wait for the `sent` or `send_failed` event instead.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Review id (rr_…)."
+          },
+          "client_id": {
+            "description": "Stable Idempotency-Key for this cancellation. Reuse it after a transport timeout.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "check_suppression",
+      "title": "Check whether a recipient has opted out",
+      "description": "Pre-check, BEFORE you compose, whether a recipient has opted out of this org's mail (list-unsubscribe / suppression). If suppressed=true, a send to that address WILL be rejected with recipient_suppressed: do NOT include them; drop that recipient or pick another. This checks your OWN org's opt-outs only (it never reveals a platform-wide or other-tenant opt-out). Returns suppressed (bool) plus the matching org rows (each with an id you can revoke_suppression if the recipient asked to resume).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "recipient": {
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+            "description": "The recipient address to pre-check for an opt-out."
+          }
+        },
+        "required": [
+          "recipient"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "create_inbox",
+      "title": "Create inbox",
+      "description": "Create an inbox within the explicitly authorized project using existing entitled capacity. First check list_inboxes for an existing match. Omit username/domain for a shared address; an owned domain must have readiness.ready_for_inboxes=true. Returns the actual inbox status; creation alone is not proof of sending readiness. Metadata and client_id retain their normal idempotency behavior.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "description": "Desired local part (before the @). On a shared domain it must normalize to at least 5 characters and cannot use a reserved name. Omit for an auto-generated handle.",
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$"
+          },
+          "domain": {
+            "description": "Domain to create the inbox on (must be an org domain). Omit for the account's shared domain.",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "Sender name for API mail, up to 60 Unicode characters after normalization. Use a clear identity without emoji, unsupported invisible characters, addresses or thread markers. Contextually valid Persian and Indic join controls are supported. Omit/empty defaults to Agent {username}: agent007 becomes Agent 007; alice_bot becomes Agent alice-bot. Unsafe generated defaults fall back to Agent; invalid explicit names are rejected. SMTP preserves its own validated name.",
+            "type": "string",
+            "maxLength": 512
+          },
+          "metadata": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "maxLength": 256
+                    },
+                    {
+                      "type": "number"
+                    },
+                    {
+                      "type": "boolean"
+                    }
+                  ]
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "description": "Arbitrary key-value metadata to store on the inbox (string/number/boolean values; ≤256 keys, ≤256 chars per key/string value; nested objects/arrays rejected; a key with a null value is dropped). Echoed back on the response and replayed on idempotent retries."
+          },
+          "project_id": {
+            "description": "Optional project_id ASSERTION: must match the key's fixed bound project (see whoami). This is NOT a project selector; a mismatch is rejected. Omit unless you want the safety check.",
+            "type": "string",
+            "minLength": 1
+          },
+          "client_id": {
+            "description": "Optional idempotency key. Re-calling with the same client_id returns the existing inbox instead of creating a duplicate.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "delete_contact_list_entry",
+      "title": "Delete a contact allow/block entry",
+      "description": "Delete a contact-list entry by id (lst_…). The allow/block rule stops applying immediately.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Owned inbox the entry belongs to."
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Entry id (lst_…) from add_contact_list_entry / list_contact_lists."
+          }
+        },
+        "required": [
+          "inbox",
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "delete_inbox",
+      "title": "Delete inbox",
+      "description": "Permanently delete an inbox and all of its messages, and tear down its sender identity. Requires mailbox:delete, or mailbox:create for the owning agent as the lifecycle-cleanup fallback. This cannot be undone or recovered.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          }
+        },
+        "required": [
+          "inbox"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "delete_message",
+      "title": "Delete a message",
+      "description": "Delete one message by its opaque id (msg_…). By default it is moved to the Trash folder (a recoverable soft delete); pass expunge=true to permanently remove it. A message already in Trash is always expunged. The inbox owns the message. Returns {id, deleted, expunged, count}.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Owned inbox the message belongs to."
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Opaque message id (msg_…)."
+          },
+          "expunge": {
+            "default": false,
+            "description": "true to permanently remove instead of moving to Trash.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "inbox",
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "delete_thread",
+      "title": "Delete a thread",
+      "description": "Delete an entire conversation thread by its stable id (thr_…): every message in it (across INBOX and Sent). By default the messages are moved to Trash (recoverable); pass expunge=true to permanently remove them. The inbox owns the thread. Returns {id, deleted, expunged, count} where count is the number of messages removed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Owned inbox the thread belongs to."
+          },
+          "thread_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable thread id (thr_…) from list_threads or a message."
+          },
+          "expunge": {
+            "default": false,
+            "description": "true to permanently remove instead of moving to Trash.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "inbox",
+          "thread_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "forward_email",
+      "title": "Forward a message",
+      "description": "Forward an existing message (by its opaque id) to new recipients and submit it for HUMAN REVIEW: the default path, exactly like send_email and reply_email. Before writing, recover existing reviews, choose one semantic category with list_categories (propose_category if none fits), and apply get_rules for that category and house style. Optionally prepend a plain-text note.\n\nALWAYS pass `intent`. A forward is an outbound message to arbitrary NEW recipients that quotes an entire received thread, so the review policy binds it just as hard as a send: otherwise it would be the way around review, and a worse one, because it exfiltrates a conversation. Under the default `require_review` policy a forward with no intent is REFUSED with 422 intent_required (nothing sent, nothing queued); with one it normally returns 202 queued_for_review and a review id (rr_…). For a queued forward, first tell the human it has not been sent and share the returned review link for approval, edits or coaching; then immediately wait for review events. The subject and quoted body are materialized at SUBMIT, so the human reviews the exact bytes that go out and an approved forward delivers the reviewer's edit.\n\nOpt-outs: a forward to a suppressed recipient is ALWAYS rejected (recipient_suppressed 422). Forward gets NO solicited-response exception: that exception exists only for a reply answering an inbound message from the person who opted out.\n\nA forward is deliberately NOT threaded to its parent (no In-Reply-To): the new recipients were never part of that conversation. Internal project/organization exceptions are exposed by get_inbox.internal_email_review. They start off and require every final To/Cc/Bcc recipient to belong to the sender’s enabled project or exact organization. Other organizations, aliases, and mixed external recipients retain their usual policy. No inbox access is granted. Ordinary agents and project managers cannot enable them. Submit normally and follow the returned result; do not split recipients to evade review. get_inbox.human_email_review exposes the default-off exception for exactly one To recipient at the verified human email, no Cc/Bcc or aliases. Writing rules, intent and limits still apply; others keep their policy. Ordinary agents cannot enable it.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "message_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Opaque id of the message to forward (msg_…)."
+          },
+          "to": {
+            "minItems": 1,
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "description": "An email address."
+            },
+            "description": "One or more recipient addresses."
+          },
+          "cc": {
+            "description": "Optional Cc recipients.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "description": "An email address."
+            }
+          },
+          "bcc": {
+            "description": "Optional Bcc recipients.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "description": "An email address."
+            }
+          },
+          "text": {
+            "description": "Optional note to prepend (plain text).",
+            "type": "string"
+          },
+          "html": {
+            "description": "Accepted for wire compatibility but ignored. Forwards use one plain-text body containing the note and quote.",
+            "type": "string"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "review",
+              "direct"
+            ],
+            "description": "Review Loop assertion: 'review' routes into the human-review queue; 'direct' requests an immediate send. The account/inbox review policy may downgrade 'direct' to 'review'."
+          },
+          "intent": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string",
+                "description": "Free-text intent summary (who/what/why). Required when mode is review."
+              },
+              "meta": {
+                "description": "Optional structured intent payload.",
+                "type": "object",
+                "properties": {
+                  "goal": {
+                    "type": "string"
+                  },
+                  "recipient": {
+                    "type": "string"
+                  },
+                  "prior_touches": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "urgency": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "summary"
+            ],
+            "description": "Intent for the human reviewer. Required when the resolved mode is review."
+          },
+          "category_id": {
+            "description": "Opaque category id (cat_…) matched from the registry. Never a name.",
+            "type": "string"
+          },
+          "category_confidence": {
+            "description": "Your confidence (0..1) in the category match. Feeds the min_confidence auto-send gate only.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "composition_token": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Token returned by the fresh get_rules call used to compose this forward. Read and apply these rules before writing; never fetch a token merely to submit already-written text."
+          },
+          "client_id": {
+            "description": "Stable Idempotency-Key for this exact forward intent. Reuse it after a transport timeout.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "inbox",
+          "message_id",
+          "to",
+          "composition_token"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "get_attachment",
+      "title": "Download an attachment",
+      "description": "Download one attachment's bytes (returned base64) by its id (from list_attachments), with its filename and content type. This is the easy attachment fetch: list_attachments to find the id, then get_attachment to pull the file. The inbox owns the message.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "message_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Opaque message id (msg_…) the attachment belongs to."
+          },
+          "attachment_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Opaque attachment id (att_…) from list_attachments."
+          }
+        },
+        "required": [
+          "inbox",
+          "message_id",
+          "attachment_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_backlog_status",
+      "title": "Read the D19 backlog-reconciliation status",
+      "description": "Read the category's backlog reconciliation picture (D19/§8): how many of its QUEUED drafts are STALE (composed under older rules: they need a redraft) vs CURRENT-ENOUGH (within tolerance of the current rules-version) against the current category rules-version + house-style version. A pure $0-LLM integer compare. Read-only: you READ the picture; the human (console scan-backlog) or the graduate/rule-change hooks TRIGGER the actual sweep that releases current-enough drafts and nudges stale ones. Use it to see whether your queued drafts are about to be re-checked.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Category id (cat_…)."
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_category",
+      "title": "Get category",
+      "description": "Fetch one category by id (cat_…): its name, description, scope, and graduation state.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Category id (cat_…) from list_categories."
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_deliverability_status",
+      "title": "Get deliverability status",
+      "description": "Read this org's outbound deliverability health: an overall status badge (healthy / at_risk / paused / enforced / unknown), sending status, the latest window's sends, bounces and complaints (with rates), and the count of open findings. Use it before a large send to check the org is ready to send. Read-only and org-scoped.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_domain",
+      "title": "Is this domain ready to use?",
+      "description": "Answer whether a domain is ready, whether the customer or Extrovert needs to act, and what to do next. Show the readiness summary to the user. If it is still being set up, follow poll_after_seconds; setup continues in the background but a disconnected agent cannot receive a live update. DNS entries appear only when the customer needs to add or restore them. Requires domain:read or domain:manage.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The fully-qualified domain name (e.g. mail.acme.com)."
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_graduation_status",
+      "title": "Read a category's graduation status",
+      "description": "Read whether a category is ready to graduate to the NEXT rung (supervised→auto_notify→auto_silent). Reports the gates passed / still needed: clean approvals (N / needed), category age, the maturity gate (required for auto_silent, D16), the drift counter vs K, and can_graduate (would a human graduate succeed right now). Use this to decide when to propose_graduation: you can never flip the bit yourself (a human confirms; D16/D6).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Category id (cat_…)."
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_inbox",
+      "title": "Get inbox",
+      "description": "Fetch one inbox by id or address (includes its metadata).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          }
+        },
+        "required": [
+          "inbox"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_message",
+      "title": "Get message",
+      "description": "Fetch one message by its opaque id (msg_…), as returned by read_messages / search / wait_for_email. The owning inbox is resolved from the id. Structured output carries nullable source text/HTML fields and their nullable best-effort extracted variants; choose the presentation format below.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Opaque message id (msg_…)."
+          },
+          "format": {
+            "default": "auto",
+            "description": "Presentation format. auto returns an actual text/plain part when present, otherwise the actual HTML part. Missing alternatives are never synthesized.",
+            "type": "string",
+            "enum": [
+              "auto",
+              "text",
+              "html",
+              "both"
+            ]
+          },
+          "variant": {
+            "default": "source",
+            "description": "source is authoritative MIME content; extracted is a best-effort quote/signature-stripped derivative.",
+            "type": "string",
+            "enum": [
+              "source",
+              "extracted"
+            ]
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_pacing_state",
+      "title": "Read the demand-driven pacing state for a category",
+      "description": "Read the category's demand-driven pacing snapshot (M7 Slice B/§8): the human review CURSOR position, the effective lookahead window (freshness is guaranteed only for the next few drafts after the cursor), the HARD per-nudge fan-out ceiling (rework_batch_max: one nudge can never fan to 500), the per-agent nudge interval, and each queued draft's classification (behind_cursor | in_window_fresh | in_window_redrafting | ahead). A pure $0-LLM read; the cursor advances from the human's console approve/reject/edit actions. Use it to see which of your drafts are about to surface (and should be redrafted against current rules) vs already passed.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Category id (cat_…)."
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_review",
+      "title": "Get review",
+      "description": "Fetch one review request by id (rr_…): its current state, `revision` (pass it as submit_revision's parent_revision), the proposed draft, the intent, the category, and (once sent) the sent body + diff.\n\nThis is the DEFINITIVE per-review 'am I done?' answer, and the poll-side companion to the event drain: use it after a crash, when your event cursor is gone. `closed` is true for sent, auto_sent, cancelled AND failed (failed is absorbing: nobody will ever move that row, so waiting on it hangs forever). `send_path` says how it got out; `send_error` says why it did not.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Review id (rr_…) from list_reviews or a queued send/reply."
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_review_decision_context",
+      "title": "Get a review's decision context (reviewer)",
+      "description": "REVIEWER PLANE (review:act): fetch your read-only decision surface for a review (rr_…) you're linked to: the intent + current draft + the append-only thread + the TWO circuit-breaker budgets (hop_count vs max_hops, and the hard review_deadline). force_to_human=true means a reject would be FORCED to the human regardless of your intent (the human is the only terminal authority, D17). You can only see reviews your active review-link covers (per-inbox beats account-wide); review:act alone is not enough. Read this, then reviewer_decide. $0 LLM: pure assembly on our side.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Review id (rr_…) you are the linked reviewer for."
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_review_feedback",
+      "title": "Get the human's feedback on a review",
+      "description": "Fetch the human's assembled feedback for a review (rr_…): the unified + structured diff of the human's edit, the human comments / rejection feedback, the decision (edited|approved|rejected|…), and the rules already born from this review. Read this after a rejected/edited nudge to learn what the human wanted, then judge whether a generalizable rule exists (learn_review_rule with the authenticated source_turn_id) and/or submit_revision a redraft. $0 LLM: pure assembly on our side.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Review id (rr_…)."
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_review_turns",
+      "title": "Get review thread turns",
+      "description": "Fetch the append-only thread turns for a review (rr_…): the intent, every draft revision, human comments/edits/decisions, captured diffs, and state changes: the full audit + learning trail.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Review id (rr_…)."
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_risk_dial",
+      "title": "Read the effective risk dial",
+      "description": "Read the brand-risk dial that governs auto-send: the account-wide default plus every category's per-category overrides (each with its RESOLVED effective value: the override applied over the account default; a null override means the category inherits that value, D12). Fields: min_confidence, first_contact_gate, drift_demote_after (K), canary_rate, graduate_min_approvals + graduate_min_age_hours (the maturity gate), auto_send_cap_per_day (the per-day volume cap). READ-ONLY: you can never flip the dial; setting it is a human (console) action (D16).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_rule_audit",
+      "title": "Read the rule/category change audit log",
+      "description": "Read the append-only change/undo audit log spanning rules AND categories (D11): the safety net for the shared/house-style rule governance. Optionally narrow to one entity. Each row carries a before/after snapshot; undo a change with undo_rule_change.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "entity_kind": {
+            "description": "Narrow to one entity kind.",
+            "type": "string",
+            "enum": [
+              "rule",
+              "category"
+            ]
+          },
+          "entity_id": {
+            "description": "Narrow to one entity (rule_… or cat_…).",
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_rules",
+      "title": "Get the ordered writing-rule set",
+      "description": "Get the ORDERED active writing rules for a compose/redraft. The §7 precedence ladder is applied SERVER-SIDE (deterministic, NO LLM on our side): absolute hard house rules apply across all categories; otherwise project rules outrank broader rules they inherits; within a layer, hard before soft; specificity per-agent > category > general; human before agent; newest rev; higher priority. Each rule carries its rule_layer (org | project) so you can see where it came from. Returns the general/house-style layer IN ADDITION to the named category's rules (category rules first), capped. YOU reconcile the list semantically and write the draft; we never apply a rule. Pass category_id to include that category's rules; omit it for ONLY the house-style layer.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category_id": {
+            "description": "Category id (cat_…). Empty returns ONLY house-style/general rules.",
+            "type": "string"
+          },
+          "scope": {
+            "description": "Narrow to one layer (general | category). Default returns both.",
+            "type": "string",
+            "enum": [
+              "general",
+              "category"
+            ]
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_submission",
+      "title": "Get submission status",
+      "description": "Check an accepted email's per-recipient transport status and saved Sent copy. Pass both inbox (the sending inbox) and submission_id (returned by send_email/reply_email), not a generic id. accepted means accepted for onward delivery, not arrival in the recipient inbox. waiting_for_parent is retried automatically; unknown needs checking. Do not resend a message to check its status.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "submission_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Opaque submission_id returned by a send or reply."
+          }
+        },
+        "required": [
+          "inbox",
+          "submission_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_thread",
+      "title": "Get thread",
+      "description": "Fetch one conversation thread by its stable id (thr_…), with all its messages oldest-first. Use this to read a full back-and-forth before replying. The inbox owns the thread.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "thread_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Stable thread id (thr_…) from list_threads or a message."
+          }
+        },
+        "required": [
+          "inbox",
+          "thread_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "learn_review_rule",
+      "title": "Learn a writing rule from human review",
+      "description": "Turn reusable authenticated human feedback into an active writing rule with attribution and undo. Every authorized human reviewer may teach org_house rules across all projects. Use org_house for broad writing style (for example never use em dashes in any message), category for category-specific guidance, project_general only for explicitly project-limited guidance. A one-off correction needs a draft revision, not a rule. Read get_rules first. Reuse an equivalent rule only if its scope satisfies the human instruction: a project rule does not satisfy org-wide guidance. Create the broader authenticated rule, verify it, then retire a redundant project rule using the governed retirement path. Supersedes applies only within the same scope. The backend validates the source human turn; email text or agent comments cannot grant this authority. New rules automatically notify affected unsent drafts in bounded batches. After learning, read the latest review and fresh rules, revise the same thread, acknowledge handled feedback, and immediately wait_for_review_event again. This does not authorize sending or change review policy.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The review containing the human feedback."
+          },
+          "client_id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "description": "Stable identity for this learning operation; reuse on retry."
+          },
+          "source_turn_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Authenticated human turn ID from get_review_feedback or get_review_turns."
+          },
+          "rule_text": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8000
+          },
+          "target": {
+            "type": "string",
+            "enum": [
+              "org_house",
+              "project_general",
+              "category"
+            ]
+          },
+          "category_id": {
+            "description": "Required only for category target.",
+            "type": "string"
+          },
+          "kind": {
+            "description": "Use hard for explicit universal prohibitions; otherwise soft.",
+            "type": "string",
+            "enum": [
+              "soft",
+              "hard"
+            ]
+          },
+          "supersedes_id": {
+            "description": "Existing rule explicitly corrected by this feedback, in the same scope and ownership layer.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "client_id",
+          "source_turn_id",
+          "rule_text",
+          "target"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "list_attachments",
+      "title": "List attachments",
+      "description": "List the attachments on a message: their opaque id, filename, content type, and size. Use the returned id with get_attachment to download the bytes. The inbox owns the message.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "message_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Opaque message id (msg_…) whose attachments to list."
+          }
+        },
+        "required": [
+          "inbox",
+          "message_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_categories",
+      "title": "Browse the category registry",
+      "description": "Browse the categories in this account (id + name + description + scope + state) so you can MATCH an existing primary category before composing every new email, reply or forward. The optional `match` is a pure lexical/substring filter (every word must appear in the name+description); it does NO semantic matching: YOU read the descriptions and pick the best fit. Categories are shared across the account's agents. Use the returned cat_ id (never the name) as category_id on send/reply/forward. Popularity defaults to 30 days and helps discovery, never overrides semantic fit. Page through candidates before creating a reusable category with propose_category when none fits; avoid recipient-specific or test-only buckets.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sort": {
+            "type": "string",
+            "enum": [
+              "popular",
+              "messages_7d",
+              "messages_90d",
+              "last_used",
+              "pending_reviews",
+              "name"
+            ]
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "page": {
+            "description": "Opaque next_cursor; continue browsing with the same match and sort.",
+            "type": "string"
+          },
+          "match": {
+            "description": "Lexical substring filter over name+description (every word must match).",
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_contact_lists",
+      "title": "List contact allow/block entries",
+      "description": "List the allow/block contact-list entries that govern an inbox: its inbox-specific entries plus any account-wide entries that apply to every inbox this agent owns.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Owned inbox whose governing entries to list."
+          }
+        },
+        "required": [
+          "inbox"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_deliverability_findings",
+      "title": "List deliverability findings",
+      "description": "List this org's deliverability findings (bounce/complaint/auth/blocklist issues affecting sending), newest first. Filter by status (open/resolved), severity (low/high), domain, or sender. Read-only and org-scoped. Use get_deliverability_status for aggregate sending health and metrics.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "description": "Filter by finding status.",
+            "type": "string",
+            "enum": [
+              "open",
+              "resolved"
+            ]
+          },
+          "severity": {
+            "description": "Filter by severity.",
+            "type": "string",
+            "enum": [
+              "low",
+              "high",
+              "unknown"
+            ]
+          },
+          "domain": {
+            "description": "Filter to one sending domain.",
+            "type": "string"
+          },
+          "sender": {
+            "description": "Filter to one sender address.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max rows to return.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "cursor": {
+            "description": "Opaque cursor from a previous call's next_cursor.",
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_domain_events",
+      "title": "Resume domain setup and health updates",
+      "description": "Read durable updates for a visible domain, including ready, action needed and recovered. Save next_cursor and pass it as after on the same domain, including after restarting. Drain has_more immediately; otherwise wait poll_after_seconds. Summarize new events for the human. This does not wake a disconnected agent or host.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "after": {
+            "description": "Saved next_cursor from this domain's previous event page.",
+            "type": "string",
+            "pattern": "^\\d+$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_domains",
+      "title": "Check which domains are ready to use",
+      "description": "List visible domains with a plain-language readiness result, who needs to act, and the next step. Inbox counts are scoped to this agent, not the whole account. Requires domain:read or domain:manage. Never infer readiness from signing or verification flags. Follow next_cursor for more results.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "description": "Opaque next_cursor from the previous domain page.",
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_inboxes",
+      "title": "List inboxes",
+      "description": "List inboxes visible to this connection, newest first. Follow next_cursor with the same filters for more pages. An empty result describes only its authorized scope; a readable inbox missing from a complete matching list is an inconsistency to report, not proof of ownership restrictions. A project (default) key lists its agent's inboxes in its project with no extra args. An ORG-tier key must pick a breadth: pass `project` (a concrete project id) or `wildcard:true` (the whole org subtree); a bare org-key list is rejected (breadth_required).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "default": 20,
+            "description": "Max inboxes to return.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "description": "Opaque next_cursor from the preceding page.",
+            "type": "string",
+            "minLength": 1
+          },
+          "domain": {
+            "description": "Filter to an exact domain, such as internal.wild-hockey.com.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253
+          },
+          "project": {
+            "description": "Optional explicit project selector; must stay within this connection's granted reach. Omit to use the consented resources.",
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_outbox",
+      "title": "List durable outbound work",
+      "description": "List bounded outbound work accepted for an inbox. `sent` is true only after provider acceptance; checking_status is fenced and must not be resent.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "before": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "inbox"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_review_events",
+      "title": "Drain review events",
+      "description": "Non-blocking drain of the next un-acked review nudges for this agent, in FIFO order (strict per review), with the per-review cursors. The durable nudge queue is the authoritative liveness source. Side-effect free: re-calling returns the same frontier until you ack. After acting on an event, call ack_review_event to advance the cursor.\n\nHOW A LOOP TERMINATES: every review that reaches sent / auto_sent / failed / cancelled emits EXACTLY ONE terminal event: `sent`, `send_failed` or `cancelled`: and it is the last and highest-seq event that review will ever produce. Ack it and stop polling that review. `front_run_next` also means stop: you tried to mutate a review somebody already finished.\n\nNon-terminal reasons: `redraft_requested` and `rejected` (redraft via submit_revision), `feedback_added` (a HUMAN commented: answer or redraft), `rule_changed` and `propagate_general_rule` (re-read get_rules, then redraft or restamp_review), `recheck_category` (browse current category descriptions and rules, consolidate eligible semantic duplicates with merge_categories, then fetch fresh get_rules and revise or restamp). `staleness` and `approved` are RESERVED and never emitted. Handle any unknown reason by acking and ignoring it: the set grows additively.\n\nEach event's `payload` carries the actionable detail (the delivered message_id, the scrubbed send error, the current revision) and is printed with the event.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "review_id": {
+            "description": "Restrict the drain to one review's events (rr_…).",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max events to return.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_reviews",
+      "title": "List reviews",
+      "description": "List the review requests submitted in this account so a sending agent can monitor its submissions in the human review queue. At the start of outbound work recover composer=me and list_review_events before drafting. Unless the user explicitly asks for inspection only, resume existing authorized sends. Inbound replies are not reviewer feedback. Filter by `state` (one or more), `category_id`, or `inbox`. Human-authority actions (approve/reject/edit-send) happen in the console, never via tools.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "thread_id": {
+            "description": "Find existing reviews for this conversation. Omit composer=me to include other composers within your authorized inbox access before drafting a reply.",
+            "type": "string",
+            "minLength": 1
+          },
+          "composer": {
+            "description": "Only reviews composed by this connected agent; use for recovery, not conversation collision checks.",
+            "type": "string",
+            "const": "me"
+          },
+          "state": {
+            "description": "Filter by one or more review states (e.g. needs_review).",
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "needs_review",
+                  "in_review",
+                  "chatting",
+                  "stale",
+                  "approved",
+                  "sent",
+                  "auto_sent",
+                  "rejected",
+                  "stalled",
+                  "cancelled",
+                  "failed"
+                ]
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "enum": [
+                    "needs_review",
+                    "in_review",
+                    "chatting",
+                    "stale",
+                    "approved",
+                    "sent",
+                    "auto_sent",
+                    "rejected",
+                    "stalled",
+                    "cancelled",
+                    "failed"
+                  ]
+                }
+              }
+            ]
+          },
+          "category_id": {
+            "description": "Filter by opaque category id (cat_…).",
+            "type": "string"
+          },
+          "inbox": {
+            "description": "Filter by composer inbox address.",
+            "type": "string"
+          },
+          "limit": {
+            "description": "Max reviews to return.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "page": {
+            "description": "Opaque page cursor from a previous call.",
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_suppressions",
+      "title": "List recipient opt-outs (suppressions)",
+      "description": "List this org's recipient opt-outs (list-unsubscribe / suppression rows), newest first. These are recipients the org may no longer email: a send to one is rejected with recipient_suppressed. Active rows only by default; pass include_revoked=true to also see revoked rows. Only your OWN org's rows are returned (never platform-wide or other-tenant opt-outs). Use check_suppression to test one specific address instead.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "include_revoked": {
+            "default": false,
+            "description": "Also include revoked rows (default false = active opt-outs only).",
+            "type": "boolean"
+          },
+          "limit": {
+            "description": "Max rows to return.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 200
+          },
+          "cursor": {
+            "description": "Opaque cursor from a previous call's next_cursor.",
+            "type": "string"
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_threads",
+      "title": "List threads",
+      "description": "List conversation threads in an inbox, most-recently-active first. Pass next_cursor back as cursor to continue without restarting the list.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "limit": {
+            "default": 20,
+            "description": "Max threads to return.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "description": "Opaque next_cursor returned by the previous page.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "inbox"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "mark_read",
+      "title": "Mark message read / unread",
+      "description": "Set or clear a message's read state via the native IMAP \\Seen flag (Extrovert's label-free read tracking). Pass read=false to mark unread. The message is resolved from its id; inbox is required to open the right inbox.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Opaque message id (msg_…)."
+          },
+          "read": {
+            "default": true,
+            "description": "true to mark read, false to mark unread.",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "inbox",
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "merge_categories",
+      "title": "Consolidate duplicate new categories",
+      "description": "After browsing descriptions and rules, consolidate genuinely identical message purposes created by concurrent agents. Both categories must be agent-authored, shared, supervised, under 24 hours old, with matching policy and exclusive use in your project. Prefer the existing category that already holds the relevant rules. Supply a semantic rationale; names alone do not prove equivalence. The server preserves all rules and reviews and schedules composers to recheck; it never approves or sends. On conflict reread both categories and follow merged_into. Mature, human-curated or differently governed categories need human curation. After merging, get_review and fresh get_rules for the survivor, then revise or honestly restamp the same review.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Duplicate category to merge away."
+          },
+          "into_category_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Canonical category to retain."
+          },
+          "rationale": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000,
+            "description": "Why both descriptions describe the same reusable purpose; maximum 2000 UTF-8 bytes."
+          }
+        },
+        "required": [
+          "id",
+          "into_category_id",
+          "rationale"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "onboard_domain",
+      "title": "Use a domain you own",
+      "description": "Connect an already-owned delegated inbox domain or subdomain within the explicitly authorized project. Publishes no registrar changes and never registers or purchases a domain. Return the server's nameserver records for the customer to publish without replacing unrelated website/email records. Follow readiness separately from DNS verification.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The inbox subdomain to connect (e.g. agents.example.com)."
+          },
+          "scope": {
+            "description": "Domain visibility is project-only, derived from the connection. Ordinary domains cannot be organization-wide.",
+            "type": "string",
+            "enum": [
+              "project"
+            ]
+          },
+          "project_id": {
+            "description": "Optional project_id ASSERTION: must match the key's fixed bound project (see whoami). This is NOT a project selector; a mismatch is rejected. Omit unless you want the safety check.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "post_review_chat",
+      "title": "Post a chat turn on a review",
+      "description": "Ask the human reviewer a clarifying question on a review's thread (rr_…): append an agent_question turn.\n\nLEGAL FROM: needs_review, in_review, chatting. A question on a needs_review draft does NOT open it: the draft stays in the human queue, no reviewer is assigned, and no nudge is sent. Only an in_review draft flips to chatting. (A HUMAN comment on a needs_review draft DOES open it: that asymmetry is deliberate: an agent must not be able to pull a draft out of the queue by asking a question.)\n\nThe human sees your question on the console stream and replies with a comment (read it via get_review_turns / get_review_feedback). Idempotent on client_id (the Idempotency-Key). Use this when you are UNSURE what the human wants; otherwise just submit_revision a redraft. $0 LLM: YOU compose the question.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Review id (rr_…)."
+          },
+          "text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Your question/comment for the human reviewer."
+          },
+          "client_id": {
+            "description": "Idempotency key (Idempotency-Key); a retry with the same key never doubles the turn.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "promote_rule",
+      "title": "Promote a rule between layers",
+      "description": "Move a rule between the category and general/house-style layers (via a supersession). Promote to 'general' to make a category rule apply across ALL categories (house-style); promote to 'category' to scope a general rule down. Never promote to general without a human signal: house-style has account-wide blast radius (D2).",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Rule id (rule_…)."
+          },
+          "to_scope": {
+            "type": "string",
+            "enum": [
+              "general",
+              "category"
+            ],
+            "description": "general (house-style) or category."
+          }
+        },
+        "required": [
+          "id",
+          "to_scope"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "propose_category",
+      "title": "Propose a category",
+      "description": "Propose a NEW category with a name + a skill-style description (D9). It stands immediately and is shared across the account's agents. ONLY propose after browsing the registry with list_categories and finding no good match: duplicates fragment the rules. Returns the cat_ id to use as category_id on send/reply.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Display name (mutable; never used as a reference key)."
+          },
+          "description": {
+            "description": "Skill-style matcher text describing when this category applies.",
+            "type": "string"
+          },
+          "scope": {
+            "description": "org_shared (default) or agent_private.",
+            "type": "string",
+            "enum": [
+              "org_shared",
+              "agent_private"
+            ]
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "propose_graduation",
+      "title": "Propose graduating a category",
+      "description": "PROPOSE graduating a category (D16/D6): records your request (with optional evidence) for a human to review and returns the current gate status. It does NOT change the category state: flipping the graduation bit is a human (console) action; an agent can only propose. A never_graduate category stays locked. Check get_graduation_status first so you only propose when the gates are (nearly) met.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Category id (cat_…)."
+          },
+          "evidence": {
+            "description": "Optional structured evidence for the human (e.g. {approvals: 20, last_edits: 0}).",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {}
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "read_messages",
+      "title": "Read messages",
+      "description": "List messages in an inbox, newest first. Narrow with exact-field filters (from/to/subject substring) or unread_only to focus on what's new (native IMAP read state). Page with limit + offset. Returns headers and bodies.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "limit": {
+            "default": 20,
+            "description": "Max messages to return.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "default": 0,
+            "description": "Number of messages to skip (paging).",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "unread_only": {
+            "default": false,
+            "description": "Only return unread messages (\\Seen flag clear).",
+            "type": "boolean"
+          },
+          "from": {
+            "description": "Only messages whose sender contains this substring.",
+            "type": "string"
+          },
+          "to": {
+            "description": "Only messages whose recipient contains this substring.",
+            "type": "string"
+          },
+          "subject": {
+            "description": "Only messages whose subject contains this substring.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "inbox"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "reply_email",
+      "title": "Reply to thread",
+      "description": "Compose a reply within an existing thread and submit it for HUMAN REVIEW: the default path, exactly like send_email. Before writing, recover existing reviews, choose one semantic category with list_categories (propose_category if none fits), and apply get_rules for that category and house style. Select the parent with thread_id (the latest message in that thread) OR message_id (that specific message, which must be the newest message). Before composing, read ALL messages in get_thread, including multiple consecutive inbound messages and corrections inside quoted text. Reply once to the newest message, incorporating every outstanding point. Check list_reviews with inbox and thread_id, without composer=me, to find existing drafts by any accessible composer; coordinate or revise the existing draft rather than create a duplicate. Preserve context_version as expected_context_version. On reply_already_pending, recover/coordinate the existing draft instead of retrying with a new key. On 409 reply_context_changed, reread and reconsider the body, never merely refresh the token. If the latest message is outbound, check whether the request was already answered. For broken threads, search bounded related correspondence and read relevant results; keep separate threads identified and never infer membership from subject alone. Recipients default from the parent; optional to replaces that list. Subject and In-Reply-To/References remain derived server-side.\n\nALWAYS pass `intent`. Under the default `require_review` policy a reply with no intent is REFUSED with 422 intent_required (nothing sent, nothing queued); with one it normally returns 202 queued_for_review and a review id (rr_…), and the reply has NOT gone out until a `sent` review event arrives. For a queued reply, first tell the human it has not been sent and share the returned review link for approval, edits or coaching; then immediately wait for review events. The envelope is resolved at submit, so the human reviews a message with its real subject and recipients. Internal project/organization exceptions are exposed by get_inbox.internal_email_review. They start off and require every final To/Cc/Bcc recipient to belong to the sender’s enabled project or exact organization. Other organizations, aliases, and mixed external recipients retain their usual policy. No inbox access is granted. Ordinary agents and project managers cannot enable them. Submit normally and follow the returned result; do not split recipients to evade review. get_inbox.human_email_review can expose a separately enabled exception: exactly one derived To recipient at the verified human email, no Cc/Bcc or aliases. Writing rules, intent and limits still apply; others keep their policy. This starts off and ordinary agents cannot enable it.\n\nOpt-outs: a reply to a suppressed recipient is rejected with recipient_suppressed (HTTP 422) at SUBMIT, before a review is queued. Replies get ONE narrow exception: a suppressed recipient is allowed when this reply answers an inbound message FROM them that arrived AFTER their opt-out (a recipient-re-initiated exchange). Nothing else qualifies: send_email and forward_email get no exception at all.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "thread_id": {
+            "description": "Thread to reply within (thr_…). One of thread_id / message_id.",
+            "type": "string",
+            "minLength": 1
+          },
+          "message_id": {
+            "description": "Specific message to reply to (msg_…). One of thread_id / message_id.",
+            "type": "string",
+            "minLength": 1
+          },
+          "expected_context_version": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Required context_version from get_thread read before composing. A changed conversation returns 409 reply_context_changed: read all messages again, reconsider the draft, then submit with the new version."
+          },
+          "expected_last_message_id": {
+            "description": "Optional additional last_message_id check from get_thread; expected_context_version is required for the full conversation snapshot.",
+            "type": "string",
+            "minLength": 1
+          },
+          "to": {
+            "description": "Explicit To override; replaces derived recipients including reply_all. Omit to retain defaults.",
+            "minItems": 1,
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "description": "An email address."
+            }
+          },
+          "text": {
+            "description": "Plain-text reply body.",
+            "type": "string"
+          },
+          "html": {
+            "description": "Optional HTML reply body.",
+            "type": "string"
+          },
+          "cc": {
+            "description": "Optional Cc recipients.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "description": "An email address."
+            }
+          },
+          "bcc": {
+            "description": "Optional Bcc recipients.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "description": "An email address."
+            }
+          },
+          "reply_to": {
+            "description": "Override the Reply-To header.",
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "headers": {
+            "description": "Optional custom headers (e.g. List-Unsubscribe); reserved/unsafe names are dropped.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "reply_all": {
+            "default": false,
+            "description": "Reply to all thread recipients, not just the original sender.",
+            "type": "boolean"
+          },
+          "attachments": {
+            "description": "Optional files to attach (base64); sent as a multipart/mixed message.",
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "File name shown to the recipient, e.g. invoice.pdf."
+                },
+                "content_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 127,
+                  "description": "MIME type, e.g. application/pdf, image/png, text/csv."
+                },
+                "content_base64": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Standard base64 of the raw file bytes."
+                }
+              },
+              "required": [
+                "filename",
+                "content_type",
+                "content_base64"
+              ],
+              "description": "A file to attach (base64)."
+            }
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "review",
+              "direct"
+            ],
+            "description": "Review Loop assertion: 'review' routes into the human-review queue; 'direct' requests an immediate send. The account/inbox review policy may downgrade 'direct' to 'review'."
+          },
+          "intent": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string",
+                "description": "Free-text intent summary (who/what/why). Required when mode is review."
+              },
+              "meta": {
+                "description": "Optional structured intent payload.",
+                "type": "object",
+                "properties": {
+                  "goal": {
+                    "type": "string"
+                  },
+                  "recipient": {
+                    "type": "string"
+                  },
+                  "prior_touches": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "urgency": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "summary"
+            ],
+            "description": "Intent for the human reviewer. Required when the resolved mode is review."
+          },
+          "category_id": {
+            "description": "Opaque category id (cat_…) matched from the registry. Never a name.",
+            "type": "string"
+          },
+          "category_confidence": {
+            "description": "Your confidence (0..1) in the category match. Feeds the min_confidence auto-send gate only.",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "composition_token": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Token returned by the fresh get_rules call used to compose this reply. Read and apply these rules before writing; never fetch a token merely to submit already-written text."
+          },
+          "client_id": {
+            "description": "Stable Idempotency-Key for this exact reply intent. Reuse it after a transport timeout.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "inbox",
+          "expected_context_version",
+          "composition_token"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "restamp_review",
+      "title": "Re-stamp a draft's rules-version without redrafting ($0)",
+      "description": "The $0 escape valve when a rule_changed/recheck nudge fires AND the draft genuinely already complies (D19/§8). Reread get_review first: a human can approve or edit-send during a pending recheck, superseding it. Never restamp an approved or terminal review. Use it ONLY for 'I read the new rules and no change is needed'. If the draft DOES need to change, use submit_revision: re-stamping a draft that should have been redrafted makes you lie to the born-stale accounting. Human approval is a separate explicit decision and does not depend on this compliance stamp. Instead of an expensive redraft, assert 'I reviewed this against rules vX and no change is needed': the server advances the draft's composed_* rules-versions to vX WITHOUT a new draft (no revision bump, no body change, no nudge). A born-stale draft re-stamped to the CURRENT version records that you checked the unchanged draft against those rules. against_version must NOT exceed the category's current rules-version (you can't claim a version that doesn't exist). Use submit_revision instead when the draft DOES need to change. $0 LLM: you judged.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Review id (rr_…)."
+          },
+          "against_version": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "The category rules-version you reviewed against (≤ the category's current rules-version)."
+          },
+          "house_style_version": {
+            "description": "Optional: re-stamp the house-style axis to this version (≤ the org's current house_style_version).",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "client_id": {
+            "description": "Stable Idempotency-Key for this exact re-stamp. Reuse it after a transport timeout.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "id",
+          "against_version"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "retire_rule",
+      "title": "Retire a rule",
+      "description": "Soft-delete a rule (status='retired'); the history survives as training data (there is NO hard delete). Use this to drop a rule that no longer applies: consolidate redundant rules by saving one merged rule and retiring the originals.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Rule id (rule_…)."
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "reviewer_decide",
+      "title": "Decide a review as the linked reviewer",
+      "description": "REVIEWER PLANE (review:act): submit your decision on a review (rr_…) you're linked to. action=approve|edit|reject|escalate. approve/edit → the PLATFORM sends with the COMPOSER's credentials (you NEVER hold mailbox:send on an inbox you don't own: the credential boundary); edit also supplies a new subject/body. reject → back to the composer to redraft (hop_count++). escalate → straight to the human queue. revision is the CAS: it MUST equal the draft's current revision (from get_review_decision_context): a mismatch is a 409 STALE with NO change (re-read, re-decide; the human always wins, D17). The two circuit breakers (hop_count ≥ max_hops, or the hard review_deadline) FORCE a reject to the human regardless of your intent: the result's forced_by_breaker names it. $0 LLM: YOU judge; we route, send, and enforce the breakers.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Review id (rr_…)."
+          },
+          "action": {
+            "type": "string",
+            "enum": [
+              "approve",
+              "edit",
+              "reject",
+              "escalate"
+            ],
+            "description": "approve | edit | reject | escalate."
+          },
+          "revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "The revision you decided against (PRIMARY CAS; 409 STALE on mismatch)."
+          },
+          "version": {
+            "description": "Optional row-version CAS (defense in depth).",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "subject": {
+            "description": "Edited subject (edit action).",
+            "type": "string"
+          },
+          "body": {
+            "description": "Edited body text (edit action).",
+            "type": "string"
+          },
+          "feedback": {
+            "description": "Your note (reject: the rule-birth signal; escalate: the human-facing reason).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "action",
+          "revision"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "revoke_suppression",
+      "title": "Revoke a suppression (re-enable a recipient)",
+      "description": "Revoke ONE of this org's suppression rows so the recipient can be emailed again: e.g. the recipient explicitly asked to resubscribe. A reason is REQUIRED and is audit-logged (do not revoke without a genuine recipient signal: re-suppressing after a revoke flags the org for abuse review). You may only revoke your OWN org's rows (a foreign, platform-global, or shared-domain id is an indistinguishable not-found). Find the id via list_suppressions or check_suppression. Returns the revoked row.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Suppression row id (sup_…) from list_suppressions / check_suppression."
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Why the opt-out is being revoked (required, audit-logged). E.g. 'recipient re-subscribed via reply'."
+          }
+        },
+        "required": [
+          "id",
+          "reason"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "save_rule",
+      "title": "Save / edit a writing rule",
+      "description": "Maintain a project-level writing rule outside authenticated reviewer feedback. The audit log and undo preserve history. scope='general' iff category_id is empty (applies to this project’s categories); else category-scoped. Saves are ALWAYS project-layer: the new rule is bound to this key's fixed project (see whoami) and its rule_layer is 'project'. Use learn_review_rule for all authenticated reviewer feedback, including project and category guidance. For org-wide house rules, save_rule cannot create them. With supersedes_id the write is an EDIT (append-only by supersession: a new rev of the same lineage, the prior superseded). For ALL authenticated reviewer feedback use learn_review_rule instead. Use save_rule for explicit project-level rule maintenance. Returns the new active project rule.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "description": "Stable retry id for this exact rule save; reuse it after a timeout. The MCP derives one when omitted.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "rule_text": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The rule body, e.g. 'no em-dashes' or 'be more pushy, we need MRR'."
+          },
+          "category_id": {
+            "description": "Category id (cat_…). Empty = house-style/general (D2).",
+            "type": "string"
+          },
+          "scope": {
+            "description": "Defaults from category_id (general iff empty).",
+            "type": "string",
+            "enum": [
+              "general",
+              "category"
+            ]
+          },
+          "kind": {
+            "description": "soft (default) or hard (non-overridable).",
+            "type": "string",
+            "enum": [
+              "soft",
+              "hard"
+            ]
+          },
+          "priority": {
+            "description": "Higher wins the last ladder tiebreak.",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "source_review_id": {
+            "description": "Provenance: the review this rule was learned from (rr_…).",
+            "type": "string"
+          },
+          "source_turn_id": {
+            "description": "Provenance: the thread turn (turn_…).",
+            "type": "string"
+          },
+          "supersedes_id": {
+            "description": "Set to EDIT the prior version (rule_…).",
+            "type": "string"
+          },
+          "scope_agent_id": {
+            "description": "Set for a per-agent override; empty = all org agents.",
+            "type": "string"
+          },
+          "propagate_to_pending": {
+            "description": "Deprecated compatibility hint. Affected pending reviews are always scheduled for recheck; false does not disable it.",
+            "type": "boolean"
+          },
+          "suggested_batch": {
+            "description": "Deprecated compatibility hint; recheck events recommend batches of three.",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "rule_text"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "search",
+      "title": "Search messages",
+      "description": "Full-text search across messages (subject, body, sender). Scope to one inbox with `inbox`, or omit to search all of this agent's inboxes.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Search terms."
+          },
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "limit": {
+            "default": 20,
+            "description": "Max results.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search_threads",
+      "title": "Search threads",
+      "description": "Search conversation threads by subject, participant, or latest-message snippet. Results are newest-active first; pass next_cursor back as cursor to continue.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "query": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Text to match against thread subject, participants, or snippet."
+          },
+          "limit": {
+            "default": 20,
+            "description": "Max threads to return.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "description": "Opaque next_cursor returned by the previous page.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "inbox",
+          "query"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "send_email",
+      "title": "Send email",
+      "description": "Compose a new email from an authorized inbox and submit under its enforced review policy. Recover existing drafts first. Select or propose a suitable category, read get_rules BEFORE composing, and pass that composition_token plus intent. For an existing conversation use reply_email instead. Limits: 50 total recipients, 1,800,000 encoded bytes, 20 attachments. Read get_inbox for current review policy and any already-enabled recipient exceptions; this connection cannot enable exceptions. mode never bypasses server policy. Recipient suppression and contact rules are enforced before acceptance. Queued is not sent: share its review link and follow the SAME review with wait_for_review_event, handling feedback and revisions until confirmed sent or an unsuccessful terminal outcome. A terminal failed send must not be cancelled or recreated without resolving the original outcome. Reuse client_id only for the exact same intent after a transport timeout.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "to": {
+            "minItems": 1,
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "description": "An email address."
+            },
+            "description": "One or more recipient addresses."
+          },
+          "subject": {
+            "type": "string",
+            "maxLength": 255,
+            "description": "Subject line."
+          },
+          "text": {
+            "type": "string",
+            "description": "Plain-text body."
+          },
+          "html": {
+            "description": "Optional HTML body.",
+            "type": "string"
+          },
+          "cc": {
+            "description": "Optional Cc recipients.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "description": "An email address."
+            }
+          },
+          "bcc": {
+            "description": "Optional Bcc recipients.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "email",
+              "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$",
+              "description": "An email address."
+            }
+          },
+          "reply_to": {
+            "description": "Override the Reply-To header.",
+            "type": "string",
+            "format": "email",
+            "pattern": "^(?!\\.)(?!.*\\.\\.)([A-Za-z0-9_'+\\-\\.]*)[A-Za-z0-9_+-]@([A-Za-z0-9][A-Za-z0-9\\-]*\\.)+[A-Za-z]{2,}$"
+          },
+          "headers": {
+            "description": "Optional custom headers (e.g. List-Unsubscribe); reserved/unsafe names are dropped.",
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "attachments": {
+            "description": "Optional files to attach (base64); sent as a multipart/mixed message.",
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "File name shown to the recipient, e.g. invoice.pdf."
+                },
+                "content_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 127,
+                  "description": "MIME type, e.g. application/pdf, image/png, text/csv."
+                },
+                "content_base64": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Standard base64 of the raw file bytes."
+                }
+              },
+              "required": [
+                "filename",
+                "content_type",
+                "content_base64"
+              ],
+              "description": "A file to attach (base64)."
+            }
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "review",
+              "direct"
+            ],
+            "description": "Review Loop assertion: 'review' routes into the human-review queue; 'direct' requests an immediate send. The account/inbox review policy may downgrade 'direct' to 'review'."
+          },
+          "intent": {
+            "type": "object",
+            "properties": {
+              "summary": {
+                "type": "string",
+                "description": "Free-text intent summary (who/what/why). Required when mode is review."
+              },
+              "meta": {
+                "description": "Optional structured intent payload.",
+                "type": "object",
+                "properties": {
+                  "goal": {
+                    "type": "string"
+                  },
+                  "recipient": {
+                    "type": "string"
+                  },
+                  "prior_touches": {
+                    "type": "integer",
+                    "minimum": -9007199254740991,
+                    "maximum": 9007199254740991
+                  },
+                  "urgency": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": [
+              "summary"
+            ],
+            "description": "Intent for the human reviewer. Required when the resolved mode is review."
+          },
+          "category_id": {
+            "description": "Opaque category id (cat_…) matched from the registry. Never a name.",
+            "type": "string"
+          },
+          "category_confidence": {
+            "description": "Your confidence (0..1) in the category match. Feeds the min_confidence auto-send gate ONLY; the server never scores. Below the threshold (or omitted when one is set) the would-be auto-send routes to needs_review (gate_outcome held:low_confidence).",
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          },
+          "composition_token": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Token returned by the fresh get_rules call used to compose this message. Read and apply these rules before writing; never fetch a token merely to submit already-written text."
+          },
+          "client_id": {
+            "description": "Stable Idempotency-Key for this exact send intent. Reuse it after a transport timeout.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "inbox",
+          "to",
+          "subject",
+          "text",
+          "composition_token"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": true,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "submit_revision",
+      "title": "Submit a redrafted revision",
+      "description": "Post a NEW draft for a review (rr_…) under a parent_revision CAS: the way to redraft after feedback, a chat answer, or a rule_changed / recheck_category nudge. Humans may approve or edit-send during a recheck, superseding that work. Reread get_review before acting; never revise an approved or terminal review. `parent_revision` MUST equal the draft's current `revision`, which get_review prints.\n\nLEGAL FROM: needs_review, in_review, chatting, rejected. needs_review IS legal: a reviewer reject, a born-stale rule change and a recheck_category nudge all hand the draft back to you sitting in needs_review, and redrafting it is exactly what you are being asked to do. On success the draft is re-rendered in place (revision++), stays/returns to needs_review, and the reviewer is nudged.\n\nThe three 409s are DIFFERENT errors: read `code`, not just the status:\n  • `stale`: your (revision, version) is no longer current and NOTHING was mutated. RETRY, bounded (≤3): re-read get_review + get_review_feedback, re-apply your edit on top of theirs, resubmit with the new parent_revision. The human always wins (D17).\n  • `wrong_state`: this verb is illegal from the current state but the draft is still live. NEVER retry it; read the allowed_action hints in the error and pick a legal verb.\n  • `terminal`: the review is sent/auto_sent/cancelled. STOP. Nothing will ever succeed, and a `front_run_next` event is waiting in your drain.\n\nPin `rules_version_seen` to the category's rule_high_water (get_category prints it). $0 LLM: YOU compose the redraft. For replies, reread the complete email thread (including new messages) and pass its expected_context_version before revising. This is separate from reviewer feedback. The composition_token must match the current review category from get_review (omit category_id in get_rules when the review is uncategorized). Learning a new category rule does not reclassify an existing draft.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Review id (rr_…)."
+          },
+          "expected_context_version": {
+            "description": "Required when revising a reply: context_version from rereading its entire get_thread before redrafting. On 409 reread and reconsider; never restamp stale text.",
+            "type": "string",
+            "minLength": 1
+          },
+          "parent_revision": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991,
+            "description": "The revision you composed against, from get_review's `revision` (PRIMARY CAS; 409 `stale` on mismatch)."
+          },
+          "version": {
+            "description": "Optional row-version CAS (defense in depth).",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "to": {
+            "description": "Replace To recipients. Omit to preserve; [] clears the group. Additional recipients require available quota.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "cc": {
+            "description": "Replace Cc recipients. Each recipient consumes quota.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "bcc": {
+            "description": "Replace Bcc recipients. Each recipient consumes quota.",
+            "maxItems": 50,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "subject": {
+            "description": "New subject.",
+            "type": "string"
+          },
+          "text": {
+            "description": "New body text (canonical: matches send/reply/forward's `text`).",
+            "type": "string"
+          },
+          "body": {
+            "description": "DEPRECATED alias for `text`, still accepted. Sending both with different content is rejected.",
+            "type": "string"
+          },
+          "html": {
+            "description": "New HTML body.",
+            "type": "string"
+          },
+          "attachments": {
+            "description": "REPLACES the draft's attachments. Omit to leave them untouched; pass [] to clear them. Without this a redraft could never restore a file the human reviewed the message with.",
+            "maxItems": 20,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "filename": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 255,
+                  "description": "File name shown to the recipient, e.g. invoice.pdf."
+                },
+                "content_type": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 127,
+                  "description": "MIME type, e.g. application/pdf, image/png, text/csv."
+                },
+                "content_base64": {
+                  "type": "string",
+                  "minLength": 1,
+                  "description": "Standard base64 of the raw file bytes."
+                }
+              },
+              "required": [
+                "filename",
+                "content_type",
+                "content_base64"
+              ],
+              "description": "A file to attach (base64)."
+            }
+          },
+          "built_at": {
+            "description": "When you built this draft (informational).",
+            "type": "string"
+          },
+          "rules_version_seen": {
+            "description": "Rule high-water this draft was composed against (born-stale basis).",
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "composition_token": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Token returned by the fresh get_rules call used to compose this revision. Read and apply these rules before writing; never fetch a token merely to submit already-written text."
+          },
+          "client_id": {
+            "description": "Stable Idempotency-Key for this exact revision. Reuse it after a transport timeout.",
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "id",
+          "parent_revision",
+          "composition_token"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "undo_rule_change",
+      "title": "Undo a rule change",
+      "description": "Undo a rule change by its audit-row id (udo_…): restore the prior version as a NEW forward supersession (action='restore'). Agents may undo too (the audit safety net is in both planes: D11). Idempotent: a re-undo of an already-undone row is a clean 409. Find the udo_ id via get_rule_audit.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "udo_id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Audit row id to undo (udo_…)."
+          }
+        },
+        "required": [
+          "udo_id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "update_category",
+      "title": "Rename / re-describe a category",
+      "description": "Update a category's name and/or description: metadata ONLY (D10). Renaming never breaks a reference because nothing keys on the name. Any agent in the account may edit; a rename/redescribe entry is written to the audit log. Use merge_categories only for eligible new duplicates; broader merges and deletion are console actions.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Category id (cat_…)."
+          },
+          "name": {
+            "description": "New display name.",
+            "type": "string"
+          },
+          "description": {
+            "description": "New skill-style description.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "update_inbox",
+      "title": "Update inbox",
+      "description": "Update display_name or metadata in place without deleting the inbox. Omitted fields remain unchanged; metadata objects merge, null values delete keys, and top-level null clears metadata. Returns the updated inbox. Does not change quota or configure event delivery.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "display_name": {
+            "description": "Sender name for future API mail, up to 60 Unicode characters after normalization. Empty string clears to a bare address; omission leaves unchanged. No emoji, unsupported invisibles, embedded addresses or thread markers. Contextually valid Persian and Indic join controls are supported. Queued reviews retain their name; SMTP uses its own validated name.",
+            "type": "string",
+            "maxLength": 512
+          },
+          "metadata": {
+            "anyOf": [
+              {
+                "type": "object",
+                "propertyNames": {
+                  "type": "string"
+                },
+                "additionalProperties": {
+                  "anyOf": [
+                    {
+                      "anyOf": [
+                        {
+                          "type": "string",
+                          "maxLength": 256
+                        },
+                        {
+                          "type": "number"
+                        },
+                        {
+                          "type": "boolean"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Patch the inbox's metadata with a shallow merge: an object merges in (a key whose value is null DELETES that key); a top-level null clears ALL metadata; omit the field to leave it unchanged. Values are string/number/boolean; nested objects/arrays rejected; ≤256 keys, ≤256 chars each."
+          },
+          "project_id": {
+            "description": "Optional project_id ASSERTION: must match the key's fixed bound project (see whoami). This is NOT a project selector; a mismatch is rejected. Omit unless you want the safety check.",
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "inbox"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "verify_domain",
+      "title": "Trigger or refresh domain verification",
+      "description": "Recheck DNS for an already-onboarded ns_delegated domain within granted project access. Does not register domains or resume purchased-domain setup. Read get_domain for readiness and follow bounded retry timing; DNS confirmation alone does not mean mail is ready.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The domain to (re)verify."
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": false,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": true
+      }
+    },
+    {
+      "name": "wait_for_domain",
+      "title": "Wait briefly for domain setup",
+      "description": "Wait up to 50 seconds for mail readiness without triggering DNS work. Return immediately if the domain is ready, the customer must act, or setup needs attention. A timed_out outcome is not failure: save the result, tell the user setup continues, and resume after resume_after_seconds. Use list_domain_events to recover updates after restarting. Never promise to wake a disconnected agent.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": "string",
+            "minLength": 1
+          },
+          "timeout_seconds": {
+            "description": "Default 45. Zero performs one status check.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 50
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "wait_for_email",
+      "title": "Wait for email (blocking)",
+      "description": "Block until the next matching message arrives in an inbox, then return it with any OTP code / verification link already extracted. This is the killer primitive for sign-in and verification flows: trigger the email elsewhere, then call this and act on otp_code / verification_link in the same turn. Narrow the wait with from / subject / regex. Returns matched=false if nothing arrives before timeout: retry or lengthen the timeout if expected. This waits for inbox mail only. For pending-review attention, reviewer feedback, or writing-rule/category changes use wait_for_review_event with no review_id.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "inbox": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Inbox id: the canonical OPAQUE inbox_id (`pmbx_…`; treat it as opaque), or the inbox's full email address as a within-project alias (agent7@extrovertmail.com)."
+          },
+          "from": {
+            "description": "Only match senders containing this substring (e.g. 'stripe.com').",
+            "type": "string"
+          },
+          "subject": {
+            "description": "Only match subjects containing this substring.",
+            "type": "string"
+          },
+          "regex": {
+            "description": "Case-sensitive Go RE2 expression over subject or readable body. Prefix with (?i) for case-insensitive matching.",
+            "type": "string"
+          },
+          "link_hint": {
+            "description": "Prefer an extracted verification link containing this substring; it does not filter message matches.",
+            "type": "string"
+          },
+          "since_now": {
+            "default": true,
+            "description": "Only match emails that arrive AFTER this call (default). Set false to also match an already-delivered message.",
+            "type": "boolean"
+          },
+          "timeout_ms": {
+            "default": 45000,
+            "description": "Bounded wait budget in milliseconds (default 45s, maximum 50s). A timeout is not proof no message will arrive; resume when needed.",
+            "type": "integer",
+            "minimum": 1000,
+            "maximum": 50000
+          }
+        },
+        "required": [
+          "inbox"
+        ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": false,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "wait_for_review_event",
+      "title": "Wait for a review event",
+      "description": "Long-poll (~25–55s) for the next review nudge: blocks until one is available OR the deadline, then returns like list_review_events (empty on timeout: re-call to keep watching). Use this for an always-on agent that wants to react to human feedback, delivery outcomes, writing-rule changes and category reconsideration; use list_review_events for recovery. After a newly queued send, first tell the human it has not been sent and share the returned review link for approval, edits or coaching. Immediately wait after that handoff and after every revision, including interactive Hermes sessions. Omit review_id to watch all reviews this caller may access with one durable attention wait. Unlike wait_for_email, this includes reviewer feedback and rule/category updates. No events are acknowledged by waiting; reconnect with the same identity to replay unhandled work, and acknowledge only after successful handling. Cancellation stops the wait, never the reviews. An empty timeout means call again, not finish the task.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "review_id": {
+            "description": "Restrict the wait to one review's events (rr_…).",
+            "type": "string"
+          },
+          "wait_seconds": {
+            "description": "Long-poll budget in seconds (default ~30).",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 55
+          },
+          "limit": {
+            "description": "Max events to return.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          }
+        },
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "whoami",
+      "title": "Check my connection and permissions",
+      "description": "Confirm the connected identity, selected inboxes or project, granted email actions, and expiry. Resource reach and actions are independent. An expired grant requires explicit reconnection through this host; retrying cannot widen permission.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

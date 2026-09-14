@@ -1,0 +1,40 @@
+{
+  "name": "extrovert-assistant",
+  "version": "0.1.0-pre.1",
+  "description": "Read and manage authorized email, use owned domains, and send through Extrovert's Review Loop.",
+  "author": {
+    "name": "Extrovert",
+    "url": "https://extrovert.dev"
+  },
+  "homepage": "https://docs.extrovert.dev",
+  "repository": "https://github.com/extrovert-dot-dev/extrovert-skills",
+  "license": "MIT",
+  "keywords": [
+    "email",
+    "inbox",
+    "mcp",
+    "review-loop"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "developerName": "Extrovert",
+    "category": "Productivity",
+    "capabilities": [
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://extrovert.dev",
+    "brandColor": "#D89A43",
+    "displayName": "Extrovert Assistant",
+    "shortDescription": "Email with your existing Extrovert account",
+    "longDescription": "Read and manage authorized email, use owned domains, and send through Extrovert's Review Loop.",
+    "defaultPrompt": [
+      "Connect my existing Extrovert account.",
+      "Summarize unread mail in my selected inbox.",
+      "Draft a reply and follow its review."
+    ],
+    "privacyPolicyURL": "https://extrovert.dev/privacy",
+    "termsOfServiceURL": "https://extrovert.dev/terms"
+  }
+}

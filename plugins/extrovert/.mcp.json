@@ -3,7 +3,10 @@
     "extrovert": {
       "type": "stdio",
       "command": "npx",
-      "args": ["-y", "@extrovert.dev/mcp@next"]
+      "args": [
+        "-y",
+        "@extrovert.dev/mcp@next"
+      ]
     }
   }
 }

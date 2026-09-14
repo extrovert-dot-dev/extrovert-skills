@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "extrovert": {
+      "type": "http",
+      "url": "https://mcp.extrovert.dev/mcp"
+    }
+  }
+}

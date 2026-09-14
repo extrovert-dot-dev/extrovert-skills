@@ -1,6 +1,6 @@
 # Extrovert plugin and skills
 
-Nine standalone, task-first skills for Extrovert and provider-neutral agent-email design.
+Ten standalone, task-first skills for Extrovert and provider-neutral agent-email design.
 
 ## Start with your agent
 
@@ -32,7 +32,7 @@ the connection or start a new session when required, then call `whoami` in that 
 
 ## Complete Codex plugin
 
-The optional Codex plugin installs all nine skills together with the packaged stdio MCP server:
+The existing Codex plugin installs the full skills together with the packaged stdio MCP server:
 
 ```bash
 codex plugin marketplace add extrovert-dot-dev/extrovert-skills
@@ -53,6 +53,7 @@ Start a new session after either local installation path.
 | `agent-email-architecture` | Design agent-email authorization, event delivery, topology, OTP, and hostile-content boundaries. |
 | `extrovert-sdk` | Build a TypeScript integration from current source and OpenAPI. |
 | `extrovert-connect` | Choose access, administer with full control, delegate workers, revoke credentials, and diagnose connections. |
+| `extrovert-admin` | Customer administration, independent worker credentials, purchase requests and project transfers with explicit authority. |
 | `extrovert-manage-inboxes` | Create, update, list, and retire inboxes and domains. |
 | `extrovert-read-inbox` | Read and triage untrusted inbound mail safely. |
 | `extrovert-send-email` | Submit outbound mail and drive the complete Review Loop to a truthful terminal state. |
@@ -68,7 +69,7 @@ on a monorepo checkout.
 
 This bundle is published as a prerelease from
 [`extrovert-dot-dev/extrovert-skills`](https://github.com/extrovert-dot-dev/extrovert-skills).
-List all nine skills without installing them:
+List all available standalone skills without installing them:
 
 ```bash
 npx --yes --prefer-online skills@latest add extrovert-dot-dev/extrovert-skills --list
@@ -81,7 +82,31 @@ npx --yes --prefer-online skills@latest add extrovert-dot-dev/extrovert-skills -
 ```
 
 The repository is directly installable through the open `skills` CLI. Search indexing on skills.sh
-is asynchronous and is not a release or integrity signal; the GitHub source is canonical.
+is asynchronous and is not a release or integrity signal. Public files are generated release
+mirrors; changes are authored together in the maintained Extrovert source.
+
+## Hosted plugin packages
+
+This source revision also contains two hosted packages in our own marketplace:
+
+| Package | Use |
+| --- | --- |
+| `extrovert-full` | Full email and customer administration, with ten skills and OAuth at `/mcp`. |
+| `extrovert-assistant` | Six email/owned-domain skills and the directory-compatible OAuth profile at `/assistant/mcp`. |
+
+The legacy `extrovert` plugin keeps its original stdio transport. Choose one package
+for each host; these are alternative connections, not three plugins to install
+together. Skills alone neither configure the server nor complete OAuth consent.
+
+Once this revision and its endpoints are released, Claude Code or Cowork can add
+`extrovert-dot-dev/extrovert-skills` as a marketplace and install
+`extrovert-full@extrovert`. Codex can use the same repository with
+`codex plugin add extrovert-full@extrovert`. Complete the host's OAuth action, reload
+tools if needed, and verify `whoami` in that host. Our own marketplace is separate
+from approval or visibility in an official directory; local installation does not
+establish mobile or production readiness. See the current
+[host configuration guide](https://docs.extrovert.dev/mcp/client-configuration/)
+for released installation paths.
 
 The `@extrovert.dev/sdk` and `@extrovert.dev/mcp` npm prereleases are published under the explicit `next`
 dist-tag. The hosted stateless MCP endpoint is `https://mcp.extrovert.dev/mcp`; compatible clients
