@@ -4,7 +4,7 @@
 
 Read `signup.status` from live context: `enabled` permits offering self-signup; `disabled` means use
 the console or an enrollment invitation; `unavailable` means the check failed, not that signup is
-enabled. Do not loop on signup errors. Use the current onboarding guide to resolve status.
+enabled. Preserve credentials on errors. A generic forbidden response does not prove an existing account; do not invent that diagnosis or delete credentials. For maintenance, honor Retry-After and retry within a bounded active session. Use the current onboarding guide to resolve status.
 For bootstrap without an existing credential, use the packaged local stdio server or CLI's `signup`
 and `verify` commands; hosted OAuth signs into an existing console account. Inspect installed CLI
 help for its exact inputs and preserve any existing profile rather than replacing it.
@@ -19,6 +19,7 @@ promise to wake up later without a running task, or send a separate email withou
 When `activation_method` is `incoming_email`, signup reserves the inbox for 24 hours. Keep the
 limited key and tell the human: "Send an email from {human_email} to {address} to activate your
 agent's inbox and link it to your human email." Use the returned addresses; any subject or body works.
+Also offer the browser alternative: visit https://extrovert.dev -> **Sign up**, use that same human email, and **Connect workspace** if prompted. Already registered console users choose **Sign in**. This connects the existing agent workspace; it does not reserve another inbox.
 Give the human these instructions before waiting. While the session is active, call
 `check_activation` with `wait_seconds: 55`, repeating pending waits while the authorized host remains active.
 On a host supporting the negotiated MCP Tasks extension, this same tool can return
@@ -36,7 +37,7 @@ or webhooks. A reservation is not a verified account or a sent first message.
 
 A mismatched sender does not replace the expected human. Before proof, to correct a typo, use
 `correct_activation_email` with the current revision, then request a fresh matching email; the
-original expiry stays fixed. A verified matching console login with explicit approval is an
+original expiry stays fixed. Same-email console signup or sign-in with explicit workspace connection is an
 alternative. Existing account owners enroll agents through their console.
 
 For a **legacy response that actually issued an OTP**, use the human-supplied code with
@@ -69,7 +70,7 @@ identified separately. Recover `onboarding.starter` from verification or `signup
 Do not create a second message. Historical signups without this handoff keep their ordinary
 first-send flow; recover existing work before using `client_id: "signup-hello:<agent_id>"`.
 
-Load `extrovert-send-email` and `extrovert-writing-rules`. Show the review link and explain that
+Load `extrovert-send-email` and `extrovert-writing-rules`. With the review link, tell the human: "First time in the console? Sign up with {human_email}, then Connect workspace if prompted. Already registered? Sign in with that same email. This opens the workspace we already created." Explain that
 Extrovert prepared a practice draft the human can approve, edit, or coach. Offer this optional
 copyable feedback: "Save an Extrovert writing rule for all our messages: never use em dashes.
 Revise this draft to follow that rule, too." This example is not permission to save a rule.
@@ -84,6 +85,6 @@ with the described JSON on stdin. Use it for review recovery, event waits, feedb
 readback and revisions without writing a custom transport or blocking on a full host restart.
 
 Close setup by briefly explaining the connection's actual agent-scoped permissions from `whoami`.
-Tell the human they can sign in to Extrovert and ask the agent to help explore capabilities for
+Tell the human they can sign up for console access, or sign in if already registered, with the same human email and ask the agent to help explore capabilities for
 them and their agents. Broader administration requires explicit consent; never silently widen
 this connection. Link [Connections and access](https://docs.extrovert.dev/concepts/connections-and-access/).

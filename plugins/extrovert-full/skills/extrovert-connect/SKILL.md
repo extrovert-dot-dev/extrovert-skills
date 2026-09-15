@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect an existing Extrovert account, resume signup, or diagnose identity and access. Use for OAuth, enrollment, host setup, and connection recovery; broader administration needs explicit consent.
 metadata:
-  version: "0.1.3"
+  version: "0.1.4"
 ---
 
 # Connect to Extrovert
@@ -81,3 +81,5 @@ nor installed skill versions proves the executing MCP package version. Do not cl
 the update succeeded or failed from those values. A fresh CLI reports only its own invocation.
 After updating local MCP, reload this host connection (Hermes: `/reload-mcp`) and
 verify another MCP call here. Preserve pins, profiles and edited skills.
+
+For a new inbox, lead with email activation and briefly offer same-email console signup as the alternative. Console registration links the existing workspace; it is not a second agent signup. See [signup](references/signup.md) for the concise human handoff and active watch.

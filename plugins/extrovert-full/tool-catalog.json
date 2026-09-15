@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "extrovert/mcp",
-  "sourceSha256": "5ae4e7b815ee7b126efac2b32bcb687c80c88c1487a3fe3db2d8bd83321439af",
-  "serverVersion": "0.1.3",
+  "sourceSha256": "61c26940bc8141b076db3ba590e7db9f9c7a25e7819d64ab20f273aa345842bb",
+  "serverVersion": "0.1.4",
   "fixtureMode": "offline",
   "tools": [
     {
@@ -3900,7 +3900,7 @@
     {
       "name": "sign_up",
       "title": "Sign up for a free account",
-      "description": "Reserve a free inbox for your agent. Supply the human email expected to activate it. For incoming-email activation, ask the human to send from that email to the returned inbox within 24 hours, or approve it after verified console sign-in. The key can only check, correct, or complete activation; it cannot read or send mail. Keep the issued key: repeating signup does not extend the reservation. Existing human accounts enroll agents through their console. During migration, a legacy response may instead report an emailed OTP. Follow the returned activation method.",
+      "description": "Reserve a free inbox for your agent. Supply the human email expected to activate it. For incoming-email activation, ask the human to send from that email to the returned inbox within 24 hours, or sign up in the console with that same human email and connect the workspace (sign in if already registered). The key can only check, correct, or complete activation; it cannot read or send mail. Keep the issued key: repeating signup does not extend the reservation. Existing human accounts enroll agents through their console. During migration, a legacy response may instead report an emailed OTP. Follow the returned activation method.",
       "inputSchema": {
         "type": "object",
         "properties": {
