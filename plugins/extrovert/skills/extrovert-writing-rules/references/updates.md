@@ -8,7 +8,7 @@ only if present; otherwise fetch
 https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
 An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
 policy permits an unpinned CLI, use
-`npx --yes --prefer-online @extrovert.dev/mcp@next agent status --json`.
+`npx --yes --prefer-online @extrovert.dev/mcp agent status --json`.
 Read the live guide for current product behavior and use the host's current tool schemas. If a
 schema remains stale, refresh the catalog or reconnect before continuing; inspect state before
 retrying an uncertain mutation.

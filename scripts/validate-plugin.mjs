@@ -55,7 +55,7 @@ for (const pkg of inventory.packages ?? []) {
   check(capabilities.profile === pkg.profile && capabilities.version === pkg.version, `${pkg.name}: capability metadata drift`);
   check(digest(pluginRoot) === pkg.sha256, `${pkg.name}: plugin digest mismatch`);
   const expectedServer = pkg.transport === "stdio"
-    ? { type: "stdio", command: "npx", args: ["-y", "@extrovert.dev/mcp@next"] }
+    ? { type: "stdio", command: "npx", args: ["-y", `@extrovert.dev/mcp@${pkg.version}`] }
     : { type: "http", url: `https://mcp.extrovert.dev${pkg.profile === "assistant" ? "/assistant/mcp" : "/mcp"}` };
   check(JSON.stringify(mcp) === JSON.stringify({ mcpServers: { extrovert: expectedServer } }), `${pkg.name}: unexpected transport, fields or credentials`);
   const skillRoot = join(pluginRoot, "skills");

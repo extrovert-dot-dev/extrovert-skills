@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect an existing Extrovert account through hosted OAuth, choose inbox or project access, and diagnose authentication, consent and mobile connection failures without widening permissions.
 metadata:
-  version: "0.1.0-pre.4"
+  version: "0.1.0"
 ---
 
 # Connect to Extrovert

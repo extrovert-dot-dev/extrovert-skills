@@ -1,6 +1,6 @@
 {
   "name": "extrovert-full",
-  "version": "0.1.0-pre.44",
+  "version": "0.1.0",
   "description": "Extrovert email and customer administration with hosted OAuth and explicitly scoped access.",
   "author": {
     "name": "Extrovert",

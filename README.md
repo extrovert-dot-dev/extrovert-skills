@@ -30,7 +30,7 @@ Choose the intended host and project or user scope in the installer. Skills prov
 they do not configure or authenticate MCP. For a host with local execution, the setup entry point is:
 
 ```bash
-npx --yes --prefer-online @extrovert.dev/mcp@next setup --host auto
+npx --yes --prefer-online @extrovert.dev/mcp setup --host auto
 ```
 
 Follow the reported host selection, native configuration commands, and authentication steps. Reload
@@ -50,7 +50,7 @@ Start a new Codex session after installation. For local stdio, use an existing c
 an enrollment token, then call `whoami`. The equivalent explicit local setup is:
 
 ```bash
-npx --yes --prefer-online @extrovert.dev/mcp@next setup --host codex --transport stdio
+npx --yes --prefer-online @extrovert.dev/mcp setup --host codex --transport stdio
 ```
 
 Start a new session after either local installation path.
@@ -74,7 +74,7 @@ on a monorepo checkout.
 
 ## Distribution status
 
-This bundle is published as a prerelease from
+This bundle is published from
 [`extrovert-dot-dev/extrovert-skills`](https://github.com/extrovert-dot-dev/extrovert-skills).
 List all available standalone skills without installing them:
 
@@ -115,8 +115,9 @@ establish mobile or production readiness. See the current
 [host configuration guide](https://docs.extrovert.dev/mcp/client-configuration/)
 for released installation paths.
 
-The `@extrovert.dev/sdk` and `@extrovert.dev/mcp` npm prereleases are published under the explicit `next`
-dist-tag. The hosted stateless MCP endpoint is `https://mcp.extrovert.dev/mcp`; compatible clients
+The `@extrovert.dev/sdk` and `@extrovert.dev/mcp` packages default to stable. Optional
+[`@next` preview access](https://docs.extrovert.dev/operating/agent-updates/#preview-access)
+is separate from GitHub skill/plugin updates. The hosted stateless MCP endpoint is `https://mcp.extrovert.dev/mcp`; compatible clients
 discover Extrovert OAuth and open browser sign-in and explicit consent, while scoped agent-key bearer authentication remains
 available for clients configured explicitly.
 

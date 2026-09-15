@@ -2,7 +2,7 @@
 name: configure-himalaya
 description: Configure Himalaya or another standard mail client for an Extrovert inbox from export_email_config output. Use when an agent runtime needs IMAP and SMTP settings, a mailbox login, a terminal email client, or raw credentials, and explain SMTP review holds, delivery status and safe retries before enabling outbound mail.
 metadata:
-  version: "0.1.0-pre.44"
+  version: "0.1.0"
 ---
 
 # Configure Himalaya
@@ -15,7 +15,7 @@ only if present; otherwise fetch
 https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
 An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
 policy permits an unpinned CLI, use
-`npx --yes --prefer-online @extrovert.dev/mcp@next agent status --json`.
+`npx --yes --prefer-online @extrovert.dev/mcp agent status --json`.
 Read the live guide for current product behavior and use the host's current tool schemas. If a
 schema remains stale, refresh the catalog or reconnect before continuing; inspect state before
 retrying an uncertain mutation.

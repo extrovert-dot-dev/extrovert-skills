@@ -18,11 +18,11 @@
 - Local CLI/stdio OAuth: `auth login` signs in to an existing account and saves a separate local
   connection. Refresh respects the granted identity, reach, actions, and expiry. Hosted MCP OAuth
   remains managed by the host; do not copy its tokens into local API credentials.
-- Enrollment token: prefer `npx -y @extrovert.dev/mcp@next enroll --agent-handle <stable-name>`.
+- Enrollment token: prefer `npx -y @extrovert.dev/mcp enroll --agent-handle <stable-name>`.
   It accepts hidden stdin or `EXTROVERT_ENROLLMENT_KEY`, saves the scoped agent key privately, and checks
   identity. Keep the same handle and `--client-id` on a retry. With tools already connected,
   `redeem_enrollment` also stores the returned key in the packaged local stdio server.
-- Existing agent key or independently issued connection credential (`ev_credential_...`): use `npx -y @extrovert.dev/mcp@next auth login --with-token` and hidden stdin.
+- Existing agent key or independently issued connection credential (`ev_credential_...`): use `npx -y @extrovert.dev/mcp auth login --with-token` and hidden stdin.
   Never put a key in a command argument or repeat it in a response.
 
 Set `EXTROVERT_PROFILE` before login, enrollment, and setup to separate agent identities. Hermes uses its
@@ -35,7 +35,7 @@ credential is a deliberate full-control choice, not a routine workaround for a f
 
 The MCP prerelease is published under the explicit `next` dist-tag. Prefer the hosted stateless
 Streamable HTTP endpoint and OAuth when the client supports remote MCP. For an unpinned local stdio
-host, run `npx --yes --prefer-online @extrovert.dev/mcp@next`; preserve deliberate version pins.
+host, run `npx --yes --prefer-online @extrovert.dev/mcp`; preserve deliberate version pins.
 Supply only the agent key or independently issued connection credential intended for that worker.
 
 ## Verify immediately

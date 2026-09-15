@@ -2,7 +2,7 @@
 name: wait-for-otp
 description: Retrieve a one-time passcode, verification code, magic link, or email 2FA challenge from an Extrovert inbox using wait_for_email. Use during signup, login, account confirmation, or device verification when an agent needs one matching message and structured OTP or link extraction without writing a polling loop.
 metadata:
-  version: "0.1.0-pre.44"
+  version: "0.1.0"
 ---
 
 # Wait for an OTP or verification link
@@ -15,7 +15,7 @@ only if present; otherwise fetch
 https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
 An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
 policy permits an unpinned CLI, use
-`npx --yes --prefer-online @extrovert.dev/mcp@next agent status --json`.
+`npx --yes --prefer-online @extrovert.dev/mcp agent status --json`.
 Read the live guide for current product behavior and use the host's current tool schemas. If a
 schema remains stale, refresh the catalog or reconnect before continuing; inspect state before
 retrying an uncertain mutation.

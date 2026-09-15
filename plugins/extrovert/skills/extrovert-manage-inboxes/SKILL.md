@@ -2,7 +2,7 @@
 name: extrovert-manage-inboxes
 description: Create, inspect, update, list, or retire Extrovert inboxes and domains with scoped keys and stable retry identities. Use for a new email identity, fleet provisioning, metadata or send-limit changes, contact controls, domain onboarding, credential export, or safe inbox and domain cleanup.
 metadata:
-  version: "0.1.0-pre.44"
+  version: "0.1.0"
 ---
 
 # Manage Extrovert inboxes
@@ -15,7 +15,7 @@ only if present; otherwise fetch
 https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
 An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
 policy permits an unpinned CLI, use
-`npx --yes --prefer-online @extrovert.dev/mcp@next agent status --json`.
+`npx --yes --prefer-online @extrovert.dev/mcp agent status --json`.
 Read the live guide for current product behavior and use the host's current tool schemas. If a
 schema remains stale, refresh the catalog or reconnect before continuing; inspect state before
 retrying an uncertain mutation.

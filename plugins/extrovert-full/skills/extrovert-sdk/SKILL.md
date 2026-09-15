@@ -2,7 +2,7 @@
 name: extrovert-sdk
 description: Build or troubleshoot a TypeScript integration against the Extrovert REST API using the current SDK source and OpenAPI contract. Use for delegated administrative workflows, client construction, org/project/inbox addressing, thread workflows, pagination, error handling, commerce requests, reviewed sends, OTP waits, webhooks, streams, signature verification, or offline fixture tests.
 metadata:
-  version: "0.1.0-pre.44"
+  version: "0.1.0"
 ---
 
 # Extrovert TypeScript SDK
@@ -15,7 +15,7 @@ only if present; otherwise fetch
 https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
 An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
 policy permits an unpinned CLI, use
-`npx --yes --prefer-online @extrovert.dev/mcp@next agent status --json`.
+`npx --yes --prefer-online @extrovert.dev/mcp agent status --json`.
 Read the live guide for current product behavior and use the host's current tool schemas. If a
 schema remains stale, refresh the catalog or reconnect before continuing; inspect state before
 retrying an uncertain mutation.
@@ -30,7 +30,7 @@ that condition without treating it as disabled signup or permission to guess new
 [updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
 
 The prerelease package is published under the explicit `next` dist-tag. Use
-`npm install @extrovert.dev/sdk@next`, or pin `@extrovert.dev/sdk@0.1.0-pre.13` for reproducible dogfood
+`npm install @extrovert.dev/sdk`, or pin `@extrovert.dev/sdk@0.1.0-pre.13` for reproducible dogfood
 tests. The public REST API and served OpenAPI remain the underlying contract. Do not imply that a
 hosted MCP route substitutes for the SDK; use the SDK for direct TypeScript application integration.
 

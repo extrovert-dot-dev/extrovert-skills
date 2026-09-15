@@ -8,7 +8,7 @@ only if present; otherwise fetch
 https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
 An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
 policy permits an unpinned CLI, use
-`npx --yes --prefer-online @extrovert.dev/mcp@next agent status --json`.
+`npx --yes --prefer-online @extrovert.dev/mcp agent status --json`.
 Read the live guide for current product behavior and use the host's current tool schemas. If a
 schema remains stale, refresh the catalog or reconnect before continuing; inspect state before
 retrying an uncertain mutation.
@@ -23,8 +23,10 @@ that condition without treating it as disabled signup or permission to guess new
 [updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
 
 For an authorized unpinned local MCP update, inspect and refresh the saved host
-launch entry to use `npx --yes --prefer-online @extrovert.dev/mcp@next`, preserving
-its other arguments, environment and scope. Running a newer standalone CLI does
+launch entry to use `npx --yes --prefer-online @extrovert.dev/mcp`, preserving
+its other arguments, environment and scope. For an explicitly selected preview,
+retain `@next` or `@beta` instead; a routine refresh does not authorize switching channels.
+Running a newer standalone CLI does
 not update the host's saved launch entry; restart that MCP connection afterward.
 
 ## Connect in this order
@@ -43,7 +45,7 @@ not update the host's saved launch entry; restart that MCP connection afterward.
    For CLI-only work, use its `whoami`. Saved configuration or pending login is not connected.
 
 ```bash
-npx --yes --prefer-online @extrovert.dev/mcp@next setup --host auto
+npx --yes --prefer-online @extrovert.dev/mcp setup --host auto
 ```
 
 Automatic selection prefers hosted MCP. If selection is ambiguous, choose the intended host
@@ -52,7 +54,7 @@ Preserve existing server entries and profile credentials. Installing a skill alo
 MCP. Do not build a custom JSON-RPC transport or install a similarly named product.
 See [host setup](https://docs.extrovert.dev/mcp/client-configuration/) for exact adapters and plugins.
 
-For local access, use `npx --yes --prefer-online @extrovert.dev/mcp@next auth login`.
+For local access, use `npx --yes --prefer-online @extrovert.dev/mcp auth login`.
 Without an interactive terminal, use `auth login --no-browser --json`, show the returned
 `authorization_url` when pending, then run `auth complete --json` in the same profile with the
 website's completion code on private stdin. Never put the code in arguments, chat, or logs.

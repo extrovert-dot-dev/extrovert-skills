@@ -5,7 +5,7 @@
 Install the explicit prerelease tag:
 
 ```bash
-npm install @extrovert.dev/sdk@next
+npm install @extrovert.dev/sdk
 ```
 
 Pin `@extrovert.dev/sdk@0.1.0-pre.13` when a test needs a reproducible contract. The public REST fallback

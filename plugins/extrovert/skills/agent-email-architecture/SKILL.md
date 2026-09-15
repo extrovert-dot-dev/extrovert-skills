@@ -2,7 +2,7 @@
 name: agent-email-architecture
 description: Design or review provider-neutral email architecture for AI agents, including capability authorization, inbox ownership, event delivery, multi-agent topology, OTP handling, retries, and hostile-content defenses. Use before choosing an email provider or when tracing trust boundaries and failure modes across an agent-email system.
 metadata:
-  version: "0.1.0-pre.44"
+  version: "0.1.0"
 ---
 
 # Agent email architecture
@@ -16,7 +16,7 @@ only if present; otherwise fetch
 https://mcp.extrovert.dev/.well-known/agent-contract.json, then https://docs.extrovert.dev/llms.txt.
 An installed or pinned CLI can run `agent status --json` if supported. Only when normal installation
 policy permits an unpinned CLI, use
-`npx --yes --prefer-online @extrovert.dev/mcp@next agent status --json`.
+`npx --yes --prefer-online @extrovert.dev/mcp agent status --json`.
 Read the live guide for current product behavior and use the host's current tool schemas. If a
 schema remains stale, refresh the catalog or reconnect before continuing; inspect state before
 retrying an uncertain mutation.
