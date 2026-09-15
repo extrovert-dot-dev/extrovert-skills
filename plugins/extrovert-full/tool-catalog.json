@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "extrovert/mcp",
-  "sourceSha256": "46e8be91565f298773b4d092c0f7cdc7f46861261685da562cd016ae6dfe6279",
-  "serverVersion": "0.1.1",
+  "sourceSha256": "71fda56c634429861c28dbb14fb9212a3f803c998ae5cece8ff4974b74179534",
+  "serverVersion": "0.1.2",
   "fixtureMode": "offline",
   "tools": [
     {
@@ -446,7 +446,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           },
           "client_id": {
             "type": "string",
@@ -1165,7 +1165,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           },
           "feedback_id": {
             "type": "string",
@@ -1548,7 +1548,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           },
           "case_id": {
             "type": "string",
@@ -1581,7 +1581,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           }
         },
         "required": [
@@ -2019,7 +2019,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           },
           "limit": {
             "type": "integer",
@@ -2244,7 +2244,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           },
           "case_id": {
             "type": "string",
@@ -2286,7 +2286,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           },
           "limit": {
             "type": "integer",
@@ -2934,7 +2934,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           },
           "case_id": {
             "type": "string",
@@ -3190,7 +3190,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           },
           "case_id": {
             "type": "string",
@@ -3330,7 +3330,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           },
           "case_id": {
             "type": "string",
@@ -3951,7 +3951,7 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200,
-            "description": "Project from the current authorized identity; use - only for authorized organization-wide reads."
+            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
           },
           "client_id": {
             "type": "string",
@@ -4613,7 +4613,7 @@
     {
       "name": "whoami",
       "title": "Check my connection and permissions",
-      "description": "Confirm that this agent is connected, show the organization and project it acts in, and explain which actions this connection is allowed to perform. Use capabilities before attempting a restricted action. Inspect connection identity, resource reach, actions, and expiry separately from inbox ownership. Hosted MCP and local CLI may use different credentials. Reconnect an expired grant through explicit consent; do not silently replace it. Ordinary mail permissions do not grant policy changes; explicit Full account control enables customer administration through the administrative action tools.",
+      "description": "Confirm that this agent is connected, show the organization and project it acts in, and explain which actions this connection is allowed to perform. Inspect the granted scopes as well as the mail capability summary. Use its project_id directly for support tools; support:submit permits following your own reports without support:read or project administration access. Inspect connection identity, resource reach, actions, and expiry separately from inbox ownership. Hosted MCP and local CLI may use different credentials. Reconnect an expired grant through explicit consent; do not silently replace it. Ordinary mail permissions do not grant policy changes; explicit Full account control enables customer administration through the administrative action tools.",
       "inputSchema": {
         "type": "object",
         "properties": {},

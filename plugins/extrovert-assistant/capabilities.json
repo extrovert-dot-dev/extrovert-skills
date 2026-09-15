@@ -1,6 +1,6 @@
 {
   "profile": "assistant",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "tools": [
     "ack_review_event",
     "add_contact_list_entry",
@@ -85,7 +85,7 @@
   ],
   "skills": {
     "extrovert-connect": {
-      "sha256": "23d63d0f74217f6004b82c4d254bf2d0ef10fd2122c7d545519f61b7627b5404",
+      "sha256": "fee781d24830be23249a0aa61a8dbd78c9774c0f3daae15c15a63a4215ce44e8",
       "mcp_tools": [
         "agent_context",
         "list_inboxes",
@@ -95,7 +95,7 @@
       ]
     },
     "extrovert-manage-inboxes": {
-      "sha256": "934447b6034a9c6e807e574781ed0183d8ab8796241965265a321dff4c2ded91",
+      "sha256": "ec33d2c2fcce2c9a07ae1fbb9433f6fb6ee4045ebba0aa31a3ef663204e4aaed",
       "mcp_tools": [
         "add_contact_list_entry",
         "agent_context",
@@ -116,7 +116,7 @@
       ]
     },
     "extrovert-read-inbox": {
-      "sha256": "dc6c007b10cbe960fde3163d25883c0298ca94d02d828553c7cd8746a18559d0",
+      "sha256": "bf6439172dae07f0fc24412d193bee8bc2798c8c88c07be912974b2297ff60ad",
       "mcp_tools": [
         "agent_context",
         "batch_update_messages",
@@ -139,7 +139,7 @@
       ]
     },
     "extrovert-send-email": {
-      "sha256": "bb6dd74e64099640fb21bc65171c5db351afbb364d6df93b89ef07b7cba165b7",
+      "sha256": "2c923a455a0a18c647e7d0645abae44b49bc7acf82cdff18ae2ea1c81e480c20",
       "mcp_tools": [
         "ack_review_event",
         "agent_context",
@@ -174,7 +174,7 @@
       ]
     },
     "extrovert-writing-rules": {
-      "sha256": "4980d79389adaae5ad7fc421db61f30185e45444d9b10d441043088e7260a129",
+      "sha256": "fabf8302b52b2be97b233fd9fcab0aec27836aefa65009ff6b9f9cab0be7d34b",
       "mcp_tools": [
         "agent_context",
         "get_category",
@@ -197,7 +197,7 @@
       ]
     },
     "wait-for-otp": {
-      "sha256": "0b83a4567babe8cb06944de292516e6f0b0276c3abd9779dc26856a4bba58468",
+      "sha256": "3edadfdb51fbabf50c75bcd5ccf049fc8779040a3055d68d2e6f7ad777b8b0d1",
       "mcp_tools": [
         "agent_context",
         "wait_for_email",
@@ -205,7 +205,7 @@
       ]
     },
     "extrovert-support": {
-      "sha256": "eef119ca614dd15383ccf9dd35866a22d913048214b7e4eb46204087236641ef",
+      "sha256": "621eda027b0572b522b5acee222f780b61a932bbdaec133f7b5565396b67cb01",
       "mcp_tools": [
         "agent_context",
         "create_support_case",

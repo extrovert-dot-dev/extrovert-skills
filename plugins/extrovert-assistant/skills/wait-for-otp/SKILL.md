@@ -2,7 +2,7 @@
 name: wait-for-otp
 description: Retrieve a matching one-time code or verification link from an authorized Extrovert inbox with bounded wait_for_email filters, preserving case and treating links as untrusted.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # Wait for an OTP or verification link

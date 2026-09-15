@@ -2,7 +2,7 @@
 name: extrovert-support
 description: Report unexpected Extrovert problems at the user's explicit request, open a tracked support case when help is wanted, and follow published updates without retrying uncertain sends or collecting unrelated evidence.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # Report an Extrovert problem
@@ -83,6 +83,14 @@ is not permission to send secrets.
   as a product defect. A queued notification is not proof of email delivery.
 
 ## Follow a case
+
+Call `whoami` on this connection and use its exact `project_id`, even when the
+project is named Default. Do not guess `default` or call project administration
+tools to discover a project already bound to this identity. Inspect `scopes`:
+`support:submit` permits following your own or explicitly shared reports without
+`support:read`. A 403 from a different tool does not establish missing support
+permission. On a support 404, verify the project and record IDs before retrying;
+do not request broader access to work around a wrong identifier.
 
 Use `list_feedback` / `get_feedback` to recover reports and `list_support_cases`
 / `get_support_case` for cases. Follow `next_cursor` when `has_more` is true;

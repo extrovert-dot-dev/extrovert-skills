@@ -19,7 +19,7 @@
       "profile": "full",
       "transport": "stdio",
       "claude": false,
-      "version": "0.1.1",
+      "version": "0.1.2",
       "skills": [
         "agent-email-architecture",
         "extrovert-sdk",
@@ -33,14 +33,14 @@
         "configure-himalaya",
         "extrovert-support"
       ],
-      "sha256": "58dd7aca4746634bf96c662d7f49c57ca32b186cbb309750f7d6839d05f9ade6"
+      "sha256": "53580a6d3c9aec3af59ec1736f0fd0c11b8e45da71450467d64b70bb76bc12e0"
     },
     {
       "name": "extrovert-full",
       "profile": "full",
       "transport": "http",
       "claude": true,
-      "version": "0.1.1",
+      "version": "0.1.2",
       "skills": [
         "agent-email-architecture",
         "extrovert-sdk",
@@ -54,14 +54,14 @@
         "configure-himalaya",
         "extrovert-support"
       ],
-      "sha256": "bc5417f84da180b3c96fe6c9688cc760ef9f39ea5fc781c52698aa7d2070b891"
+      "sha256": "539e84ddb365dd8e6aeb7e1d22ae2601fff268f5e6036c1d941cd77a7b4e6031"
     },
     {
       "name": "extrovert-assistant",
       "profile": "assistant",
       "transport": "http",
       "claude": true,
-      "version": "0.1.0",
+      "version": "0.1.1",
       "skills": [
         "extrovert-connect",
         "extrovert-manage-inboxes",
@@ -71,7 +71,7 @@
         "wait-for-otp",
         "extrovert-support"
       ],
-      "sha256": "f3f0dae9c2868241d35a1ef4a7172fe3bee8332b9a263ed0021997caff92b79f"
+      "sha256": "b5cf23d8de1caaa6f7edf6cb6b0cd1068c48cb70cb2dcb987d92238eeb5a9284"
     }
   ]
 }
