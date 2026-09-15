@@ -98,7 +98,7 @@ This source revision also contains two hosted packages in our own marketplace:
 
 | Package | Use |
 | --- | --- |
-| `extrovert-full` | Full email and customer administration, with ten skills and OAuth at `/mcp`. |
+| `extrovert-full` | Full email and customer administration, with eleven skills and OAuth at `/mcp`. |
 | `extrovert-assistant` | Six email/owned-domain skills and the directory-compatible OAuth profile at `/assistant/mcp`. |
 
 The legacy `extrovert` plugin keeps its original stdio transport. Choose one package
