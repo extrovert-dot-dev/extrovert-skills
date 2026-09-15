@@ -2,7 +2,7 @@
 name: extrovert-support
 description: Report unexpected Extrovert problems at the user's explicit request, open a tracked support case when help is wanted, and follow published updates without retrying uncertain sends or collecting unrelated evidence.
 metadata:
-  version: "0.1.0-pre.3"
+  version: "0.1.0-pre.4"
 ---
 
 # Report an Extrovert problem

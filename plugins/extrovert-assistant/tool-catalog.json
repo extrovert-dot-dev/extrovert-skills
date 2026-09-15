@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "extrovert/mcp",
-  "sourceSha256": "efdb1114d2189a94f239f41e6bc5cd4b67e2976c03f57dd7df8929d973c4334c",
-  "serverVersion": "0.1.0-pre.3",
+  "sourceSha256": "088e395e3d2bfca0a2ac07671ad5e53b0a5f742950406941203db0a90a890fae",
+  "serverVersion": "0.1.0-pre.4",
   "profile": "assistant",
   "fixtureMode": "offline",
   "tools": [
@@ -1320,7 +1320,7 @@
     {
       "name": "get_support_settings",
       "title": "Read support reporting policy",
-      "description": "Check feedback capture policy and support availability for this project. Does not grant permission or change settings. Assistant connections always require an explicit user request to report a problem.",
+      "description": "Check feedback capture policy and support availability for this project. The default support:submit grant permits this read and filing/following your own feedback and cases. Does not grant permission or change settings. Assistant connections always require an explicit user request to report a problem.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1668,7 +1668,7 @@
     {
       "name": "list_feedback",
       "title": "List reported problems",
-      "description": "List feedback visible to the current identity within this project. Use next_cursor for another bounded page.",
+      "description": "List your own or explicitly shared feedback in this project. Reading other reports requires explicit support:read; project managers include it. Use next_cursor for another bounded page.",
       "inputSchema": {
         "type": "object",
         "properties": {
@@ -1934,7 +1934,7 @@
     {
       "name": "list_support_cases",
       "title": "List support cases",
-      "description": "List cases accessible to this identity with bounded pagination. Open cases can be resumed in later sessions without keeping a wait running.",
+      "description": "List your own or explicitly shared cases with bounded pagination. Reading other cases requires explicit support:read; project managers include it. Open cases can be resumed in later sessions without keeping a wait running.",
       "inputSchema": {
         "type": "object",
         "properties": {

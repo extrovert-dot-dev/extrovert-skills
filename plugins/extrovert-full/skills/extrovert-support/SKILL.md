@@ -2,7 +2,7 @@
 name: extrovert-support
 description: Report an unexpected Extrovert failure with limited task evidence, open a tracked support case when help is wanted, and follow published case updates. Use when reporting or checking an Extrovert product issue, not ordinary pending email approval or recipient replies.
 metadata:
-  version: "0.1.0-pre.43"
+  version: "0.1.0-pre.44"
 ---
 
 # Report an Extrovert problem
@@ -10,6 +10,15 @@ metadata:
 Check the tools available in this session before using the names below. If they
 are absent, keep the report for the human and use the console's Support page.
 Do not install or replace a pinned package just to submit a report.
+
+## Report access
+
+New credentials include `support:submit` by default: file feedback and cases,
+then read and follow the reports owned by that identity or explicitly shared with it.
+The user can opt out in connection consent or credential permissions. An explicit
+custom API scope list replaces the defaults. Reading other reports requires
+`support:read`; updating other cases requires `support:write`, within the granted
+project and resources. Project manager access includes all three permissions.
 
 ## Full integration reporting policy
 
