@@ -2,7 +2,7 @@
 name: extrovert-admin
 description: Administer Extrovert customer accounts, delegate worker access, manage domain purchases and plan changes, or transfer project resources with explicitly authorized permissions. Use for larger setup, billing requests, account policy changes, or independent credential lifecycle; ordinary reading, sending and owned-domain linkage use the narrower workflow skills.
 metadata:
-  version: "0.1.0"
+  version: "0.1.1"
 ---
 
 # Administer an Extrovert account
