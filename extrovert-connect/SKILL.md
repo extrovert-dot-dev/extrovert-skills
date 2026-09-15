@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect an existing Extrovert account, resume signup, or diagnose identity and access. Use for OAuth, enrollment, host setup, and connection recovery; broader administration needs explicit consent.
 metadata:
-  version: "0.1.2"
+  version: "0.1.3"
 ---
 
 # Connect to Extrovert
@@ -68,3 +68,16 @@ Report the proven milestone and next action: connected identity, draft awaiting
 review, or confirmed sent message. A claimed inbox still needs credential exchange;
 a queued draft is unsent; sent is not proof of receipt. A stopped host cannot wake
 itself by polling. Preserve secrets, existing pins, installation scope and retry IDs.
+
+## Support and runtime checks
+
+For support lists and case-ID reads/replies, use the authenticated connection directly;
+no preliminary whoami or project lookup is required. See `extrovert-support`.
+For update verification, inspect executing_runtime in an MCP `agent_context` or
+`whoami` call from this conversation. If executing_runtime is absent, report that
+this connection's running version is unknown. Older tools show an "Extrovert VERSION"
+heading from the hosted release; neither that heading, release_version, tool count,
+nor installed skill versions proves the executing MCP package version. Do not claim
+the update succeeded or failed from those values. A fresh CLI reports only its own invocation.
+After updating local MCP, reload this host connection (Hermes: `/reload-mcp`) and
+verify another MCP call here. Preserve pins, profiles and edited skills.

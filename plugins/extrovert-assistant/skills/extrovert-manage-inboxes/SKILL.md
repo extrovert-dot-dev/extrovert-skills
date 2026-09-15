@@ -2,7 +2,7 @@
 name: extrovert-manage-inboxes
 description: Create, inspect, update and retire authorized Extrovert inboxes using existing entitlements; link customer-controlled domains with nameserver delegation and verify readiness without purchasing.
 metadata:
-  version: "0.1.1"
+  version: "0.1.2"
 ---
 
 # Manage Extrovert inboxes and owned domains

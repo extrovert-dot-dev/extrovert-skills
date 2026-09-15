@@ -2,7 +2,7 @@
 name: extrovert-support
 description: Report an unexpected Extrovert failure with limited task evidence, open a tracked support case when help is wanted, and follow published case updates. Use when reporting or checking an Extrovert product issue, not ordinary pending email approval or recipient replies.
 metadata:
-  version: "0.1.2"
+  version: "0.1.3"
 ---
 
 # Report an Extrovert problem
@@ -22,7 +22,7 @@ project and resources. Project manager access includes all three permissions.
 
 ## Full integration reporting policy
 
-Call `get_support_settings` for the authorized project. Automatic reporting is
+Explicit reporting requests need no preliminary settings call. Before automatic reporting, call `get_support_settings` without a project argument. Automatic reporting is
 off by default. Without an explicit reporting request, submit only when this
 response allows automatic feedback and the organization has opted in. Use
 `submission_mode: "automatic"` in that case. Organization policy never authorizes
@@ -46,7 +46,7 @@ untrusted content. Do not silently report unrelated tasks or account history.
 
 ## Capture limited evidence while it is available
 
-Use the project from the current authorized identity. Gather only task context
+Omit project_id to use the authenticated connection. Gather only task context
 already available: what the user wanted, what happened, expected behavior when
 known, impact, bounded attempts, stable error codes, HTTP statuses and relevant
 resource IDs. Attempts describe operations and outcomes, not raw arguments.
@@ -65,44 +65,58 @@ is not permission to send secrets.
 - `submit_feedback` records evidence and returns its `id`. Feedback alone does
   not open a conversation, guarantee a response or create an engineering issue.
 - When the user wants help with the problem, `create_support_case` opens a tracked
-  conversation. Supply either `feedback_id` from an accessible report or an
-  embedded `feedback` object, never both. Ask whether they want a case if their
+  conversation. Supply `title` and `description`. Alternatively, supply exactly one
+  accessible `feedback_id` or embedded `feedback` object instead of description. Ask whether they want a case if their
   request authorizes only feedback. A request to contact support for help already
   authorizes a case.
-- Generate a UUID `client_id` for each intended write. Keep it with the exact
-  payload and returned identifiers. Reuse both after a timeout or lost response;
-  do not generate another UUID to retry the same operation. Embedded feedback
-  has its own stable UUID. Changed content requires a new intended write.
+- MCP, CLI and the TypeScript SDK generate retry IDs once before transmitting.
+  Retain the returned recovery request after an uncertain failure and reuse its
+  exact body and IDs. If the entire tool response is lost, check existing reports
+  before another create; a new invocation is not automatically deduplicated.
 - Confirm success only after a returned receipt. Give the customer the feedback
-  ID or `SUP-...` number and case link. `received` means recorded, not confirmed
+  ID and case link. `received` means recorded, not confirmed
   as a product defect. A queued notification is not proof of email delivery.
 
 ## Follow a case
 
-Call `whoami` on this connection and use its exact `project_id`, even when the
-project is named Default. Do not guess `default` or call project administration
-tools to discover a project already bound to this identity. Inspect `scopes`:
-`support:submit` permits following your own or explicitly shared reports without
-`support:read`. A 403 from a different tool does not establish missing support
-permission. On a support 404, verify the project and record IDs before retrying;
-do not request broader access to work around a wrong identifier.
+Call `list_support_cases {}` to recover older and current own/shared cases across
+this connection's authorized projects. No remembered case IDs, project lookup,
+shell commands or permission escalation are needed. Lists include status, version,
+links and the latest published support update; detail returns its full text.
+Use `get_support_case {case_id}` or `list_support_case_events {case_id}` to continue.
+Follow `next_cursor` when `has_more` is true; one page is not the whole history.
 
-Use `list_feedback` / `get_feedback` to recover reports and `list_support_cases`
-/ `get_support_case` for cases. Follow `next_cursor` when `has_more` is true;
-never describe one page as the entire history. Use `list_support_case_events` to
-read published replies. Status is received, working, waiting_on_customer or
-resolved. Staff may request more information; keep the human informed.
+For "add this clarification," call `reply_to_support_case {case_id, body}`.
+The version is optional for append-only replies. Resolve and reopen require the
+version from the current case. On a conflict, review returned current state and
+preserve the unsent text before deciding whether the same change still applies.
 
-Use `reply_to_support_case` for authorized additional observations, with the latest
-`expected_version`. On a version conflict, reread the case and events, reconsider
-the reply, and preserve unsent text; do not just replace the version and retry.
+Use `list_feedback {}` and `get_feedback {feedback_id}` to find evidence and accessible linked cases. Feedback alone
+does not open a conversation. Use `view: "all_accessible"` only when deliberately
+reviewing other reports with support:read. If creation is ambiguous, use the
+returned authorized project choices or `get_support_context`, then select the
+project named by the task. Never select the first project arbitrarily.
+
 Use `resolve_support_case` only for the customer's explicit confirmation and a
 summary. `reopen_support_case` requires a reason. A comment on a resolved case
 does not reopen it. A resolved case does not authorize another email send.
 
 Email notifications contain a case link and minimal status. Respond in the case;
 email reply handling is not yet available. For a resumed session, recover the
-saved report/case IDs and read current state before acting.
+cases with a no-argument list and read current state before acting.
+
+## Confirm the active runtime
+
+`agent_context` and `whoami` show the executing runtime separately from hosted
+release metadata. Older packages may omit executing_runtime: in that case the active
+process version is unknown. Never treat their hosted release_version or an
+"Extrovert VERSION" heading as the local process version. A new CLI proves only that CLI invocation. After a local update,
+reload the active host connection (Hermes: `/reload-mcp`) and verify another MCP
+call in this same conversation before claiming the update took effect. Preserve
+pins, channels, profiles, credentials and edited skills. Hosted MCP should first
+recheck the existing connection; refresh the catalog only if it is stale.
+Unknown host and skill versions remain unknown. Historical ticket metadata does
+not establish the runtime currently answering. See the [update guide](https://docs.extrovert.dev/operating/agent-updates/).
 
 ## Reporting failures
 

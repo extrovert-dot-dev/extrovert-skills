@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "extrovert/mcp",
-  "sourceSha256": "33bfc2fe45761f7d68a18ed99e47b14628187f3a3a51f74b04127208ac77b07d",
-  "serverVersion": "0.1.1",
+  "sourceSha256": "abdcaf180c68118f9f4553de5a3d21f79d430b994d02dec25d1d2ea2c8349a98",
+  "serverVersion": "0.1.2",
   "profile": "assistant",
   "fixtureMode": "offline",
   "tools": [
@@ -311,15 +311,15 @@
     {
       "name": "create_support_case",
       "title": "Ask Extrovert support for help",
-      "description": "At the user's request, open a tracked support conversation and notify its human participants. Provide either an existing accessible feedback_id or new structured feedback, exactly one. This shares evidence with Extrovert support and may email the human; it does not retry an email, promise a fix or create an engineering issue.",
+      "description": "At the user's request, open a tracked support conversation and notify its human participants. Provide title and description, or exactly one of structured feedback and an accessible feedback_id. Retry IDs are generated automatically. No settings lookup is needed for an explicit request. This shares evidence with Extrovert support and may email the human; it does not retry an email, promise a fix or create an engineering issue.",
       "inputSchema": {
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           },
           "client_id": {
             "type": "string",
@@ -330,6 +330,11 @@
             "type": "string",
             "minLength": 1,
             "maxLength": 200
+          },
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 2000
           },
           "impact": {
             "type": "string",
@@ -349,10 +354,10 @@
             "type": "object",
             "properties": {
               "client_id": {
+                "description": "Optional retry ID. Generated once for this invocation when omitted. Check existing reports if the entire response is lost.",
                 "type": "string",
                 "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-                "description": "Persist this UUID for this exact report; reuse it after a lost response."
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
               },
               "submission_mode": {
                 "type": "string",
@@ -485,7 +490,6 @@
               }
             },
             "required": [
-              "client_id",
               "submission_mode",
               "category",
               "user_intent",
@@ -496,10 +500,7 @@
           }
         },
         "required": [
-          "project_id",
-          "client_id",
-          "title",
-          "impact"
+          "title"
         ],
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false
@@ -922,10 +923,10 @@
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           },
           "feedback_id": {
             "type": "string",
@@ -934,7 +935,6 @@
           }
         },
         "required": [
-          "project_id",
           "feedback_id"
         ],
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -1292,10 +1292,10 @@
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           },
           "case_id": {
             "type": "string",
@@ -1304,9 +1304,35 @@
           }
         },
         "required": [
-          "project_id",
           "case_id"
         ],
+        "$schema": "https://json-schema.org/draft/2020-12/schema",
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_support_context",
+      "title": "Find support access and project choices",
+      "description": "Discover effective support capabilities and authorized project choices when a report destination is ambiguous. Ordinary lists and case-ID reads need no preliminary discovery.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "maxLength": 2048
+          }
+        },
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false
       },
@@ -1325,15 +1351,12 @@
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           }
         },
-        "required": [
-          "project_id"
-        ],
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false
       },
@@ -1673,10 +1696,10 @@
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           },
           "limit": {
             "type": "integer",
@@ -1688,9 +1711,6 @@
             "maxLength": 2048
           }
         },
-        "required": [
-          "project_id"
-        ],
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false
       },
@@ -1897,10 +1917,10 @@
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           },
           "case_id": {
             "type": "string",
@@ -1918,7 +1938,6 @@
           }
         },
         "required": [
-          "project_id",
           "case_id"
         ],
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -1939,10 +1958,10 @@
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           },
           "limit": {
             "type": "integer",
@@ -1968,9 +1987,6 @@
             "maxLength": 200
           }
         },
-        "required": [
-          "project_id"
-        ],
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "additionalProperties": false
       },
@@ -2374,10 +2390,10 @@
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           },
           "case_id": {
             "type": "string",
@@ -2401,9 +2417,7 @@
           }
         },
         "required": [
-          "project_id",
           "case_id",
-          "client_id",
           "expected_version",
           "body"
         ],
@@ -2631,10 +2645,10 @@
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           },
           "case_id": {
             "type": "string",
@@ -2658,10 +2672,7 @@
           }
         },
         "required": [
-          "project_id",
           "case_id",
-          "client_id",
-          "expected_version",
           "body"
         ],
         "$schema": "https://json-schema.org/draft/2020-12/schema",
@@ -2682,10 +2693,10 @@
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           },
           "case_id": {
             "type": "string",
@@ -2709,9 +2720,7 @@
           }
         },
         "required": [
-          "project_id",
           "case_id",
-          "client_id",
           "expected_version",
           "body"
         ],
@@ -3252,16 +3261,16 @@
         "type": "object",
         "properties": {
           "project_id": {
+            "description": "Optional authorized project ID. Omit to use the connection's support context; do not guess IDs or use project names.",
             "type": "string",
             "minLength": 1,
-            "maxLength": 200,
-            "description": "Exact project_id from whoami, not the project name (for example Default) or a guessed ID. No project administration lookup is needed. Use - only for authorized organization-wide reads."
+            "maxLength": 200
           },
           "client_id": {
+            "description": "Optional retry ID. Generated once for this invocation when omitted. Check existing reports if the entire response is lost.",
             "type": "string",
             "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-            "description": "Persist this UUID for this exact report; reuse it after a lost response."
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
           "submission_mode": {
             "type": "string",
@@ -3391,8 +3400,6 @@
           }
         },
         "required": [
-          "project_id",
-          "client_id",
           "submission_mode",
           "category",
           "user_intent",

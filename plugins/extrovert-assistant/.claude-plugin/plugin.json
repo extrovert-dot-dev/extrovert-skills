@@ -1,6 +1,6 @@
 {
   "name": "extrovert-assistant",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Read and manage authorized email, use owned domains, and send through Extrovert's Review Loop.",
   "author": {
     "name": "Extrovert",

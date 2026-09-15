@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect an existing Extrovert account through hosted OAuth, choose inbox or project access, and diagnose authentication, consent and mobile connection failures without widening permissions.
 metadata:
-  version: "0.1.1"
+  version: "0.1.2"
 ---
 
 # Connect to Extrovert
@@ -63,3 +63,10 @@ For a mobile host, distinguish the installed app and version, workspace restrict
 and its connector installation path. Do not claim a local desktop configuration
 authenticated the phone. Confirm first read after OAuth and recheck after resuming
 the app. A stopped host cannot monitor mail or wake itself through polling.
+
+For update verification, call `agent_context` or `whoami` in this conversation and
+inspect `executing_runtime`. If that field is absent, the running version is unknown.
+A hosted release heading, tool count, installed skill version or fresh CLI does not
+prove the active MCP version. After an authorized local update, reload the active
+host connection (Hermes uses `/reload-mcp`) and verify a subsequent MCP call here.
+Preserve existing pins, profiles, credentials and edited skills.

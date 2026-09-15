@@ -2,7 +2,7 @@
 name: extrovert-writing-rules
 description: Apply Extrovert writing rules before composing, learn reusable authenticated review feedback, and govern categories, rule scopes, supersession, retirement and audit without granting sending authority.
 metadata:
-  version: "0.1.1"
+  version: "0.1.2"
 ---
 
 # Extrovert writing rules
