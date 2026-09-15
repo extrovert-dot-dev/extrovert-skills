@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "extrovert/mcp",
-  "sourceSha256": "4f7b8e91e8f60ac13188a062f886a419c65724465286ab6c04398c5e9ddd4b8b",
-  "serverVersion": "0.1.0-pre.41",
+  "sourceSha256": "03aaac6c25192861b2a501a019a1ea0cb78f0ee62705200b6bc6166c88a778f0",
+  "serverVersion": "0.1.0-pre.42",
   "fixtureMode": "offline",
   "tools": [
     {
