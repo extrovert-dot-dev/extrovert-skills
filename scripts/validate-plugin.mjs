@@ -63,7 +63,7 @@ for (const pkg of inventory.packages ?? []) {
   check(same(actualSkills, pkg.skills), `${pkg.name}: skill inventory mismatch`);
   if (pkg.profile === "full") check(same(pkg.skills, standalone.skills ?? []), `${pkg.name}: missing full skill`);
   else {
-    check(same(pkg.skills, ["extrovert-connect", "extrovert-manage-inboxes", "extrovert-read-inbox", "extrovert-send-email", "extrovert-writing-rules", "wait-for-otp"]), "assistant six-skill inventory mismatch");
+    check(same(pkg.skills, ["extrovert-connect", "extrovert-manage-inboxes", "extrovert-read-inbox", "extrovert-send-email", "extrovert-writing-rules", "wait-for-otp", "extrovert-support"]), "assistant seven-skill inventory mismatch");
     check(!capabilities.tools?.some((name) => /commerce|administrative|signup|activation|enrollment|webhook|export_email_config|quote_domain|request_domain_purchase|request_plan_change|offboard_domain|get_job/.test(name)), "assistant includes excluded tools");
   }
   if (pkg.claude) {

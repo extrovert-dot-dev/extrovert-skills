@@ -1,6 +1,6 @@
 {
   "profile": "assistant",
-  "version": "0.1.0-pre.2",
+  "version": "0.1.0-pre.3",
   "tools": [
     "ack_review_event",
     "add_contact_list_entry",
@@ -9,6 +9,7 @@
     "cancel_review",
     "check_suppression",
     "create_inbox",
+    "create_support_case",
     "delete_contact_list_entry",
     "delete_inbox",
     "delete_message",
@@ -19,6 +20,7 @@
     "get_category",
     "get_deliverability_status",
     "get_domain",
+    "get_feedback",
     "get_graduation_status",
     "get_inbox",
     "get_message",
@@ -31,6 +33,8 @@
     "get_rule_audit",
     "get_rules",
     "get_submission",
+    "get_support_case",
+    "get_support_settings",
     "get_thread",
     "learn_review_rule",
     "list_attachments",
@@ -39,10 +43,13 @@
     "list_deliverability_findings",
     "list_domain_events",
     "list_domains",
+    "list_feedback",
     "list_inboxes",
     "list_outbox",
     "list_review_events",
     "list_reviews",
+    "list_support_case_events",
+    "list_support_cases",
     "list_suppressions",
     "list_threads",
     "mark_read",
@@ -53,7 +60,10 @@
     "propose_category",
     "propose_graduation",
     "read_messages",
+    "reopen_support_case",
     "reply_email",
+    "reply_to_support_case",
+    "resolve_support_case",
     "restamp_review",
     "retire_rule",
     "reviewer_decide",
@@ -62,6 +72,7 @@
     "search",
     "search_threads",
     "send_email",
+    "submit_feedback",
     "submit_revision",
     "undo_rule_change",
     "update_category",
@@ -74,7 +85,7 @@
   ],
   "skills": {
     "extrovert-connect": {
-      "sha256": "09adb8b817c9ddab05bf9540efc8ae0e32abb9aa9c920bb1be96e873d4881182",
+      "sha256": "11b011fb17152cdbf0409794a4a4732b3e42b970ca499a77518d9d702996962f",
       "mcp_tools": [
         "agent_context",
         "list_inboxes",
@@ -84,7 +95,7 @@
       ]
     },
     "extrovert-manage-inboxes": {
-      "sha256": "ba539ab1678ead2e2bf40dbe588bbbd7340cf6b3e889ee1fe658d49702bbe775",
+      "sha256": "b27999bcf6a443da6dd75ab72138ba6c444fc808f6543611ae3ad702831576ba",
       "mcp_tools": [
         "add_contact_list_entry",
         "agent_context",
@@ -105,7 +116,7 @@
       ]
     },
     "extrovert-read-inbox": {
-      "sha256": "ea70e2c2d0590d6d69449c3b8fd02eb9cae11c9b6197085961b59dec9abab34a",
+      "sha256": "b4e9e6e33613150f8787079f60fbe46f19cfa2d5f3487aa917d9b92bcee6877b",
       "mcp_tools": [
         "agent_context",
         "batch_update_messages",
@@ -128,7 +139,7 @@
       ]
     },
     "extrovert-send-email": {
-      "sha256": "a0e91ea9f0fe0412a6fe63010581af9967ec25936daf2a732fbd063cc317e1e3",
+      "sha256": "c12654dd896f707e3a0d4808ba0e1e9dfa81b92c1814af63be4eab2eefd45d40",
       "mcp_tools": [
         "ack_review_event",
         "agent_context",
@@ -163,7 +174,7 @@
       ]
     },
     "extrovert-writing-rules": {
-      "sha256": "ad6b73b0d8244213789e1610f300b9afd68f35fe2cddfc15cde2032d64bd052e",
+      "sha256": "8c2f16654634943a992983b52eb4d8c3f0517e9190f8f4e69778259064716ff5",
       "mcp_tools": [
         "agent_context",
         "get_category",
@@ -186,10 +197,27 @@
       ]
     },
     "wait-for-otp": {
-      "sha256": "e0bfdde0239362120e44dd9ce11b576b99eb963bdc8b8d37f47d90e2df2a8667",
+      "sha256": "5523effd12f1719820861a18caea9cfce5e757e5401d087dcf45efabdf9b0a69",
       "mcp_tools": [
         "agent_context",
         "wait_for_email",
+        "whoami"
+      ]
+    },
+    "extrovert-support": {
+      "sha256": "6588b0a00dc9edd54a482b8c0f47a3282dbe39e5772ec3f28c041127e43c5e49",
+      "mcp_tools": [
+        "agent_context",
+        "create_support_case",
+        "get_feedback",
+        "get_support_case",
+        "list_feedback",
+        "list_support_case_events",
+        "list_support_cases",
+        "reopen_support_case",
+        "reply_to_support_case",
+        "resolve_support_case",
+        "submit_feedback",
         "whoami"
       ]
     }

@@ -11,7 +11,8 @@
     "extrovert-send-email",
     "extrovert-writing-rules",
     "wait-for-otp",
-    "configure-himalaya"
+    "configure-himalaya",
+    "extrovert-support"
   ],
   "groupings": [
     {
@@ -42,6 +43,12 @@
       "skills": [
         "extrovert-send-email",
         "extrovert-writing-rules"
+      ]
+    },
+    {
+      "title": "Report problems",
+      "skills": [
+        "extrovert-support"
       ]
     }
   ]

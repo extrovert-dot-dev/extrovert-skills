@@ -2,7 +2,7 @@
 name: extrovert-send-email
 description: Send, reply, forward, or continue a previously authorized Extrovert email through human review. Use for feedback, redrafts, queued mail, recovery, and delivery status even when the latest request does not repeat send. Inspection-only requests remain read-only.
 metadata:
-  version: "0.1.0-pre.42"
+  version: "0.1.0-pre.43"
 ---
 
 # Send email through Extrovert

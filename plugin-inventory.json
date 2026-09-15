@@ -10,7 +10,8 @@
     "extrovert-send-email",
     "extrovert-writing-rules",
     "wait-for-otp",
-    "configure-himalaya"
+    "configure-himalaya",
+    "extrovert-support"
   ],
   "packages": [
     {
@@ -18,7 +19,7 @@
       "profile": "full",
       "transport": "stdio",
       "claude": false,
-      "version": "0.1.0-pre.42",
+      "version": "0.1.0-pre.43",
       "skills": [
         "agent-email-architecture",
         "extrovert-sdk",
@@ -29,16 +30,17 @@
         "extrovert-send-email",
         "extrovert-writing-rules",
         "wait-for-otp",
-        "configure-himalaya"
+        "configure-himalaya",
+        "extrovert-support"
       ],
-      "sha256": "f251f0ef79a0f800ad30a41052c3303e3bc09cfc9cdc5842dee31456c7ef5644"
+      "sha256": "9a951c9b2130beeebfc7d1f78d62d59e620b866a4f2644d9d2fd7724e2970e2b"
     },
     {
       "name": "extrovert-full",
       "profile": "full",
       "transport": "http",
       "claude": true,
-      "version": "0.1.0-pre.42",
+      "version": "0.1.0-pre.43",
       "skills": [
         "agent-email-architecture",
         "extrovert-sdk",
@@ -49,25 +51,27 @@
         "extrovert-send-email",
         "extrovert-writing-rules",
         "wait-for-otp",
-        "configure-himalaya"
+        "configure-himalaya",
+        "extrovert-support"
       ],
-      "sha256": "1f97c76f7974492670ee9c44931020f596beeacb62fb0ebbcd506a2e61a03fef"
+      "sha256": "7698f6545603dc336ed0ea5df540ec0fd8ede03ede0fe07891836f2e31a91fb1"
     },
     {
       "name": "extrovert-assistant",
       "profile": "assistant",
       "transport": "http",
       "claude": true,
-      "version": "0.1.0-pre.2",
+      "version": "0.1.0-pre.3",
       "skills": [
         "extrovert-connect",
         "extrovert-manage-inboxes",
         "extrovert-read-inbox",
         "extrovert-send-email",
         "extrovert-writing-rules",
-        "wait-for-otp"
+        "wait-for-otp",
+        "extrovert-support"
       ],
-      "sha256": "7152bce7af097ae77fe1dfaa8a97aed326380f0463642d29b55a3a75a9273780"
+      "sha256": "21da3763bf8d43c6db55fe95ed4fb623a03201a864932c2be7552148d84caa5d"
     }
   ]
 }

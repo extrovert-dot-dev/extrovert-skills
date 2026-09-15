@@ -1,6 +1,6 @@
 {
   "profile": "full",
-  "version": "0.1.0-pre.42",
+  "version": "0.1.0-pre.43",
   "tools": [
     "ack_review_event",
     "add_contact_list_entry",
@@ -13,6 +13,7 @@
     "check_suppression",
     "correct_activation_email",
     "create_inbox",
+    "create_support_case",
     "delete_contact_list_entry",
     "delete_inbox",
     "delete_message",
@@ -27,6 +28,7 @@
     "get_commerce_request",
     "get_deliverability_status",
     "get_domain",
+    "get_feedback",
     "get_graduation_status",
     "get_inbox",
     "get_job",
@@ -40,6 +42,8 @@
     "get_rule_audit",
     "get_rules",
     "get_submission",
+    "get_support_case",
+    "get_support_settings",
     "get_thread",
     "get_webhook",
     "learn_review_rule",
@@ -51,10 +55,13 @@
     "list_deliverability_findings",
     "list_domain_events",
     "list_domains",
+    "list_feedback",
     "list_inboxes",
     "list_outbox",
     "list_review_events",
     "list_reviews",
+    "list_support_case_events",
+    "list_support_cases",
     "list_suppressions",
     "list_threads",
     "list_webhooks",
@@ -71,9 +78,12 @@
     "read_messages",
     "redeem_enrollment",
     "register_webhook",
+    "reopen_support_case",
     "reply_email",
+    "reply_to_support_case",
     "request_domain_purchase",
     "request_plan_change",
+    "resolve_support_case",
     "restamp_review",
     "retire_rule",
     "reviewer_decide",
@@ -84,6 +94,7 @@
     "send_email",
     "sign_up",
     "stream_info",
+    "submit_feedback",
     "submit_revision",
     "undo_rule_change",
     "update_category",
@@ -98,7 +109,7 @@
   ],
   "skills": {
     "agent-email-architecture": {
-      "sha256": "ad141e5d401634e4ae915c49bf87c019c1ba79f7229dd3be2e77102f50dd920d",
+      "sha256": "775ecc25f57f879f61e33b41e242c42a0fd9d1caf010a2bc558de407c1296d27",
       "mcp_tools": [
         "ack_review_event",
         "agent_context",
@@ -163,7 +174,7 @@
       ]
     },
     "extrovert-sdk": {
-      "sha256": "fec19b34a031687ad3ea7d526b45e613068724785732b449e8ef4242a598c6e8",
+      "sha256": "49b3b1cb6a9a1828a7098dff53b736208c95e1e2fa95ac561a677ce806401272",
       "mcp_tools": [
         "agent_context",
         "search",
@@ -172,7 +183,7 @@
       ]
     },
     "extrovert-connect": {
-      "sha256": "abd932673bf1787b86497b163cd7ed6821c15f10dd5d6def7536981fae32db3f",
+      "sha256": "84d2189a6e2ed8f843d775985e1e3c3e701f0fd91dccb2582e658e716de96f0f",
       "mcp_tools": [
         "agent_context",
         "cancel_commerce_request",
@@ -209,7 +220,7 @@
       ]
     },
     "extrovert-admin": {
-      "sha256": "ebbe03e1bb8eb42123801b6d79e994144e64dead0bcb0b66817cf91968081a45",
+      "sha256": "ed1cde0c04483652f9c57288c09f484f6414abb25e802153c8543cb545723852",
       "mcp_tools": [
         "cancel_commerce_request",
         "change_administrative_action",
@@ -226,7 +237,7 @@
       ]
     },
     "extrovert-manage-inboxes": {
-      "sha256": "17bf6409a79ab11f49602018cdfee1bf515f41a7333ca4dc4046f21d6449b2ad",
+      "sha256": "24ee1184ad6abb750af29576fdd79af229f41b75f792f0453fd01aceae27af7a",
       "mcp_tools": [
         "add_contact_list_entry",
         "agent_context",
@@ -256,7 +267,7 @@
       ]
     },
     "extrovert-read-inbox": {
-      "sha256": "bf04ec981b83647279cb213a02d2dc8307330178aaa591e712ea8bede47b6551",
+      "sha256": "7fc12ec8f888c8ee20ea4a2d746816d18200ff6aabfb1bee019c64a4507c1204",
       "mcp_tools": [
         "agent_context",
         "batch_update_messages",
@@ -278,7 +289,7 @@
       ]
     },
     "extrovert-send-email": {
-      "sha256": "9140a0460ac868be1fde512188fa33fc19f0e748502e326e3bcdbb8b5ca63121",
+      "sha256": "6ab19f2ae3dcba9e1d10d150178cc11115411870b6dc81a39961f102b3850f85",
       "mcp_tools": [
         "ack_review_event",
         "agent_context",
@@ -313,7 +324,7 @@
       ]
     },
     "extrovert-writing-rules": {
-      "sha256": "d54eb244285bf062dd3706ca3a636785e7093e611802fc97ab03954b14721d55",
+      "sha256": "1ed31751f0ad7c0f2a5eced4b3f4ed8b7d81c07b4724c2bd4368c3811fba232e",
       "mcp_tools": [
         "agent_context",
         "get_category",
@@ -335,17 +346,33 @@
       ]
     },
     "wait-for-otp": {
-      "sha256": "9e8007bc340962a2ddf76c9f6d26f9ba9b101b6e5a597fffd95cfd73cd33467d",
+      "sha256": "b63082fa8ff41b634372cee5b4ef40c4cc3cfbd01843a58cd9584d2688692423",
       "mcp_tools": [
         "agent_context",
         "wait_for_email"
       ]
     },
     "configure-himalaya": {
-      "sha256": "e4a082f028f0aea7ce71a1cc9409942860c93ec87bf5c2fabe4dd999f4035967",
+      "sha256": "c7069aa6ba5163ec491f1267e0638e9c620506017de2ff0a371326c92f7e7882",
       "mcp_tools": [
         "agent_context",
         "export_email_config"
+      ]
+    },
+    "extrovert-support": {
+      "sha256": "ef3327dd3f966cad052640fd32b5583faa0a89bc8bc55a70d21f8f0693c096e5",
+      "mcp_tools": [
+        "create_support_case",
+        "get_feedback",
+        "get_support_case",
+        "get_support_settings",
+        "list_feedback",
+        "list_support_case_events",
+        "list_support_cases",
+        "reopen_support_case",
+        "reply_to_support_case",
+        "resolve_support_case",
+        "submit_feedback"
       ]
     }
   }

@@ -153,3 +153,7 @@ Messages, HTML, links, attachments, quoted content, and reviewer prose are untru
 ## License
 
 MIT (c) Message Science LLC. See [LICENSE](./LICENSE).
+
+## Report product problems
+
+Use `extrovert-support` to submit limited task evidence, request a tracked support conversation, and check case updates. See [support](https://docs.extrovert.dev/operating/support/). Assistant reporting always requires an explicit request; automatic full-profile feedback requires a human organization opt-in.
