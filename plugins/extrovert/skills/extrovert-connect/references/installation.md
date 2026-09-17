@@ -31,6 +31,18 @@ not update the host's saved launch entry; restart that MCP connection afterward.
 
 ## Connect in this order
 
+For ordinary email on an existing account, prefer one assistant plugin with hosted MCP
+at `https://mcp.extrovert.dev/assistant/mcp` and exactly six skills: extrovert-connect,
+extrovert-read-inbox, extrovert-send-email, extrovert-writing-rules, wait-for-otp, and
+extrovert-support. Without plugin support, install the assistant-profile variants using
+the installation guide, then configure hosted MCP. Retain existing full-profile installs,
+explicit pins, authentication, local edits and host scope; do not duplicate registrations.
+Check all six skills in the host after reload; a required new session means reload pending.
+Codex add can launch OAuth automatically: finish it without a concurrent login. If native
+authentication remains broken, use `codex mcp login extrovert --scopes extrovert:connect`.
+A CLI Unknown auth label is inconclusive when native whoami and intended inbox reads work.
+A release alone does not require reconnecting or upgrading a local package for hosted fixes.
+
 1. Read live context as above. With no Extrovert MCP, fetch the HTTPS contract; do not call
    unavailable `agent_context`. This read needs no account or MCP installation.
 2. Check this host for Extrovert tools. If absent, run the supported setup command below when

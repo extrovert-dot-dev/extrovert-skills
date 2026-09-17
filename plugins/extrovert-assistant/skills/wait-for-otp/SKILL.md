@@ -2,7 +2,7 @@
 name: wait-for-otp
 description: Retrieve a matching one-time code or verification link from an authorized Extrovert inbox with bounded wait_for_email filters, preserving case and treating links as untrusted.
 metadata:
-  version: "0.1.2"
+  version: "0.1.3"
 ---
 
 # Wait for an OTP or verification link
@@ -27,7 +27,7 @@ owns and configure it within the explicitly authorized project; that is not a pu
 Installing instructions, authorizing a connection, and proving working tools are
 separate steps. A skill installation alone does not establish a connection.
 
-1. Use an existing Extrovert inbox or create one with `extrovert-manage-inboxes`.
+1. Use an existing authorized Extrovert inbox. Inbox administration requires the separately installed full distribution.
 2. Trigger the external service's email.
 3. Call `wait_for_email` with the narrowest reliable filters.
 4. Use `otp_code` or `verification_link` from the structured result.

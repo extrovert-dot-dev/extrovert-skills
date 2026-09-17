@@ -2,7 +2,7 @@
 name: extrovert-send-email
 description: Send, reply, forward, or continue a previously authorized Extrovert email through human review. Use for feedback, redrafts, queued mail, recovery, and delivery status even when the latest request does not repeat send. Inspection-only requests remain read-only.
 metadata:
-  version: "0.1.4"
+  version: "0.1.5"
 ---
 
 # Send email through Extrovert
@@ -39,6 +39,22 @@ MCP needs no local runtime. Do not install an SDK or build a transport for ordin
 
 An explicit "inspect only," "report only," or "do not continue" request limits this run to reads and a report, with no learning, acknowledgements, revisions, or sending.
 
+For `recheck_category`, `rule_changed`, or `propagate_general_rule`, read the latest review,
+feedback, and applicable rules before deciding whether the draft needs changes. Preserve human
+edits. Pass the highest review-specific recheck `seq` actually handled as `recheck_through_seq`
+to `submit_revision` (with the read `parent_revision` and `version`) or `restamp_review`
+(with `expected_version` set to the read review version and current rule versions).
+Verify the successful response's `recheck_completed_through_seq` covers that sequence, then
+acknowledge handled events. Acknowledgement alone does not complete a recheck. Newer events,
+stale rule stamps, or pending category work remain outstanding; reread on conflict rather than
+overwriting edits or claiming that newer work was handled. Older responses without the watermark
+require an authoritative `get_review` read and reconciliation, not an assumed completion.
+
+A review-specific event list or wait can return an authoritative `review` summary even after its
+events are acknowledged. A sent review stays sent; failed and cancelled reviews stay terminal
+and unsuccessful. Aggregate queue emptiness means no outstanding attention, not that an email
+sent. Missing review state means unknown: read `get_review`. Authenticated feedback can still
+need action after sending; handle it without resubmitting the original message.
 <!-- shared:end recovery -->
 
 ## Select the procedure, not the whole manual

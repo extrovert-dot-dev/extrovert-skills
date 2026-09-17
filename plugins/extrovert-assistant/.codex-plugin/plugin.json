@@ -1,7 +1,7 @@
 {
   "name": "extrovert-assistant",
-  "version": "0.1.2",
-  "description": "Read and manage authorized email, use owned domains, and send through Extrovert's Review Loop.",
+  "version": "0.1.3",
+  "description": "Connect an existing account, read authorized email, and send through Extrovert's Review Loop.",
   "author": {
     "name": "Extrovert",
     "url": "https://extrovert.dev"
@@ -28,7 +28,7 @@
     "brandColor": "#D89A43",
     "displayName": "Extrovert Assistant",
     "shortDescription": "Email with your existing Extrovert account",
-    "longDescription": "Read and manage authorized email, use owned domains, and send through Extrovert's Review Loop.",
+    "longDescription": "Connect an existing account, read authorized email, and send through Extrovert's Review Loop.",
     "defaultPrompt": [
       "Connect my existing Extrovert account.",
       "Summarize unread mail in my selected inbox.",

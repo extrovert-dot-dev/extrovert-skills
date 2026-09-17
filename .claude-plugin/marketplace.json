@@ -15,7 +15,7 @@
     {
       "name": "extrovert-assistant",
       "source": "./plugins/extrovert-assistant",
-      "description": "Read and manage authorized email, use owned domains, and send through Extrovert's Review Loop."
+      "description": "Connect an existing account, read authorized email, and send through Extrovert's Review Loop."
     }
   ]
 }

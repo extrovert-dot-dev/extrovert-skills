@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect an existing Extrovert account, resume signup, or diagnose identity and access. Use for OAuth, enrollment, host setup, and connection recovery; broader administration needs explicit consent.
 metadata:
-  version: "0.1.4"
+  version: "0.1.5"
 ---
 
 # Connect to Extrovert
@@ -20,8 +20,8 @@ permission. A pending signup takes precedence over a new browser login.
    Without it, fetch https://mcp.extrovert.dev/.well-known/agent-contract.json and
    use https://docs.extrovert.dev/llms.txt to select only the needed guide.
 2. Prefer the host's remote MCP/OAuth connection when supported: it requires no
-   local Node, compiler, SDK, or source checkout. The full endpoint is
-   `https://mcp.extrovert.dev/mcp`. Use an already installed plugin's endpoint
+   local Node, compiler, SDK, or source checkout. For ordinary existing-account
+   email use `https://mcp.extrovert.dev/assistant/mcp`. Use an already installed plugin's endpoint
    unchanged. Installation of skills alone does not connect tools.
 3. If remote MCP is unavailable, reuse an installed CLI. Its published package
    needs Node >=20 but no TypeScript compiler, pnpm, Git, or Docker. Read
@@ -52,6 +52,12 @@ its intended inbox. Lead with account/project names and capabilities; retain IDs
 scopes, reach and expiry privately. A saved configuration, successful browser
 callback, or CLI health check does not prove hosted MCP access. After repeated
 401s at the same stage, stop approvals and report its sanitized error/request ID.
+
+In Codex, `codex mcp add extrovert --url https://mcp.extrovert.dev/assistant/mcp`
+starts authorization itself; do not begin a second concurrent login. If that flow needs
+recovery, run `codex mcp login extrovert --scopes extrovert:connect`, then verify with native
+`whoami` and an authorized inbox read. An "Unknown" CLI auth label is inconclusive when those
+authenticated calls work. A release does not require reconnecting a working hosted connection.
 
 ## Resume, then do useful work
 

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "extrovert/mcp",
-  "sourceSha256": "abdcaf180c68118f9f4553de5a3d21f79d430b994d02dec25d1d2ea2c8349a98",
-  "serverVersion": "0.1.2",
+  "sourceSha256": "718594ef5812573ee74350b6af30ebcea00645579e18bd1096d45373e0b46f9a",
+  "serverVersion": "0.1.3",
   "profile": "assistant",
   "fixtureMode": "offline",
   "tools": [
@@ -2758,6 +2758,18 @@
             "minimum": -9007199254740991,
             "maximum": 9007199254740991
           },
+          "expected_version": {
+            "description": "Row version from get_review. Supply it to prevent a restamp racing a human edit or approval.",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "recheck_through_seq": {
+            "description": "Highest recheck event sequence actually handled. Requires current rules; acknowledgement alone cannot complete this work.",
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991
+          },
           "client_id": {
             "description": "Stable Idempotency-Key for this exact re-stamp. Reuse it after a transport timeout.",
             "type": "string",
@@ -3443,6 +3455,12 @@
             "description": "Optional row-version CAS (defense in depth).",
             "type": "integer",
             "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "recheck_through_seq": {
+            "description": "Highest rule/category recheck event sequence actually handled for this review. Completion is independent of acknowledgement; newer work remains pending.",
+            "type": "integer",
+            "minimum": 1,
             "maximum": 9007199254740991
           },
           "to": {

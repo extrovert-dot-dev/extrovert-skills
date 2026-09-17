@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect an existing Extrovert account through hosted OAuth, choose inbox or project access, and diagnose authentication, consent and mobile connection failures without widening permissions.
 metadata:
-  version: "0.1.2"
+  version: "0.1.3"
 ---
 
 # Connect to Extrovert
@@ -35,6 +35,20 @@ account and approve the identity, resources, actions and lifetime they actually 
 Reuse an existing connection or pending authorization before starting another.
 Missing tools or local credentials are not evidence that a new account is needed.
 Do not ask the person to paste a password or bearer token into chat.
+
+Prefer one supported assistant plugin with these six discoverable skills:
+extrovert-connect, extrovert-read-inbox, extrovert-send-email, extrovert-writing-rules,
+wait-for-otp, and extrovert-support. Without a plugin, install the generated assistant
+skill variants and configure hosted MCP separately. Preserve working full-profile
+connections, explicit pins, customizations, authentication, and host scope; do not
+install a duplicate plugin or reconnect merely because a release occurred.
+
+Codex `mcp add` can start authorization automatically; do not launch a second login
+while it is pending. If authentication remains broken, recover with
+`codex mcp login extrovert --scopes extrovert:connect`. An Unknown CLI auth label is
+inconclusive when native authenticated tools work. Refresh hosted tool discovery
+and verify all six skills in the intended host. If a new session is needed to load
+skills, report reload pending rather than claiming discovery succeeded.
 
 Choose selected inboxes for ordinary reading/sending. Selected inboxes exclude
 future inboxes. Creating an inbox or linking an owned domain requires explicitly

@@ -2,7 +2,7 @@
 name: wait-for-otp
 description: Retrieve a one-time passcode, verification code, magic link, or email 2FA challenge from an Extrovert inbox using wait_for_email. Use during signup, login, account confirmation, or device verification when an agent needs one matching message and structured OTP or link extraction without writing a polling loop.
 metadata:
-  version: "0.1.4"
+  version: "0.1.5"
 ---
 
 # Wait for an OTP or verification link
@@ -30,7 +30,7 @@ that condition without treating it as disabled signup or permission to guess new
 [updates](https://docs.extrovert.dev/operating/agent-updates/) for targeted refresh instructions.
 
 <!-- shared:start workflow -->
-1. Use an existing Extrovert inbox or create one with `extrovert-manage-inboxes`.
+1. Use an existing authorized Extrovert inbox. Inbox administration requires the separately installed full distribution.
 2. Trigger the external service's email.
 3. Call `wait_for_email` with the narrowest reliable filters.
 4. Use `otp_code` or `verification_link` from the structured result.

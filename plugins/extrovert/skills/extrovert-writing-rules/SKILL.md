@@ -2,7 +2,7 @@
 name: extrovert-writing-rules
 description: Read Extrovert writing rules before composing and turn reusable human feedback into governed rules. Use for get_rules, category matching, saving or superseding a preference, promotion, retirement, audit, undo, risk-dial inspection, or proposing graduation without confusing one reviewer's edit with a universal rule.
 metadata:
-  version: "0.1.4"
+  version: "0.1.5"
 ---
 
 # Extrovert writing rules
@@ -58,6 +58,13 @@ After saving, fetch fresh rules and their new composition token, revise the curr
 without overwriting human edits, acknowledge handled feedback, and **wait again**. Other
 composers receive durable nudges for their affected drafts. No agent may revise another
 agent's mail or change sending policy merely because it learned a shared writing rule.
+
+For review-specific rechecks, carry the highest actually handled event `seq` as
+`recheck_through_seq` through `submit_revision` or `restamp_review`. Use the read revision/version
+for revision and `expected_version` for restamp, with current applicable rule versions.
+Verify `recheck_completed_through_seq` covers the handled sequence before acknowledging it.
+Acknowledgement is notification delivery, not evidence that rules or category work was completed.
+Never claim newer events were handled; conflicts require rereading the draft and rules.
 
 For category feedback or `recheck_category`, read
 [category convergence](references/categories.md) before deciding whether to merge.
