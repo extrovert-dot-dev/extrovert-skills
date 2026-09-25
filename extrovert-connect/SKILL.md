@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect an existing Extrovert account, resume signup, or diagnose identity and access. Use for OAuth, enrollment, host setup, and connection recovery; broader administration needs explicit consent.
 metadata:
-  version: "0.1.6"
+  version: "0.1.7"
 ---
 
 # Connect to Extrovert
@@ -63,7 +63,8 @@ authenticated calls work. A release does not require reconnecting a working host
 
 - New account or pending `signup:verify` credential: read
   [signup](references/signup.md) before acting. Preserve the original account,
-  profile and expiry. Wait for actual human proof; never invent a code or approve it.
+  profile and expiry. Pass an optional gift code with `human_email`; a pending gift
+  requires the human to claim that same workspace without a card. Wait for actual human proof; never invent a code or approve it.
 - Existing authorized send or "any feedback?": use `list_reviews` with
   `composer: "me"` and `list_review_events`, then load `extrovert-send-email`
   and `extrovert-writing-rules`. Resume the same draft. Inspection-only means reads only.

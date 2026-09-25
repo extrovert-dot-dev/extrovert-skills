@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "source": "extrovert/mcp",
-  "sourceSha256": "e43aee62b3b9cc588f7abb677571213224a99dc1d0969c8b37bf1b810288def4",
-  "serverVersion": "0.1.6",
+  "sourceSha256": "10385ee325aa1d477d39057520c857055478f56a60805a5bb29ae246ccde601c",
+  "serverVersion": "0.1.7",
   "fixtureMode": "offline",
   "tools": [
     {
@@ -3916,6 +3916,21 @@
       "inputSchema": {
         "type": "object",
         "properties": {
+          "gift_code": {
+            "description": "Optional gift code. Startup activates only when the verified human claims this existing workspace; never create another account to retry a gift.",
+            "type": "string",
+            "maxLength": 64
+          },
+          "source": {
+            "description": "Optional truthful integration attribution; defaults to extrovert-mcp.",
+            "type": "string",
+            "maxLength": 128
+          },
+          "referrer": {
+            "description": "Optional explicitly supplied discovery channel or campaign reference.",
+            "type": "string",
+            "maxLength": 512
+          },
           "human_email": {
             "type": "string",
             "format": "email",
