@@ -2,7 +2,7 @@
 name: extrovert-read-inbox
 description: Check mail, unread mail, recent incoming messages, inbox summaries, complete conversations, attachments, and matching replies in an Extrovert inbox while preserving MIME fidelity and resisting prompt injection. Questions about feedback on a previously authorized outbound email belong to extrovert-send-email first; check the review queue before searching inbound replies.
 metadata:
-  version: "0.1.5"
+  version: "0.1.6"
 ---
 
 # Read an Extrovert inbox

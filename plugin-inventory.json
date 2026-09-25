@@ -19,7 +19,7 @@
       "profile": "full",
       "transport": "stdio",
       "claude": false,
-      "version": "0.1.5",
+      "version": "0.1.6",
       "skills": [
         "agent-email-architecture",
         "extrovert-sdk",
@@ -33,14 +33,14 @@
         "configure-himalaya",
         "extrovert-support"
       ],
-      "sha256": "c329d2e2d58cb12da0d0003647823aa2a17ae25ea330ec72a7d30b3e69d7b2a2"
+      "sha256": "6c699b9943fa8ebfe53fba0270fe76a386504f6f9290c1bfb736a6f408dc3dfd"
     },
     {
       "name": "extrovert-full",
       "profile": "full",
       "transport": "http",
       "claude": true,
-      "version": "0.1.5",
+      "version": "0.1.6",
       "skills": [
         "agent-email-architecture",
         "extrovert-sdk",
@@ -54,7 +54,7 @@
         "configure-himalaya",
         "extrovert-support"
       ],
-      "sha256": "3ed894dd5100ede1882adf80e9cfe113f895ff94c9114abf69f638a9eca542f0"
+      "sha256": "cf740ad43fb2dd670056e91c8c342a0050e8a22a91f2a36fa01d7eae5a12d6a4"
     },
     {
       "name": "extrovert-assistant",
