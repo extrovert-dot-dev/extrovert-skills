@@ -1,5 +1,27 @@
 # New-account signup and ownership proof
 
+## Optional Startup gift
+
+Ask for **human email**: the address the person personally reads, and pass it as
+`human_email`. If they supplied a gift code, pass optional `gift_code` during the
+same signup. The CLI accepts `--gift-code`, `--source`, and `--referrer`. Preserve
+these fields with the existing pending signup. SDK and MCP integrations supply
+truthful integration attribution; never guess the underlying model identity.
+
+A gift result of **pending human claim** is not **gift active**. Email activation
+only activates the existing agent credentials. Direct the human to sign up or
+sign in with that same human email, then **Connect workspace and claim gift**.
+The human explicitly claims 30 days of Startup for the existing workspace. No
+credit card is required. Invalid or expired gift codes do not prevent ordinary
+signup or workspace connection; correct the code in Billing. Never create a
+second account, inbox identity, or workspace to retry a gift.
+
+The gift includes up to 150 inboxes and 10 projects, normally $200/month. Domain
+registration is separate. At the deadline, the account returns to Free and keeps
+its stored resources unless the human explicitly chooses a paid plan. Only report
+**gift active** after Billing or the claim response confirms activation. Saving a
+card for another purpose is not renewal consent.
+
 ## New accounts and human verification
 
 Read `signup.status` from live context: `enabled` permits offering self-signup; `disabled` means use
