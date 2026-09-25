@@ -5,7 +5,7 @@
       "command": "npx",
       "args": [
         "-y",
-        "@extrovert.dev/mcp@0.1.7"
+        "@extrovert.dev/mcp@0.1.8"
       ]
     }
   }

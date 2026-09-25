@@ -2,7 +2,7 @@
 name: extrovert-connect
 description: Connect an existing Extrovert account, resume signup, or diagnose identity and access. Use for OAuth, enrollment, host setup, and connection recovery; broader administration needs explicit consent.
 metadata:
-  version: "0.1.7"
+  version: "0.1.8"
 ---
 
 # Connect to Extrovert
